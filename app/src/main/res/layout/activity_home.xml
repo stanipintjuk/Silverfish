@@ -1,0 +1,59 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/home_layout"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_weight="8"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/widget_area"
+        android:background="@drawable/tintbackground">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/text_hold_to_change_widget"
+            android:id="@+id/textView"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <com.launcher.silverfish.SquareGridLayout
+        android:layout_weight="3"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:util="http://schemas.android.com/apk/res/com.launcher.silverfish"
+        util:size="1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/shortcut_area">
+
+    </com.launcher.silverfish.SquareGridLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/remove_indicator"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/text_remove"
+            android:textColor="#000000"
+            android:textAlignment="center"
+            android:background="@drawable/red_gradient"
+            android:layout_gravity="center_horizontal|bottom" />
+    </FrameLayout>
+
+</FrameLayout>
+
