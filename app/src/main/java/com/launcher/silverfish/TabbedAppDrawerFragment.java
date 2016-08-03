@@ -20,19 +20,21 @@
 package com.launcher.silverfish;
 
 import android.content.ClipDescription;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
@@ -170,57 +172,111 @@ public class TabbedAppDrawerFragment extends Fragment{
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
 
+
                 switch (dragEvent.getAction()){
-                    case DragEvent.ACTION_DRAG_STARTED:
+                    case DragEvent.ACTION_DRAG_STARTED: {
+
                         // Care only about DRAG_APP_MOVE drags.
                         ClipDescription cd = dragEvent.getClipDescription();
                         if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
                             return false;
-                        break;
 
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        //Dont do anything
+                        // show the uninstall indicator
+                        showUninstallIndicator();
                         break;
+                    }
 
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        // Don't care about the drag that is about to leave this page.
-                        if (isOutside(dragEvent.getX(), dragEvent.getY()))
+                    case DragEvent.ACTION_DRAG_ENTERED: {
+                        //Don't do anything
+                        break;
+                    }
+
+                    case DragEvent.ACTION_DRAG_LOCATION: {
+                        // If drag is on the way out of this page then stop receiving drag events
+                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
+                        // get display size
+                        int screen_width = Utils.getScreenDimensions(getActivity()).x;
+                        if (dragEvent.getX() > screen_width - threshold) {
                             return false;
 
-                        // check if the drag is hovering over a tab button
-                        int i = getHoveringButton(dragEvent.getX(), dragEvent.getY());
+                        } else {
 
-                        // if so - change to that tab
-                        if (i > -1)
-                            setTab(i);
+                            // check if the drag is hovering over a tab button
+                            int i = getHoveringButton(dragEvent.getX(), dragEvent.getY());
+
+                            // if so - change to that tab
+                            if (i > -1)
+                                setTab(i);
+                        }
                         break;
+                    }
 
-                    case DragEvent.ACTION_DROP:
-                        // Retrieve the app name and place it in the tab.
-                        String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                        dropAppInTab(app_name);
+                    case DragEvent.ACTION_DROP: {
 
-                        int app_index = Integer.parseInt(
-                                dragEvent.getClipData().getItemAt(1).
-                                          getText().toString());
+                        int screen_height = Utils.getScreenDimensions(getActivity()).y;
+                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
 
-                        int tab_id = Integer.parseInt(
-                                dragEvent.getClipData().getItemAt(2)
-                                         .getText().toString());
+                        // if app is dropped on the uninstall indicator uninstall the app
+                        if (dragEvent.getY() >= screen_height - threshold) {
+                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            launchUninstallIntent(app_name);
 
-                        // and remove it from the tab it came from
-                        removeAppFromTab(app_index, tab_id);
+                        } else {
+                            // Retrieve the app name and place it in the tab.
+                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            dropAppInTab(app_name);
+
+                            int app_index = Integer.parseInt(
+                                    dragEvent.getClipData().getItemAt(1).
+                                            getText().toString());
+
+                            int tab_id = Integer.parseInt(
+                                    dragEvent.getClipData().getItemAt(2)
+                                            .getText().toString());
+
+                            // and remove it from the tab it came from
+                            removeAppFromTab(app_index, tab_id);
+                        }
                         break;
+                    }
 
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        //Dont do anything
+                    case DragEvent.ACTION_DRAG_ENDED: {
+                        // just hide the uninstall indactor
+                        hideUninstallIndicator();
                         break;
+                    }
 
                 }
                 return true;
             }
 
         });
+    }
+
+    private void launchUninstallIntent(String package_name){
+        Uri packageUri = Uri.parse("package:"+package_name);
+        Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
+        startActivity(uninstallIntent);
+    }
+
+    private void showUninstallIndicator(){
+        // get the layour
+        FrameLayout uninstall_indicator;
+        uninstall_indicator = (FrameLayout) rootView.findViewById(R.id.uninstall_indicator);
+
+        // make it visible
+        uninstall_indicator.setVisibility(View.VISIBLE);
+
+        // and start the animation
+        AlphaAnimation animation =  new AlphaAnimation(0.0f, 1.0f);
+        animation.setDuration(500);
+        uninstall_indicator.startAnimation(animation);
+    }
+
+    private void hideUninstallIndicator(){
+        FrameLayout uninstall_indicator;
+        uninstall_indicator = (FrameLayout)rootView.findViewById(R.id.uninstall_indicator);
+        uninstall_indicator.setVisibility(View.INVISIBLE);
     }
 
     private void removeAppFromTab(int app_index, int tab_id){
@@ -243,18 +299,6 @@ public class TabbedAppDrawerFragment extends Fragment{
         // add app and refresh the tab's layout
         fragment.addApp(app_name);
         //fragment.loadGridView();
-    }
-
-    private boolean isOutside(float x, float y) {
-        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-
-        // get display size
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int screen_width = size.x;
-
-        return x >= screen_width - threshold;
     }
 
     /**

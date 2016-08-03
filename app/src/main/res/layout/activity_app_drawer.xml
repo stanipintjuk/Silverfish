@@ -1,52 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TabHost
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:id="@+id/tabHost">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <TabHost
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal">
-
+        android:layout_height="match_parent"
+        android:id="@+id/tabHost">
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_weight="1"
-            android:id="@+id/custom_tabwidget">
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="horizontal">
 
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"></TabWidget>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:id="@+id/custom_tabwidget">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:background="@drawable/tab_style"/>
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"></TabWidget>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="+"
+                    android:background="@drawable/tab_style"/>
 
 
+            </LinearLayout>
+
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0"
+                android:visibility="gone">
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/realtabcontent"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="50">
+
+            </FrameLayout>
         </LinearLayout>
+    </TabHost>
 
 
-        <FrameLayout
-            android:id="@android:id/tabcontent"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0"
-            android:visibility="gone">
-        </FrameLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/uninstall_indicator"
+        android:visibility="invisible">
 
-        <FrameLayout
-            android:id="@+id/realtabcontent"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:layout_weight="50">
-
-        </FrameLayout>
-    </LinearLayout>
-</TabHost>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/text_uninstall"
+            android:textColor="#000000"
+            android:textAlignment="center"
+            android:background="@drawable/red_gradient"
+            android:layout_gravity="center_horizontal|bottom" />
+    </FrameLayout>
+</FrameLayout>

@@ -21,12 +21,10 @@ package com.launcher.silverfish;
 
 import android.content.ClipDescription;
 import android.content.SharedPreferences;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.Display;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -144,10 +142,7 @@ public class LauncherActivity extends FragmentActivity {
         int threshold = Constants.SCREEN_CORNER_THRESHOLD;
 
         // get display size
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
+        int width = Utils.getScreenDimensions(this).x;
 
         // Change page
         if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold){

@@ -5,6 +5,7 @@
 
     <string name="text_hold_to_change_widget">Hold to change widget</string>
     <string name="text_remove">Remove</string>
+    <string name="text_uninstall">Uninstall</string>
 
     <string name="tab_other">Other</string>
     <string name="tab_phone">Phone</string>
