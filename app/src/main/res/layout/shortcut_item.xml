@@ -6,8 +6,8 @@
 
         <ImageView
             android:id="@+id/item_app_icon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="@dimen/app_icon_size"
+            android:layout_height="@dimen/app_icon_size"
             android:layout_gravity="center"
             />
 

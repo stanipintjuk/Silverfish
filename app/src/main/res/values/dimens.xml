@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources><dimen name="widget_margin">8dp</dimen></resources>
+<resources><dimen name="app_icon_size">48dp</dimen></resources>
