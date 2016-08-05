@@ -29,5 +29,5 @@ public class Constants {
 
     public static String TAB_ID = "tab_id";
 
-    public static int SCREEN_CORNER_THRESHOLD = 60;
+    public static int SCREEN_CORNER_THRESHOLD = 40;
 }

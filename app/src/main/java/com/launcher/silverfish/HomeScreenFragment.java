@@ -286,13 +286,8 @@ public class HomeScreenFragment extends Fragment {
                         break;
                     case DragEvent.ACTION_DROP:
 
-                        // Get the screen size
-                        int screen_height = Utils.getScreenDimensions(getActivity()).y;
-
-                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-
                         // if outside of bound, remove the app
-                        if (dragEvent.getY() >= screen_height - threshold){
+                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())){
                             String appid = dragEvent.getClipData().getItemAt(0).getText().toString();
                             String appindex = dragEvent.getClipData().getItemAt(1).getText().toString();
                             removeApp(Integer.parseInt(appindex), Long.parseLong(appid));
@@ -311,6 +306,7 @@ public class HomeScreenFragment extends Fragment {
             }
         });
     }
+
 
     private void loadApps() {
 

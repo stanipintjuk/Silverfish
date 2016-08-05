@@ -37,4 +37,11 @@ public class Utils {
         return size;
     }
 
+    public static boolean onBottomScreenEdge(Activity activity, float y){
+        int screen_height = getScreenDimensions(activity).y;
+        // if on bottom 10% of the screen then consider it to be on corner
+        float threshold = 10.0f*screen_height/100.0f;
+
+        return (y >= screen_height - threshold);
+    }
 }
