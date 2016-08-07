@@ -1,0 +1,13 @@
+<resources>
+    <string name="text_hold_to_change_widget">Mantén para cambiar el widget</string>
+    <string name="text_remove">Quitar</string>
+    <string name="text_uninstall">Desinstalar</string>
+
+    <string name="tab_other">Otros</string>
+    <string name="tab_phone">Teléfono</string>
+    <string name="tab_internet">Internet</string>
+    <string name="tab_games">Juegos</string>
+    <string name="tab_media">Media</string>
+    <string name="tab_accessories">Accesorios</string>
+    <string name="tab_settings">Ajustes</string>
+</resources>
