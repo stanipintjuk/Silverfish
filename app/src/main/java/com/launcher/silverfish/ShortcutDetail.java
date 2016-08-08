@@ -5,20 +5,29 @@ package com.launcher.silverfish;
  * E-mail: stanislav.pintjuk@gmail.com
  */
 public class ShortcutDetail {
+
+    //region Fields
+
     public long id;
     public String name;
 
+    //endregion
+
+    //region Overrides
+
     @Override
-    public boolean equals(Object o){
-        if (o == null){
+    public boolean equals(Object o) {
+        if (o == null) {
             return false;
 
-        }else if (o instanceof ShortcutDetail){
+        } else if (o instanceof ShortcutDetail) {
             ShortcutDetail s = (ShortcutDetail) o;
             return s.id == this.id;
 
-        }else{
+        } else {
             return false;
         }
     }
+
+    //endregion
 }

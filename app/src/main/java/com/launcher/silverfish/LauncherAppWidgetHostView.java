@@ -23,23 +23,34 @@ import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 public class LauncherAppWidgetHostView extends AppWidgetHostView {
+
+    //region Fields
+
     private boolean mHasPerformedLongPress;
     private CheckForLongPress mPendingCheckForLongPress;
     private LayoutInflater mInflater;
+
+    //endregion
+
+    //region Constructor
 
     public LauncherAppWidgetHostView(Context context) {
         super(context);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    //endregion
+
+    //region Events
+
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        // Consume any touch events for ourselves after longpress is triggered
+        // Consume any touch events for ourselves after long press is triggered
         if (mHasPerformedLongPress) {
             mHasPerformedLongPress = false;
             return true;
         }
 
-        // Watch for longpress events at this level to make sure
+        // Watch for long press events at this level to make sure
         // users can always pick up this widget
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
@@ -60,6 +71,20 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
         return false;
     }
 
+    private void postCheckForLongClick() {
+        mHasPerformedLongPress = false;
+
+        if (mPendingCheckForLongPress == null) {
+            mPendingCheckForLongPress = new CheckForLongPress();
+        }
+        mPendingCheckForLongPress.rememberWindowAttachCount();
+        postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout());
+    }
+
+    //endregion
+
+    //region Subclasses
+
     class CheckForLongPress implements Runnable {
         private int mOriginalWindowAttachCount;
 
@@ -78,14 +103,5 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
         }
     }
 
-    private void postCheckForLongClick() {
-        mHasPerformedLongPress = false;
-
-        if (mPendingCheckForLongPress == null) {
-            mPendingCheckForLongPress = new CheckForLongPress();
-        }
-        mPendingCheckForLongPress.rememberWindowAttachCount();
-        postDelayed(mPendingCheckForLongPress, ViewConfiguration.getLongPressTimeout());
-    }
-
+    //endregion
 }

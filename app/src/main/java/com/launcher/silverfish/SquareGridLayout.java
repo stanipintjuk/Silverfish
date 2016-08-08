@@ -17,27 +17,26 @@ import android.view.View;
 
 public class SquareGridLayout extends ViewGroup {
 
-    // fields
+    //region Fields
 
     /**
      * Records the number of views on each side of the square (ie. the number of rows and columns)
      */
-
     private int mSize = 1;
 
     /**
      * Records the size of the square in pixels (excluding padding).
      * This is set during {@link #onMeasure(int, int)}
      */
-
     private int mSquareDimensions;
 
-    // constructors
+    //endregion
+
+    //region Constructors
 
     /**
-     * Constructor used to create layout programatically.
+     * Constructor used to create layout programmatically.
      */
-
     public SquareGridLayout(Context context) {
         super(context);
     }
@@ -46,7 +45,6 @@ public class SquareGridLayout extends ViewGroup {
      * Constructor used to inflate layout from XML. It extracts the size from
      * the attributes and sets it.
      */
-
 	/* This requires a resource to be defined like this:
 	 *
 	 * <resources>
@@ -63,7 +61,6 @@ public class SquareGridLayout extends ViewGroup {
 	 *   util:size="3"
 	 *   />
 	 */
-
     public SquareGridLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.SquareGridLayout);
@@ -72,14 +69,15 @@ public class SquareGridLayout extends ViewGroup {
         a.recycle();
     }
 
-    // accessors
+    //endregion
+
+    //region Accessors
 
     /**
      * Sets the number of views on each side of the square.
      *
      * @param size the size of grid (at least 1)
      */
-
     public void setSize(int size) {
         if (size < 1) throw new IllegalArgumentException("size must be positive");
         if (mSize != size) {
@@ -88,22 +86,24 @@ public class SquareGridLayout extends ViewGroup {
         }
     }
 
-    // View methods
+    //endregion
+
+    //region View methods
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-        // breakdown specs
+        // Break down specifications
         final int mw = MeasureSpec.getMode(widthMeasureSpec);
         final int mh = MeasureSpec.getMode(heightMeasureSpec);
         final int sw = MeasureSpec.getSize(widthMeasureSpec);
         final int sh = MeasureSpec.getSize(heightMeasureSpec);
 
-        // compute padding
+        // Compute padding
         final int pw = getPaddingLeft() + getPaddingRight();
         final int ph = getPaddingTop() + getPaddingBottom();
 
-        // compute largest size of square (both with and without padding)
+        // Compute largest size of square (both with and without padding)
         final int s;
         final int sp;
         if (mw == MeasureSpec.UNSPECIFIED && mh == MeasureSpec.UNSPECIFIED) {
@@ -124,17 +124,17 @@ public class SquareGridLayout extends ViewGroup {
             }
         }
 
-        // guard against giving the children a -ve measure spec due to excessive padding
+        // Guard against giving the children a negative measure spec due to excessive padding
         final int spp = Math.max(sp, 0);
 
-        // pass on our rigid dimensions to our children
+        // Pass on our rigid dimensions to our children
         final int size = mSize;
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 final View child = getChildAt(y * size + x);
                 if (child == null) continue;
-                // measure each child
-                // we could try to accommodate oversized children, but we don't
+                // Measure each child
+                // We could try to accommodate oversized children, but we don't
                 measureChildWithMargins(child,
                         MeasureSpec.makeMeasureSpec((spp + x) / size, MeasureSpec.EXACTLY), 0,
                         MeasureSpec.makeMeasureSpec((spp + y) / size, MeasureSpec.EXACTLY), 0
@@ -142,7 +142,7 @@ public class SquareGridLayout extends ViewGroup {
             }
         }
 
-        //record our dimensions
+        // Record our dimensions
         setMeasuredDimension(
                 mw == MeasureSpec.EXACTLY ? sw : sp + pw,
                 mh == MeasureSpec.EXACTLY ? sh : sp + ph
@@ -150,7 +150,9 @@ public class SquareGridLayout extends ViewGroup {
         mSquareDimensions = sp;
     }
 
-    // ViewGroup methods
+    //endregion
+
+    //region ViewGroup methods
 
     @Override
     protected LayoutParams generateDefaultLayoutParams() {
@@ -174,13 +176,13 @@ public class SquareGridLayout extends ViewGroup {
         s = mSquareDimensions;
 
         {
-            // adjust for our padding
+            // Adjust for our padding
             final int pl = getPaddingLeft();
             final int pt = getPaddingTop();
             final int pr = getPaddingRight();
             final int pb = getPaddingBottom();
 
-            // allocate any extra spare space evenly
+            // Allocate any extra spare space evenly
             l = pl + (r - pr - l - pl - s) / 2;
             t = pt + (b - pb - t - pb - s) / 2;
         }
@@ -189,14 +191,15 @@ public class SquareGridLayout extends ViewGroup {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 View child = getChildAt(y * mSize + x);
-                // optimization: we are moving through the children in order
-                // when we hit null, there are no more children to layout so return
+                // Optimization: we are moving through the children in order
+                // When we hit null, there are no more children to layout so return
                 if (child == null) return;
-                // get the child's layout parameters so that we can honour their margins
-                MarginLayoutParams lps = (MarginLayoutParams) child.getLayoutParams();
-                // we don't support gravity, so the arithmetic is simplified
 
-                // reverse x and y
+                // Get the child's layout parameters so that we can honour their margins
+                MarginLayoutParams lps = (MarginLayoutParams) child.getLayoutParams();
+                // We don't support gravity, so the arithmetic is simplified
+
+                // Reverse x and y
                 int revx = size - x - 1;
                 int revy = size - y - 1;
                 child.layout(
@@ -209,4 +212,5 @@ public class SquareGridLayout extends ViewGroup {
         }
     }
 
+    //endregion
 }

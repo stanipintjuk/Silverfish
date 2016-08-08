@@ -19,32 +19,44 @@
 
 package com.launcher.silverfish;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 
-    public LauncherPagerAdapter(FragmentManager fm) {
+    //region Fields
+
+    // Store a context so we can use getString in later methods
+    private Context _context;
+
+    //endregion
+
+    //region Constructor
+
+    public LauncherPagerAdapter(FragmentManager fm, Context c) {
         super(fm);
+        _context = c;
     }
 
-    @Override
-    public Fragment getItem(int i) {
-        // Return the right fragment for page number i
-        Fragment fragment;
-        switch (i){
-            case 0: //First page is the app drawer
-                fragment = new TabbedAppDrawerFragment();
-                break;
-            case 1: //Second page is the 'home screen'
-                fragment = new HomeScreenFragment();
-                break;
-            default: //last page is an empty fragment
-                fragment = new Fragment();
-        }
+    //endregion
 
-        return fragment;
+    //region Get items
+
+    @Override
+    public Fragment getItem(int pageNumber) {
+        // Return the right fragment for given page number
+        switch (pageNumber) {
+            case 0: // First page is the app drawer
+                return new TabbedAppDrawerFragment();
+
+            case 1: // Second page is the 'home screen'
+                return new HomeScreenFragment();
+
+            default: // Any other page (such as last) is an empty fragment
+                return new Fragment();
+        }
     }
 
     @Override
@@ -53,15 +65,16 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
-        switch (position){
+    public CharSequence getPageTitle(int pageNumber) {
+        switch (pageNumber) {
             case 0:
-                return "App Drawer";
+                return _context.getString(R.string.text_app_drawer);
             case 1:
-                return "Home Screen";
+                return _context.getString(R.string.text_home_screen);
             default:
-                return "Empty";
+                return _context.getString(R.string.text_empty);
         }
     }
 
+    //endregion
 }

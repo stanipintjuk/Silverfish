@@ -26,7 +26,7 @@ Keep in mind that this is just the first functional and stable version, so the f
 * Clean the code - ✓ (Almost. Spaghetti-code complaints are welcome.)
 * Functionality to add, remove and rename tabs in app drawer.
 * Icon support for tabs in app drawer.
-* Ability to uninstall app from the app drawer.
+* Ability to uninstall app from the app drawer. ✓
 * Functionality to change wallpaper. 
 * More shortcut layouts!
     - circular

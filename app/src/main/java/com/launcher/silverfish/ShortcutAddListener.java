@@ -23,5 +23,5 @@ package com.launcher.silverfish;
  * Used for communication between the launcher activity and the home screen fragment.
  */
 public interface ShortcutAddListener {
-    void OnShortcutAdd(String app_name);
+    void OnShortcutAdd(String appName);
 }

@@ -10,4 +10,10 @@
     <string name="tab_media">Media</string>
     <string name="tab_accessories">Accesorios</string>
     <string name="tab_settings">Ajustes</string>
+    <string name="text_renaming_tab">Renombrando «%s»</string>
+    <string name="text_cancel">Cancelar</string>
+    <string name="text_rename">Renombrar</string>
+    <string name="text_app_drawer">Cajón de aplicaciones</string>
+    <string name="text_home_screen">Pantalla principal</string>
+    <string name="text_empty">Vacío</string>
 </resources>

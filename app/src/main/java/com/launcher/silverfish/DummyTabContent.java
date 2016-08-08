@@ -27,7 +27,7 @@ import android.widget.TabHost;
 public class DummyTabContent implements TabHost.TabContentFactory {
     private Context mContext;
 
-    public DummyTabContent(Context context){
+    public DummyTabContent(Context context) {
         mContext = context;
     }
 
