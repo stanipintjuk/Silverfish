@@ -19,7 +19,9 @@
 
 package com.launcher.silverfish;
 
+import android.app.AlertDialog;
 import android.content.ClipDescription;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -28,12 +30,14 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
@@ -386,6 +390,15 @@ public class TabbedAppDrawerFragment extends Fragment{
                     setTab(tabno);
                 }
             });
+
+            // Long click on the tab should prompt a box to rename it
+            btn.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    promptRenameTab(tabno);
+                    return true;
+                }
+            });
         }
 
     }
@@ -414,4 +427,45 @@ public class TabbedAppDrawerFragment extends Fragment{
         edit.commit();
     }
 
+    private void promptRenameTab(final int tabno){
+
+        // Find which tab we're renaming
+        String tabName = arrButton.get(tabno).getText().toString();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(String.format(getString(R.string.text_renaming_tab), tabName));
+
+        // Set up the input
+        final EditText input = new EditText(getContext());
+        // Specify the type of input expected
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton(getString(R.string.text_rename), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                renameTab(tabno, input.getText().toString());
+            }
+        });
+        builder.setNegativeButton(getString(R.string.text_cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void renameTab(int tabno, String newName) {
+        if (newName != null && newName.length() > 0) {
+            // Update the name in the button for instant changes
+            arrButton.get(tabno).setText(newName);
+
+            // Update the name in the SQL database for the change to persist
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(getContext());
+            sql.renameTab(tabno + 1, newName); // + 1 since it's not index-0 based
+        }
+    }
 }

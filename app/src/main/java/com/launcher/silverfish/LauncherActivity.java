@@ -70,29 +70,24 @@ public class LauncherActivity extends FragmentActivity {
 
     private void createDefaultTabs() {
         LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
-        TabTable tab0 = new TabTable();
-        TabTable tab1 = new TabTable();
-        TabTable tab2 = new TabTable();
-        TabTable tab3 = new TabTable();
-        TabTable tab4 = new TabTable();
-        TabTable tab5 = new TabTable();
-        TabTable tab6 = new TabTable();
 
-        tab0.label=getString(R.string.tab_other);
-        tab1.label=getString(R.string.tab_phone);
-        tab2.label=getString(R.string.tab_games);
-        tab3.label=getString(R.string.tab_internet);
-        tab4.label=getString(R.string.tab_media);
-        tab5.label=getString(R.string.tab_accessories);
-        tab6.label=getString(R.string.tab_settings);
+        // Load default names for the tab
+        String[] defaultTabNames = new String[] {
+            getString(R.string.tab_other),
+            getString(R.string.tab_phone),
+            getString(R.string.tab_games),
+            getString(R.string.tab_internet),
+            getString(R.string.tab_media),
+            getString(R.string.tab_accessories),
+            getString(R.string.tab_settings),
+        };
 
-        sql.addTab(tab0);
-        sql.addTab(tab1);
-        sql.addTab(tab2);
-        sql.addTab(tab3);
-        sql.addTab(tab4);
-        sql.addTab(tab5);
-        sql.addTab(tab6);
+        // Create and add the tables to the SQL database
+        for (int i = 0; i < 7; i++) {
+            TabTable tab = new TabTable();
+            tab.label = defaultTabNames[i];
+            sql.addTab(tab);
+        }
     }
 
     private void setDragListener(){
@@ -107,7 +102,7 @@ public class LauncherActivity extends FragmentActivity {
                             return false;
                         break;
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        //Dont do anything
+                        // Don't do anything
                         break;
                     case DragEvent.ACTION_DRAG_LOCATION:
                         changePage(dragEvent);
@@ -116,7 +111,7 @@ public class LauncherActivity extends FragmentActivity {
                         dropItem(dragEvent);
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        //Dont do anything
+                        // Don't do anything
                         break;
 
                 }

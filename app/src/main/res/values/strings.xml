@@ -14,4 +14,8 @@
     <string name="tab_media">Media</string>
     <string name="tab_accessories">Accessories</string>
     <string name="tab_settings">Settings</string>
+
+    <string name="text_renaming_tab">Renaming «%s»</string>
+    <string name="text_rename">Rename</string>
+    <string name="text_cancel">Cancel</string>
 </resources>
