@@ -48,22 +48,29 @@ import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-public class TabbedAppDrawerFragment extends Fragment{
+public class TabbedAppDrawerFragment extends Fragment {
 
-    private LauncherSQLiteHelper sqlhelper;
+    //region Fields
+
     TabHost tHost;
+
+    private LauncherSQLiteHelper sqlHelper;
     private View rootView;
     private LinkedList<TabTable> arrTabs;
     private ArrayList<Button> arrButton;
-
-    // store the last open tab in RAM until onStop()
-    // to not waste precious I/O every time a tab is changed.
-    private int current_open_tab = -1;
-
     private android.support.v4.app.FragmentManager mFragmentManager;
+
+    // Store the last open tab in RAM until onStop()
+    // not to waste precious I/O every time a tab is changed.
+    private int currentOpenTab = -1;
+
+    //endregion
+
+    //region Android lifecycle
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        sqlhelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
 
         rootView = inflater.inflate(R.layout.activity_app_drawer, container, false);
         mFragmentManager = getChildFragmentManager();
@@ -82,10 +89,10 @@ public class TabbedAppDrawerFragment extends Fragment{
             public void onTabChanged(String tabId) {
                 android.support.v4.app.FragmentTransaction ft = mFragmentManager.beginTransaction();
 
-                // detach all tab fragments from UI
+                // Detach all tab fragments from UI
                 detachAllTabs(ft);
 
-                // then attach the relevant fragment.
+                // Then attach the relevant fragment.
                 for (TabTable tab : arrTabs) {
                     int i = tab.id - 1;
                     if (tabId.equals(Integer.toString(i))) {
@@ -95,8 +102,8 @@ public class TabbedAppDrawerFragment extends Fragment{
                     }
                 }
 
-                current_open_tab = getLastTabId();
-                attachTabFragment(current_open_tab, ft);
+                currentOpenTab = getLastTabId();
+                attachTabFragment(currentOpenTab, ft);
                 ft.commit();
 
             }
@@ -108,56 +115,48 @@ public class TabbedAppDrawerFragment extends Fragment{
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
 
         // Open last opened tab
-        current_open_tab = getLastTabId();
+        currentOpenTab = getLastTabId();
 
-        // if the tab is the same then onTabChanged won't be trigger,
+        // If the tab is the same then onTabChanged won't be trigger,
         // so we have to add the fragment here
-        if (current_open_tab == tHost.getCurrentTab()){
+        if (currentOpenTab == tHost.getCurrentTab()) {
             android.support.v4.app.FragmentTransaction ft = mFragmentManager.beginTransaction();
             detachAllTabs(ft);
 
-            attachTabFragment(current_open_tab, ft);
+            attachTabFragment(currentOpenTab, ft);
 
             ft.commit();
-        }else{
-            setTab(current_open_tab);
+        } else {
+            setTab(currentOpenTab);
         }
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
 
-        // save the last open tab
-        if (current_open_tab != -1)
-            setLastTabId(current_open_tab);
-
+        // Save the last open tab
+        if (currentOpenTab != -1)
+            setLastTabId(currentOpenTab);
     }
 
-    private void detachAllTabs(FragmentTransaction ft) {
+    //endregion
 
-        // Detach all tab fragments from UI
-        for (TabTable tab : arrTabs) {
-            int i = tab.id - 1;
-            AppDrawerTabFragment fragment = (AppDrawerTabFragment) mFragmentManager.findFragmentByTag(Integer.toString(i));
+    //region Tabs
 
-            if (fragment != null)
-                ft.detach(fragment);
+    //region Attaching and detaching tabs
 
-        }
-    }
-
-    private void attachTabFragment(int tab_id, android.support.v4.app.FragmentTransaction ft){
+    private void attachTabFragment(int tabId, android.support.v4.app.FragmentTransaction ft) {
         // Every tab fragment should receive its ID as an argument
         Bundle args = new Bundle();
-        args.putInt(Constants.TAB_ID, tab_id);
+        args.putInt(Constants.TAB_ID, tabId);
 
-        // retrieve the fragment
-        String fragment_tag = Integer.toString(tab_id);
+        // Retrieve the fragment
+        String fragment_tag = Integer.toString(tabId);
         AppDrawerTabFragment fragment = (AppDrawerTabFragment)mFragmentManager.findFragmentByTag(fragment_tag);
 
         // Attach it to the UI if an instance already exists, otherwise create a new instance and add it.
@@ -170,187 +169,32 @@ public class TabbedAppDrawerFragment extends Fragment{
         }
     }
 
-    private void setOnDragListener(){
+    private void detachAllTabs(FragmentTransaction ft) {
 
-        rootView.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
+        // Detach all tab fragments from UI
+        for (TabTable tab : arrTabs) {
+            int i = tab.id - 1;
+            AppDrawerTabFragment fragment = (AppDrawerTabFragment) mFragmentManager.findFragmentByTag(Integer.toString(i));
 
-
-                switch (dragEvent.getAction()){
-                    case DragEvent.ACTION_DRAG_STARTED: {
-
-                        // Care only about DRAG_APP_MOVE drags.
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
-                            return false;
-
-                        // show the uninstall indicator
-                        showUninstallIndicator();
-                        break;
-                    }
-
-                    case DragEvent.ACTION_DRAG_ENTERED: {
-                        //Don't do anything
-                        break;
-                    }
-
-                    case DragEvent.ACTION_DRAG_LOCATION: {
-                        // If drag is on the way out of this page then stop receiving drag events
-                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-                        // get display size
-                        int screen_width = Utils.getScreenDimensions(getActivity()).x;
-                        if (dragEvent.getX() > screen_width - threshold) {
-                            return false;
-
-                        } else {
-
-                            // check if the drag is hovering over a tab button
-                            int i = getHoveringButton(dragEvent.getX(), dragEvent.getY());
-
-                            // if so - change to that tab
-                            if (i > -1)
-                                setTab(i);
-                        }
-                        break;
-                    }
-
-                    case DragEvent.ACTION_DROP: {
-
-                        // if app is dropped on the uninstall indicator uninstall the app
-                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
-                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            launchUninstallIntent(app_name);
-
-                        } else {
-                            // Retrieve the app name and place it in the tab.
-                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            dropAppInTab(app_name);
-
-                            int app_index = Integer.parseInt(
-                                    dragEvent.getClipData().getItemAt(1).
-                                            getText().toString());
-
-                            int tab_id = Integer.parseInt(
-                                    dragEvent.getClipData().getItemAt(2)
-                                            .getText().toString());
-
-                            // and remove it from the tab it came from
-                            removeAppFromTab(app_index, tab_id);
-                        }
-                        break;
-                    }
-
-                    case DragEvent.ACTION_DRAG_ENDED: {
-                        // just hide the uninstall indactor
-                        hideUninstallIndicator();
-                        break;
-                    }
-
-                }
-                return true;
-            }
-
-        });
-    }
-
-    private void launchUninstallIntent(String package_name){
-        Uri packageUri = Uri.parse("package:"+package_name);
-        Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
-        startActivity(uninstallIntent);
-    }
-
-    private void showUninstallIndicator(){
-        // get the layour
-        FrameLayout uninstall_indicator;
-        uninstall_indicator = (FrameLayout) rootView.findViewById(R.id.uninstall_indicator);
-
-        // make it visible
-        uninstall_indicator.setVisibility(View.VISIBLE);
-
-        // and start the animation
-        AlphaAnimation animation =  new AlphaAnimation(0.0f, 1.0f);
-        animation.setDuration(500);
-        uninstall_indicator.startAnimation(animation);
-    }
-
-    private void hideUninstallIndicator(){
-        FrameLayout uninstall_indicator;
-        uninstall_indicator = (FrameLayout)rootView.findViewById(R.id.uninstall_indicator);
-        uninstall_indicator.setVisibility(View.INVISIBLE);
-    }
-
-    private void removeAppFromTab(int app_index, int tab_id){
-        // retrieve tab fragment
-        android.support.v4.app.FragmentManager fm = getChildFragmentManager();
-        int tab_index = tHost.getCurrentTab();
-        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(Integer.toString(tab_id));
-
-        // remove app and refresh the tab's layout
-        fragment.removeApp(app_index);
-        //fragment.loadGridView();
-    }
-
-    private void dropAppInTab(String app_name) {
-        // retrieve tab fragment
-        android.support.v4.app.FragmentManager fm = getChildFragmentManager();
-        int tab_index = tHost.getCurrentTab();
-        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(Integer.toString(tab_index));
-
-        // add app and refresh the tab's layout
-        fragment.addApp(app_name);
-        //fragment.loadGridView();
-    }
-
-    /**
-     * Returns the button which the (x, y) coordinates are inside of.
-     * Otherwise returns -1.
-     */
-    private int getHoveringButton(float x, float y) {
-
-        // loop through all buttons and check if (x,y) is inside one of them
-        for (int i = 0; i < arrButton.size(); i++){
-
-            Button btn = arrButton.get(i);
-
-            // get the geometry
-            float high_x = btn.getX();
-            float high_y = btn.getY();
-            float low_x = btn.getX()+btn.getWidth();
-            float low_y = btn.getY()+btn.getHeight();
-
-            // check if (x, y) is inside
-            if (x > high_x && x < low_x && y > high_y && y < low_y){
-               return i;
-            }
-        }
-        return -1;
-    }
-
-    private void setTab(int index){
-
-        current_open_tab = index;
-        tHost.setCurrentTab(index);
-
-        // Select the relevant tab button, and unselect all the others.
-        for (int i = 0; i < arrButton.size(); i++){
-            if (i != index)
-                arrButton.get(i).setSelected(false);
-            else
-                arrButton.get(index).setSelected(true);
+            if (fragment != null)
+                ft.detach(fragment);
         }
     }
+
+    //endregion tabs
+
+    //region Load tabs
 
     /**
      * Loads all tabs from the database.
      */
-    private void loadTabs(){
+    private void loadTabs() {
         arrButton = new ArrayList<Button>();
-        LinearLayout tabwidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
+        LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
 
-        arrTabs = sqlhelper.getAllTabs();
+        arrTabs = sqlHelper.getAllTabs();
 
-        for (TabTable tab : arrTabs){
+        for (TabTable tab : arrTabs) {
             // Create a button for each tab
             Button btn = new Button(getActivity());
             btn.setText(tab.label);
@@ -362,72 +206,67 @@ public class TabbedAppDrawerFragment extends Fragment{
             btn.setTextColor(Color.WHITE);
 
             // Add the button to the tab widget.
-            tabwidget.addView(btn);
+            tabWidget.addView(btn);
 
-            // create a fragment for the tab
-            AppDrawerTabFragment fragment = new AppDrawerTabFragment();
-
-            // and create a new tab
-            TabHost.TabSpec tSpecFragmentid = tHost.newTabSpec(Integer.toString(tab.id-1));
-            tSpecFragmentid.setIndicator(tab.label);
-            tSpecFragmentid.setContent(new DummyTabContent(getActivity().getBaseContext()));
-            tHost.addTab(tSpecFragmentid);
-
+            // And create a new tab
+            TabHost.TabSpec tSpecFragmentId = tHost.newTabSpec(Integer.toString(tab.id-1));
+            tSpecFragmentId.setIndicator(tab.label);
+            tSpecFragmentId.setContent(new DummyTabContent(getActivity().getBaseContext()));
+            tHost.addTab(tSpecFragmentId);
         }
     }
 
-    private void addOnClickListener(){
+    //endregion
 
-        //make the tab buttons switch tab.
-        for (TabTable tab : arrTabs){
+    //region Set active tab
 
-            Button btn = arrButton.get(tab.id-1);
+    private void setTab(int index) {
+        currentOpenTab = index;
+        tHost.setCurrentTab(index);
 
-            final int tabno = tab.id-1;
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    setTab(tabno);
-                }
-            });
-
-            // Long click on the tab should prompt a box to rename it
-            btn.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View view) {
-                    promptRenameTab(tabno);
-                    return true;
-                }
-            });
+        // Toggle all the tab buttons to false
+        for (Button button : arrButton) {
+            button.setSelected(false);
         }
 
+        // And then select the only relevant one
+        arrButton.get(index).setSelected(true);
     }
+
+    //endregion
+
+    //region Get and set last tab id
 
     public int getLastTabId() {
 
-        // if current_open_tab is already loaded, do not try to load it from preferences again.
-        if (current_open_tab != -1){
-            return current_open_tab;
+        // If currentOpenTab is already loaded, do not try to load it from preferences again.
+        if (currentOpenTab != -1) {
+            return currentOpenTab;
         }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
-        int lastTabId = prefs.getInt(getString(R.string.pref_last_open_tab), 0);
-        return lastTabId;
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(getActivity().getBaseContext());
+
+        return prefs.getInt(getString(R.string.pref_last_open_tab), 0);
     }
 
     /**
      * Saves the last opened tab's id in the apps preferences
-     * @param tab_id
+     * @param tabId
      */
-    public void setLastTabId(int tab_id){
+    public void setLastTabId(int tabId) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         SharedPreferences.Editor edit = prefs.edit();
 
-        edit.putInt(getString(R.string.pref_last_open_tab), tab_id);
-        edit.commit();
+        edit.putInt(getString(R.string.pref_last_open_tab), tabId);
+        edit.apply();
     }
 
-    private void promptRenameTab(final int tabno){
+    //endregion
+
+    //region Rename tab
+
+    private void promptRenameTab(final int tabno) {
 
         // Find which tab we're renaming
         String tabName = arrButton.get(tabno).getText().toString();
@@ -459,7 +298,7 @@ public class TabbedAppDrawerFragment extends Fragment{
     }
 
     private void renameTab(int tabno, String newName) {
-        if (newName != null && newName.length() > 0) {
+        if (newName != null && !newName.isEmpty()) {
             // Update the name in the button for instant changes
             arrButton.get(tabno).setText(newName);
 
@@ -468,4 +307,206 @@ public class TabbedAppDrawerFragment extends Fragment{
             sql.renameTab(tabno + 1, newName); // + 1 since it's not index-0 based
         }
     }
+
+    //endregion
+
+    //endregion
+
+    //region Listeners
+
+    private void addOnClickListener() {
+
+        //make the tab buttons switch tab.
+        for (TabTable tab : arrTabs) {
+
+            Button btn = arrButton.get(tab.id-1);
+
+            final int tabno = tab.id-1;
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    setTab(tabno);
+                }
+            });
+
+            // Long click on the tab should prompt a box to rename it
+            btn.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    promptRenameTab(tabno);
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void setOnDragListener() {
+
+        rootView.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View view, DragEvent dragEvent) {
+
+                switch (dragEvent.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED: {
+
+                        // Care only about DRAG_APP_MOVE drags.
+                        ClipDescription cd = dragEvent.getClipDescription();
+                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
+                            return false;
+
+                        // Show the uninstall indicator
+                        showUninstallIndicator();
+                        break;
+                    }
+
+                    case DragEvent.ACTION_DRAG_ENTERED: {
+                        // Don't do anything
+                        break;
+                    }
+
+                    case DragEvent.ACTION_DRAG_LOCATION: {
+                        // If drag is on the way out of this page then stop receiving drag events
+                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
+                        // Get display size
+                        int screen_width = Utils.getScreenDimensions(getActivity()).x;
+                        if (dragEvent.getX() > screen_width - threshold) {
+                            return false;
+
+                        } else {
+
+                            // Check if the drag is hovering over a tab button
+                            int i = getHoveringButton(dragEvent.getX(), dragEvent.getY());
+
+                            // If so, change to that tab
+                            if (i > -1)
+                                setTab(i);
+                        }
+                        break;
+                    }
+
+                    case DragEvent.ACTION_DROP: {
+
+                        // If app is dropped on the uninstall indicator uninstall the app
+                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
+                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            launchUninstallIntent(app_name);
+
+                        } else {
+                            // Retrieve the app name and place it in the tab.
+                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            dropAppInTab(app_name);
+
+                            int app_index = Integer.parseInt(
+                                    dragEvent.getClipData().getItemAt(1).
+                                            getText().toString());
+
+                            int tab_id = Integer.parseInt(
+                                    dragEvent.getClipData().getItemAt(2)
+                                            .getText().toString());
+
+                            // And remove it from the tab it came from
+                            removeAppFromTab(app_index, tab_id);
+                        }
+                        break;
+                    }
+
+                    case DragEvent.ACTION_DRAG_ENDED: {
+                        // Just hide the uninstall indicator
+                        hideUninstallIndicator();
+                        break;
+                    }
+
+                }
+                return true;
+            }
+
+        });
+    }
+
+    //endregion
+
+    //region Uninstall indicator
+
+    private void showUninstallIndicator() {
+        // Get the layout
+        FrameLayout uninstall_indicator;
+        uninstall_indicator = (FrameLayout) rootView.findViewById(R.id.uninstall_indicator);
+
+        // Make it visible
+        uninstall_indicator.setVisibility(View.VISIBLE);
+
+        // And start the animation
+        AlphaAnimation animation =  new AlphaAnimation(0.0f, 1.0f);
+        animation.setDuration(500);
+        uninstall_indicator.startAnimation(animation);
+    }
+
+    private void hideUninstallIndicator() {
+        FrameLayout uninstall_indicator;
+        uninstall_indicator = (FrameLayout)rootView.findViewById(R.id.uninstall_indicator);
+        uninstall_indicator.setVisibility(View.INVISIBLE);
+    }
+
+    private void launchUninstallIntent(String package_name) {
+        Uri packageUri = Uri.parse("package:"+package_name);
+        Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
+        startActivity(uninstallIntent);
+    }
+
+    //endregion
+
+    //region Apps moving
+
+    private void removeAppFromTab(int appIndex, int tabId) {
+        // Retrieve tab fragment
+        android.support.v4.app.FragmentManager fm = getChildFragmentManager();
+        AppDrawerTabFragment fragment = (AppDrawerTabFragment)
+                fm.findFragmentByTag(Integer.toString(tabId));
+
+        // Remove app and refresh the tab's layout
+        fragment.removeApp(appIndex);
+        //fragment.loadGridView();
+    }
+
+    private void dropAppInTab(String app_name) {
+        // Retrieve tab fragment
+        android.support.v4.app.FragmentManager fm = getChildFragmentManager();
+        int tab_index = tHost.getCurrentTab();
+        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(Integer.toString(tab_index));
+
+        // Add app and refresh the tab's layout
+        fragment.addApp(app_name);
+        //fragment.loadGridView();
+    }
+
+    //endregion
+
+    //region Utils
+
+    /**
+     * Returns the button which the (x, y) coordinates are inside of.
+     * Otherwise returns -1.
+     */
+    private int getHoveringButton(float x, float y) {
+
+        // Loop through all buttons and check if (x, y) is inside one of them
+        for (int i = 0; i < arrButton.size(); i++) {
+
+            Button btn = arrButton.get(i);
+
+            // Get the geometry
+            float high_x = btn.getX();
+            float high_y = btn.getY();
+            float low_x = btn.getX()+btn.getWidth();
+            float low_y = btn.getY()+btn.getHeight();
+
+            // Check if (x, y) is inside
+            if (x > high_x && x < low_x && y > high_y && y < low_y) {
+               return i;
+            }
+        }
+        return -1;
+    }
+
+    //endregion
 }

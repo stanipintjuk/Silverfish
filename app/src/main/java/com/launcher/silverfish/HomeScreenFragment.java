@@ -27,6 +27,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.appwidget.AppWidgetManager;
@@ -48,13 +49,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class HomeScreenFragment extends Fragment {
-    LauncherSQLiteHelper sqlhelper;
 
-    // Variables for communication with AppWidgetManager
-    private int WIDGET_HOST_ID = 1339;
-    private int REQUEST_PICK_APPWIDGET = 1340;
-    private int REQUEST_CREATE_APPWIDGET = 1341;
-    private int REQUEST_BIND_APPWIDGET = 1342;
+    //region Fields
+
+    LauncherSQLiteHelper sqlHelper;
+
+    // Constant variables for communication with AppWidgetManager
+    final private int WIDGET_HOST_ID = 1339;
+    final private int REQUEST_PICK_APPWIDGET = 1340;
+    final private int REQUEST_CREATE_APPWIDGET = 1341;
+    final private int REQUEST_BIND_APPWIDGET = 1342;
 
     private AppWidgetManager mAppWidgetManager;
     private LauncherAppWidgetHost mAppWidgetHost;
@@ -64,11 +68,15 @@ public class HomeScreenFragment extends Fragment {
     private ArrayList<AppDetail> appsList;
     private SquareGridLayout shortcutLayout;
 
+    //endregion
+
+    //region Android lifecycle
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState){
+                             Bundle savedInstanceState) {
 
-        sqlhelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
 
         //initiate global variables
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getBaseContext());
@@ -82,18 +90,19 @@ public class HomeScreenFragment extends Fragment {
         shortcutLayout = (SquareGridLayout)rootView.findViewById(R.id.shortcut_area);
 
         // Start listening for shortcut additions
-        ((LauncherActivity)getActivity()).setFragmshortcutAddListenertRefreshListener(new ShortcutAddListener() {
+        ((LauncherActivity)getActivity())
+                .setFragShortcutAddListenerRefreshListener(new ShortcutAddListener() {
             @Override
-            public void OnShortcutAdd(String app_name) {
-                // insert it into the database and get the row id.
+            public void OnShortcutAdd(String appName) {
+                // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                long app_id = sqlhelper.addShortcut(app_name);
+                long appId = sqlHelper.addShortcut(appName);
 
-                // create shortcut and add it
+                // Create shortcut and add it
                 ShortcutDetail shortcut = new ShortcutDetail();
-                shortcut.name = app_name;
-                shortcut.id = app_id;
-                if (addAppToView(shortcut)){
+                shortcut.name = appName;
+                shortcut.id = appId;
+                if (addAppToView(shortcut)) {
                     updateShortcuts();
                 }
             }
@@ -109,72 +118,30 @@ public class HomeScreenFragment extends Fragment {
         return rootView;
     }
 
-    private void loadWidget() {
-        ComponentName cn = sqlhelper.getWidgetContentName();
-
-        Log.d("Widget creation", "Loaded from db: " + cn.getClassName() + " - " + cn.getPackageName());
-        // Check that there actually is a widget in the database
-        if (cn.getPackageName().equals("") && cn.getClassName().equals("")){
-            Log.d("Widget creation", "DB was empty");
-            return;
-        }
-        Log.d("Widget creation", "DB was not empty");
-
-        final List<AppWidgetProviderInfo> infos = mAppWidgetManager.getInstalledProviders();
-
-        //get AppWidgetProviderInfo
-        AppWidgetProviderInfo appWidgetInfo = null;
-        //just in case you want to see all package and class names of installed widget providers, this code is useful
-        for (final AppWidgetProviderInfo info : infos) {
-            Log.d("AD3", info.provider.getPackageName() + " / "
-                    + info.provider.getClassName());
-        }
-        //iterate through all infos, trying to find the desired one
-        for (final AppWidgetProviderInfo info : infos) {
-            if (info.provider.getClassName().equals(cn.getClassName()) && info.provider.getPackageName().equals(cn.getPackageName())) {
-                //we found it
-                appWidgetInfo = info;
-                break;
-            }
-        }
-        if (appWidgetInfo == null) {
-            Log.d("Widget creation", "app info was null");
-            return; //stop here
-        }
-
-        //allocate the hosted widget id
-        int appWidgetId = mAppWidgetHost.allocateAppWidgetId();
-
-        boolean allowed_to_bind = mAppWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, cn);
-
-        // Ask the user to allow this app to have access to their widgets
-        if (!allowed_to_bind){
-            Log.d("Widget creation", "asking for permission");
-            Intent i = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
-            Bundle args = new Bundle();
-            args.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, cn);
-            args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE, null);
-            i.putExtras(args);
-            startActivityForResult(i, REQUEST_BIND_APPWIDGET);
-            return;
-        }else {
-
-            Log.d("Widget creation", "Allowed to bind");
-            Log.d("Widget creation", "creating widget");
-            //Intent i = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
-            //createWidgetFromId(appWidgetId);
-        }
-        ////creat the host view
-        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity().getBaseContext(), appWidgetId, appWidgetInfo);
-        //set the desired widget
-        hostView.setAppWidget(appWidgetId, appWidgetInfo);
-
-        placeWidget(hostView);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mAppWidgetHost.stopListening();
     }
 
+    //endregion
 
-    private boolean addAppToView(ShortcutDetail shortcut){
+    //region Manage apps and shortcuts
+
+    private void loadApps() {
+
+        LinkedList<ShortcutDetail> shortcuts = sqlHelper.getAllShortcuts();
+        for (ShortcutDetail shortcut : shortcuts) {
+            if (!addAppToView(shortcut)) {
+                // If the shortcut could not be added then the user has probably uninstalled it,
+                // so we should remove it from the db
+                Log.d("HomeFragment", "Removing shortcut "+shortcut.name+" from db");
+                sqlHelper.removeShorcut(shortcut.id);
+            }
+        }
+    }
+
+    private boolean addAppToView(ShortcutDetail shortcut) {
         try {
             ApplicationInfo appInfo = mPacMan.getApplicationInfo(shortcut.name,PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
@@ -191,30 +158,31 @@ public class HomeScreenFragment extends Fragment {
         }
     }
 
-    private void removeApp(int app_index, long app_id){
-        sqlhelper.removeShorcut(app_id);
+    private void removeApp(int app_index, long app_id) {
+        sqlHelper.removeShorcut(app_id);
         appsList.remove(app_index);
     }
 
-    private void updateShortcuts(){
+    @SuppressWarnings("deprecation")
+    private void updateShortcuts() {
         int count = appsList.size();
         int size = (int)Math.ceil(Math.sqrt(count));
         shortcutLayout.removeAllViews();
 
-        switch (size){
+        switch (size) {
             case 0:
-                // special case: if appsList is empty
+                // Special case: if appsList is empty
                 shortcutLayout.setSize(1);
                 return;
             case 1:
                 // Just make it look better when there are just a few apps
-                shortcutLayout.setPadding(0,200,0,0);
+                shortcutLayout.setPadding(0, 200, 0, 0);
                 break;
             case 2:
-                shortcutLayout.setPadding(0,100,0,0);
+                shortcutLayout.setPadding(0, 100, 0, 0);
                 break;
             default:
-                shortcutLayout.setPadding(0,0,0,0);
+                shortcutLayout.setPadding(0, 0, 0, 0);
         }
 
         // Redraw the layout
@@ -222,7 +190,7 @@ public class HomeScreenFragment extends Fragment {
         shortcutLayout.requestLayout();
         shortcutLayout.invalidate();
 
-        for (int i = 0; i < appsList.size(); i++){
+        for (int i = 0; i < appsList.size(); i++) {
             final AppDetail app = appsList.get(i);
             View convertView = getActivity().getLayoutInflater().inflate(R.layout.shortcut_item, null);
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
@@ -240,19 +208,29 @@ public class HomeScreenFragment extends Fragment {
             });
 
             // start a drag when an app has been long clicked
-            final long app_id = app.id;
-            final int app_index = i;
+            final long appId = app.id;
+            final int appIndex = i;
             convertView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     String[] mime_types = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-                    ClipData data = new ClipData(Constants.DRAG_SHORTCUT_REMOVAL, mime_types, new ClipData.Item(Long.toString(app_id)));
-                    data.addItem(new ClipData.Item(Integer.toString(app_index)));
+                    ClipData data = new ClipData(Constants.DRAG_SHORTCUT_REMOVAL,
+                            mime_types, new ClipData.Item(Long.toString(appId)));
 
-                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view.findViewById(R.id.item_app_icon));
-                    view.startDrag(data, shadowBuilder, view, 0);
+                    data.addItem(new ClipData.Item(Integer.toString(appIndex)));
 
-                    // show removal indicator
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
+                            view.findViewById(R.id.item_app_icon));
+
+                    // "This method was deprecated in API level 24. Use startDragAndDrop()
+                    // for newer platform versions."
+                    if (Build.VERSION.SDK_INT < 24) {
+                        view.startDrag(data, shadowBuilder, view, 0);
+                    } else {
+                        view.startDragAndDrop(data, shadowBuilder, view, 0);
+                    }
+
+                    // Show removal indicator
                     FrameLayout rem_ind  = (FrameLayout)rootView.findViewById(R.id.remove_indicator);
                     rem_ind.setVisibility(View.VISIBLE);
                     AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
@@ -262,15 +240,18 @@ public class HomeScreenFragment extends Fragment {
 
                 }
             });
-
         }
     }
 
-    private void setOnDragListener(){
+    //endregion
+
+    //region Listeners
+
+    private void setOnDragListener() {
         rootView.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()){
+                switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
                         // Check that it is a shortcut removal gesture
                         ClipDescription cd = dragEvent.getClipDescription();
@@ -279,18 +260,18 @@ public class HomeScreenFragment extends Fragment {
                         }
                         break;
                     case DragEvent.ACTION_DRAG_ENTERED:
-                        //Dont do anything
+                        // Don't do anything
                         break;
                     case DragEvent.ACTION_DRAG_LOCATION:
-                        //Dont do anything
+                        //Don't do anything
                         break;
                     case DragEvent.ACTION_DROP:
 
-                        // if outside of bound, remove the app
-                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())){
-                            String appid = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            String appindex = dragEvent.getClipData().getItemAt(1).getText().toString();
-                            removeApp(Integer.parseInt(appindex), Long.parseLong(appid));
+                        // If outside of bound, remove the app
+                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
+                            String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            String appIndex = dragEvent.getClipData().getItemAt(1).getText().toString();
+                            removeApp(Integer.parseInt(appIndex), Long.parseLong(appId));
                             updateShortcuts();
                         }
 
@@ -307,24 +288,7 @@ public class HomeScreenFragment extends Fragment {
         });
     }
 
-
-    private void loadApps() {
-
-        LinkedList<ShortcutDetail> shortcuts = sqlhelper.getAllShortcuts();
-        for (ShortcutDetail shortcut : shortcuts){
-
-            boolean success = addAppToView(shortcut);
-
-            // if the shortcut could not be added then the user has probably uninstalled it.
-            // so we should remove it from the db
-            if (!success){
-                Log.d("HomeFragment", "Removing shortcut "+shortcut.name+" from db");
-                sqlhelper.removeShorcut(shortcut.id);
-            }
-        }
-    }
-
-    private void addWidgetOnClickListener(){
+    private void addWidgetOnClickListener() {
         // Long click on widget area should start up widget selection
         FrameLayout widget_area = (FrameLayout)rootView.findViewById(R.id.widget_area);
         widget_area.setOnLongClickListener(new View.OnLongClickListener() {
@@ -334,18 +298,163 @@ public class HomeScreenFragment extends Fragment {
                 return true;
             }
         });
-
     }
 
+    //endregion
+
+    //region Widgets
+
+    //region Widget selection
+
     private void selectWidget() {
-        // allocate widget id and start widget selection activity
+        // Allocate widget id and start widget selection activity
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
         pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         addEmptyData(pickIntent); // This is needed work around some weird bug.
         startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
-
     }
+
+    //endregion
+
+    //region Widget creation
+
+    private void createWidget(Intent data) {
+        // Get the widget id
+        Bundle extras = data.getExtras();
+        int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+
+        createWidgetFromId(appWidgetId);
+    }
+
+    private void createWidgetFromId(int widget_id) {
+        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(widget_id);
+
+        // Create the host view
+        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity().getBaseContext(), widget_id, appWidgetInfo);
+        hostView.setAppWidget(widget_id, appWidgetInfo);
+
+        // And place the widget in widget area and save.
+        placeWidget(hostView);
+        sqlHelper.updateWidget(appWidgetInfo.provider.getPackageName(), appWidgetInfo.provider.getClassName());
+    }
+
+    //endregion
+
+    //region Widget loading
+
+    private void loadWidget() {
+        ComponentName cn = sqlHelper.getWidgetContentName();
+
+        Log.d("Widget creation", "Loaded from db: " + cn.getClassName() + " - " + cn.getPackageName());
+        // Check that there actually is a widget in the database
+        if (cn.getPackageName().isEmpty() && cn.getClassName().isEmpty()) {
+            Log.d("Widget creation", "DB was empty");
+            return;
+        }
+        Log.d("Widget creation", "DB was not empty");
+
+        final List<AppWidgetProviderInfo> infos = mAppWidgetManager.getInstalledProviders();
+
+        // Get AppWidgetProviderInfo
+        AppWidgetProviderInfo appWidgetInfo = null;
+        // Just in case you want to see all package and class names of installed widget providers,
+        // this code is useful
+        for (final AppWidgetProviderInfo info : infos) {
+            Log.d("AD3", info.provider.getPackageName() + " / "
+                    + info.provider.getClassName());
+        }
+        // Iterate through all infos, trying to find the desired one
+        for (final AppWidgetProviderInfo info : infos) {
+            if (info.provider.getClassName().equals(cn.getClassName()) &&
+                    info.provider.getPackageName().equals(cn.getPackageName())) {
+                // We found it!
+                appWidgetInfo = info;
+                break;
+            }
+        }
+        if (appWidgetInfo == null) {
+            Log.d("Widget creation", "app info was null");
+            return; // Stop here
+        }
+
+        // Allocate the hosted widget id
+        int appWidgetId = mAppWidgetHost.allocateAppWidgetId();
+
+        boolean allowed_to_bind = mAppWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, cn);
+
+        // Ask the user to allow this app to have access to their widgets
+        if (!allowed_to_bind) {
+            Log.d("Widget creation", "asking for permission");
+            Intent i = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+            Bundle args = new Bundle();
+            args.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, cn);
+            args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE, null);
+            i.putExtras(args);
+            startActivityForResult(i, REQUEST_BIND_APPWIDGET);
+            return;
+        } else {
+
+            Log.d("Widget creation", "Allowed to bind");
+            Log.d("Widget creation", "creating widget");
+            //Intent i = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+            //createWidgetFromId(appWidgetId);
+        }
+        // Create the host view
+        AppWidgetHostView hostView = mAppWidgetHost.createView(
+                getActivity().getBaseContext(), appWidgetId, appWidgetInfo);
+
+        // Set the desired widget
+        hostView.setAppWidget(appWidgetId, appWidgetInfo);
+
+        placeWidget(hostView);
+    }
+
+    //endregion
+
+    //region Widget configuration
+
+    private void configureWidget(Intent data) {
+        // Get the selected widget information
+        Bundle extras = data.getExtras();
+        int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+        if (appWidgetInfo.configure != null) {
+            // If the widget wants to be configured then start its configuration activity
+            Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+            intent.setComponent(appWidgetInfo.configure);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+            startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
+        } else {
+            // Otherwise simply create it
+            createWidget(data);
+        }
+    }
+
+    //endregion
+
+    //region Widget placing
+
+    private void placeWidget(AppWidgetHostView hostView) {
+        FrameLayout widget_area = (FrameLayout) rootView.findViewById(R.id.widget_area);
+
+        widget_area.removeAllViews();
+        widget_area.addView(hostView);
+
+        // Let the widget host view take control of the long click action.
+        hostView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                selectWidget();
+                return true;
+            }
+        });
+    }
+
+    //endregion
+
+    //region Widget bugs workarounds
 
     private void addEmptyData(Intent pickIntent) {
         // This is needed work around some weird bug.
@@ -356,60 +465,11 @@ public class HomeScreenFragment extends Fragment {
         pickIntent.putParcelableArrayListExtra(AppWidgetManager.EXTRA_CUSTOM_EXTRAS, customExtras);
     }
 
-    private void configureWidget(Intent data) {
-        // Get the selected widget information
-        Bundle extras = data.getExtras();
-        int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
-        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-        if (appWidgetInfo.configure != null) {
-            // if the widget wants to be configured then start its configuration activity.
-            Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
-            intent.setComponent(appWidgetInfo.configure);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
-        } else {
-            // otherwise simply create it.
-            createWidget(data);
-        }
-    }
+    //endregion
 
-    private void createWidget(Intent data) {
-        // get the widget id
-        Bundle extras = data.getExtras();
-        int appWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+    //endregion
 
-        createWidgetFromId(appWidgetId);
-
-    }
-
-    private void createWidgetFromId(int widget_id) {
-        AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(widget_id);
-
-        // create the hostview
-        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity().getBaseContext(), widget_id, appWidgetInfo);
-        hostView.setAppWidget(widget_id, appWidgetInfo);
-
-        // and place the widget in widget area and save.
-        placeWidget(hostView);
-        sqlhelper.updateWidget(appWidgetInfo.provider.getPackageName(), appWidgetInfo.provider.getClassName());
-    }
-
-    private void placeWidget(AppWidgetHostView hostView) {
-        FrameLayout widget_area = (FrameLayout) rootView.findViewById(R.id.widget_area);
-
-        widget_area.removeAllViews();
-        widget_area.addView(hostView);
-
-        // let the widget host view take control of the long click action.
-        hostView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                selectWidget();
-                return true;
-            }
-        });
-    }
-
+    //region Events
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -420,7 +480,7 @@ public class HomeScreenFragment extends Fragment {
             }
             else if (requestCode == REQUEST_CREATE_APPWIDGET) {
                 createWidget(data);
-            }else if (requestCode == REQUEST_BIND_APPWIDGET){
+            } else if (requestCode == REQUEST_BIND_APPWIDGET) {
                 createWidget(data);
             }
         }
@@ -432,19 +492,5 @@ public class HomeScreenFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
-    }
-
-    @Override
-    public void onStop(){
-        super.onStop();
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        mAppWidgetHost.stopListening();
-    }
+    //endregion
 }

@@ -31,7 +31,8 @@ import com.launcher.silverfish.dbmodel.TabTable;
 
 import java.util.LinkedList;
 
-public class LauncherSQLiteHelper extends SQLiteOpenHelper{
+public class LauncherSQLiteHelper extends SQLiteOpenHelper {
+
     // Database information
     private static final int DATABASE_VERSION=1;
     private static final String DATABASE_NAME="LauncherDB";
@@ -50,7 +51,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
     private static final String KEY_CLASS_NAME = "class_name";
 
 
-    public LauncherSQLiteHelper(Context context){
+    public LauncherSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
@@ -99,7 +100,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         this.onCreate(sqLiteDatabase);
     }
 
-    public void addTab(TabTable tab){
+    public void addTab(TabTable tab) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -111,7 +112,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         db.close();
     }
 
-    public void removeTab(int tab_id){
+    public void removeTab(int tab_id) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_TABS,
                 KEY_ID+" = "+Integer.toString(tab_id),
@@ -119,7 +120,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         db.close();
     }
 
-    public int renameTab(int tab_id, String new_name){
+    public int renameTab(int tab_id, String new_name) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_LABEL, new_name);
@@ -132,7 +133,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return i;
     }
 
-    public LinkedList<TabTable> getAllTabs(){
+    public LinkedList<TabTable> getAllTabs() {
         LinkedList<TabTable> tabs = new LinkedList<TabTable>();
 
         // Select all tabs from database
@@ -141,8 +142,8 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         Cursor cursor = db.rawQuery(query, null);
 
         TabTable tab = null;
-        if (cursor.moveToFirst()){
-           do{
+        if (cursor.moveToFirst()) {
+           do {
                tab = new TabTable();
                tab.id = Integer.parseInt(cursor.getString(0));
                tab.label = cursor.getString(1);
@@ -153,7 +154,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return tabs;
     }
 
-    public LinkedList<String> getAppsForTab(int tab_id){
+    public LinkedList<String> getAppsForTab(int tab_id) {
         LinkedList<String> app_names = new LinkedList<String>();
 
         SQLiteDatabase db = getReadableDatabase();
@@ -169,8 +170,8 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
                         null);
 
         String app_name = null;
-        if (cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 app_name = cursor.getString(0);
                 app_names.add(app_name);
             }while(cursor.moveToNext());
@@ -178,7 +179,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return app_names;
     }
 
-    public LinkedList<String> getAllApps(){
+    public LinkedList<String> getAllApps() {
         LinkedList<String> app_names = new LinkedList<String>();
 
         SQLiteDatabase db = getReadableDatabase();
@@ -193,8 +194,8 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
                         null);
 
         String app_name = null;
-        if (cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 app_name = cursor.getString(0);
                 app_names.add(app_name);
             }while(cursor.moveToNext());
@@ -202,7 +203,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return app_names;
     }
 
-    public void addAppToTab(String app_name, int tab_id){
+    public void addAppToTab(String app_name, int tab_id) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -213,7 +214,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         db.close();
     }
 
-    public void removeAppFromTab(String app_name, int tab_id){
+    public void removeAppFromTab(String app_name, int tab_id) {
         SQLiteDatabase db = getWritableDatabase();
 
         db.delete(TABLE_APPS,
@@ -223,7 +224,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         db.close();
     }
 
-    public long addShortcut(String app_name){
+    public long addShortcut(String app_name) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_PACKAGE_NAME, app_name);
@@ -234,21 +235,21 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return id;
     }
 
-    public void removeShorcut(long id){
+    public void removeShorcut(long id) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_SHORTCUTS, KEY_ID + " = " + Long.toString(id),null);
         db.close();
     }
 
-    public LinkedList<ShortcutDetail> getAllShortcuts(){
+    public LinkedList<ShortcutDetail> getAllShortcuts() {
         LinkedList<ShortcutDetail> shortcuts = new LinkedList<ShortcutDetail>();
 
         String query = "SELECT * FROM "+TABLE_SHORTCUTS;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
 
-        if (cursor.moveToFirst()){
-            do{
+        if (cursor.moveToFirst()) {
+            do {
                 ShortcutDetail shortcut = new ShortcutDetail();
                 shortcut.name = cursor.getString(1);
                 shortcut.id = cursor.getInt(0);
@@ -259,7 +260,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return shortcuts;
     }
 
-    public ComponentName getWidgetContentName(){
+    public ComponentName getWidgetContentName() {
         SQLiteDatabase db = getReadableDatabase();
 
         String selection = KEY_ID+" = 1";
@@ -276,7 +277,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper{
         return cn;
     }
 
-    public int updateWidget(String pkg, String cls){
+    public int updateWidget(String pkg, String cls) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_PACKAGE_NAME, pkg);

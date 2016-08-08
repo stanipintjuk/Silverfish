@@ -36,11 +36,18 @@ import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
  * This is the main activity of the launcher
  */
 public class LauncherActivity extends FragmentActivity {
+
+    //region Fields
+
     LauncherPagerAdapter mCollectionPagerAdapter;
     ViewPager mViewPager;
 
     // Used for telling home screen when a shortcut is added.
     private ShortcutAddListener shortcutAddListener;
+
+    //endregion
+
+    //region Android lifecycle
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,20 +60,24 @@ public class LauncherActivity extends FragmentActivity {
         if(!previouslyStarted) {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-            edit.commit();
+            edit.apply();
             createDefaultTabs();
         }
 
         // Create the pager
         mCollectionPagerAdapter =
                 new LauncherPagerAdapter(
-                        getSupportFragmentManager());
+                        getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
         mViewPager.setCurrentItem(1);
 
         setDragListener();
     }
+
+    //endregion
+
+    //region First time setup
 
     private void createDefaultTabs() {
         LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
@@ -90,11 +101,15 @@ public class LauncherActivity extends FragmentActivity {
         }
     }
 
-    private void setDragListener(){
+    //endregion
+
+    //region Listeners
+
+    private void setDragListener() {
         mViewPager.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()){
+                switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
                         // Only care about the DRAG_APP_MOVE description.
                         ClipDescription cd = dragEvent.getClipDescription();
@@ -118,43 +133,43 @@ public class LauncherActivity extends FragmentActivity {
                 return true;
             }
         });
-
     }
 
-    private void dropItem(DragEvent dragEvent){
-        if (mViewPager.getCurrentItem() == 1){
-            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-
-            if(getFragmshortcutAddListenertRefreshListener() != null){
-                getFragmshortcutAddListenertRefreshListener().OnShortcutAdd(app_name);
-            }
-
-        }
-    }
-
-    private void changePage(DragEvent dragEvent){
-        // Change page mid drag if drag is within threshold
-        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-
-        // get display size
-        int width = Utils.getScreenDimensions(this).x;
-
-        // Change page
-        if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold){
-            mViewPager.setCurrentItem(1);
-        }else if(mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold){
-            mViewPager.setCurrentItem(0);
-        }
-
-    }
-
-    public ShortcutAddListener getFragmshortcutAddListenertRefreshListener(){
+    public ShortcutAddListener getFragShortcutAddListenerRefreshListener() {
         return shortcutAddListener;
     }
 
-    public void setFragmshortcutAddListenertRefreshListener(ShortcutAddListener shortcutAddListener){
-        this.shortcutAddListener= shortcutAddListener;
+    public void setFragShortcutAddListenerRefreshListener(ShortcutAddListener shortcutAddListener) {
+        this.shortcutAddListener = shortcutAddListener;
+    }
 
+    //endregion
+
+    //region Events
+
+    private void dropItem(DragEvent dragEvent) {
+        if (mViewPager.getCurrentItem() == 1) {
+            String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
+
+            if(getFragShortcutAddListenerRefreshListener() != null) {
+                getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
+            }
+        }
+    }
+
+    private void changePage(DragEvent dragEvent) {
+        // Change page mid drag if drag is within threshold
+        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
+
+        // Get display size
+        int width = Utils.getScreenDimensions(this).x;
+
+        // Change page
+        if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold) {
+            mViewPager.setCurrentItem(1);
+        } else if(mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold) {
+            mViewPager.setCurrentItem(0);
+        }
     }
 
     @Override
@@ -178,5 +193,7 @@ public class LauncherActivity extends FragmentActivity {
         }
         return super.onKeyUp(keyCode, event);
     }
+
+    //endregion
 }
 
