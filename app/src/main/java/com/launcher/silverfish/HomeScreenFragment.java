@@ -331,7 +331,8 @@ public class HomeScreenFragment extends Fragment {
         AppWidgetProviderInfo appWidgetInfo = mAppWidgetManager.getAppWidgetInfo(widget_id);
 
         // Create the host view
-        AppWidgetHostView hostView = mAppWidgetHost.createView(getActivity().getBaseContext(), widget_id, appWidgetInfo);
+        AppWidgetHostView hostView = mAppWidgetHost.createView(
+                getActivity().getBaseContext(), widget_id, appWidgetInfo);
         hostView.setAppWidget(widget_id, appWidgetInfo);
 
         // And place the widget in widget area and save.
