@@ -130,6 +130,9 @@ public class TabbedAppDrawerFragment extends Fragment {
             attachTabFragment(currentOpenTab, ft);
 
             ft.commit();
+
+            // finally select the tab
+            selectTab(currentOpenTab);
         } else {
             setTab(currentOpenTab);
         }
@@ -224,6 +227,10 @@ public class TabbedAppDrawerFragment extends Fragment {
         currentOpenTab = index;
         tHost.setCurrentTab(index);
 
+        selectTab(index);
+    }
+
+    private void selectTab(int index){
         // Toggle all the tab buttons to false
         for (Button button : arrButton) {
             button.setSelected(false);
