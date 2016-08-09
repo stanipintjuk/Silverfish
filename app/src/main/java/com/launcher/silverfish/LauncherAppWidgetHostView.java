@@ -59,6 +59,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
             }
 
             case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_CANCEL:
                 mHasPerformedLongPress = false;
                 if (mPendingCheckForLongPress != null) {
