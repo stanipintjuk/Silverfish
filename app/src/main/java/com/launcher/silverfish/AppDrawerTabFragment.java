@@ -181,7 +181,10 @@ public class AppDrawerTabFragment extends Fragment {
                     AppDetail app = new AppDetail();
                     app.label = ri.loadLabel(mPacMan);
                     app.name = ri.activityInfo.packageName;
-                    app.icon = ri.activityInfo.loadIcon(mPacMan);
+
+                    // Load the icon later in an async task.
+                    app.icon = null;
+
                     appsList.add(app);
                 }
                 break;
@@ -223,19 +226,22 @@ public class AppDrawerTabFragment extends Fragment {
                 appsList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                AppDetail app = appsList.get(position);
                 if (convertView == null) {
                     convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item, null);
                 }
 
                 // Set the application icon and label for this view
+
+                // load the app icon in an async task
                 ImageView appIcon = (ImageView) convertView.findViewById(R.id.item_app_icon);
-                appIcon.setImageDrawable(appsList.get(position).icon);
+                Utils.loadAppIconAsync(mPacMan, app.name.toString(), appIcon);
 
                 TextView appLabel = (TextView) convertView.findViewById(R.id.item_app_label);
-                appLabel.setText(appsList.get(position).label);
+                appLabel.setText(app.label);
 
                 // Set various click and touch listeners
-                setClickListeners(convertView, appsList.get(position).name.toString(), position);
+                setClickListeners(convertView, app.name.toString(), position);
 
                 return convertView;
             }
