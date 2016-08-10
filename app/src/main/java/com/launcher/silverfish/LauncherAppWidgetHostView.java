@@ -20,6 +20,7 @@ import android.appwidget.AppWidgetHostView;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewConfiguration;
 
 public class LauncherAppWidgetHostView extends AppWidgetHostView {
@@ -37,11 +38,33 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
     public LauncherAppWidgetHostView(Context context) {
         super(context);
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        // Listen for touch events at this level for cancelling longClick if necessary
+        setOnTouchListener(onTouchListener);
     }
 
     //endregion
 
     //region Events
+
+    OnTouchListener onTouchListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch (motionEvent.getAction()) {
+                // Also listen for longClick cancellation here
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_MOVE:
+                case MotionEvent.ACTION_CANCEL:
+                    mHasPerformedLongPress = false;
+                    if (mPendingCheckForLongPress != null) {
+                        removeCallbacks(mPendingCheckForLongPress);
+                    }
+                    break;
+            }
+
+            return true;
+        }
+    };
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         // Consume any touch events for ourselves after long press is triggered
