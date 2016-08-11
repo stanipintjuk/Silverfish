@@ -307,6 +307,7 @@ public class HomeScreenFragment extends Fragment {
     //region Widget selection
 
     private void selectWidget() {
+
         // Allocate widget id and start widget selection activity
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
