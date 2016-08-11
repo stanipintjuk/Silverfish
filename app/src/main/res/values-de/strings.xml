@@ -10,4 +10,11 @@
     <string name="tab_media">Multimedia</string>
     <string name="tab_accessories">Zubehör</string>
     <string name="tab_settings">Einstellungen</string>
+
+    <string name="text_renaming_tab">Verbleibend «%s»</string>
+    <string name="text_rename">Umbenennen</string>
+    <string name="text_cancel">Abbrechen</string>
+    <string name="text_app_drawer">App Drawer</string>
+    <string name="text_home_screen">Hauptbildschirm</string>
+    <string name="text_empty">Leer</string>
 </resources>
