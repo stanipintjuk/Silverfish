@@ -93,7 +93,7 @@ public class TabbedAppDrawerFragment extends Fragment {
     private void promptRenameTab(final TabInfo tab, final int tab_index) {
 
         // Find which tab we're renaming
-        String tabName = tab.label;
+        String tabName = tab.getLabel();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(String.format(getString(R.string.text_renaming_tab), tabName));
@@ -108,7 +108,11 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.setPositiveButton(getString(R.string.text_rename), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                tabHandler.renameTab(tab, tab_index, input.getText().toString());
+                try {
+                    tabHandler.renameTab(tab, tab_index, input.getText().toString());
+                } catch (IllegalArgumentException e){
+                    /* This means that the user entered an empty name, so don't do anything.*/
+                }
             }
         });
         builder.setNegativeButton(getString(R.string.text_cancel), new DialogInterface.OnClickListener() {
@@ -272,7 +276,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         // Retrieve tab fragment
         android.support.v4.app.FragmentManager fm = getChildFragmentManager();
         TabInfo tab = tabHandler.getCurrentTab();
-        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(tab.tag);
+        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(tab.getTag());
 
         // Add app and refresh the tab's layout
         fragment.addApp(app_name);

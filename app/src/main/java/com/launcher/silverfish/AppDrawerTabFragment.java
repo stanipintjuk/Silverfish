@@ -162,7 +162,7 @@ public class AppDrawerTabFragment extends Fragment {
 
         switch (tabId) {
             case 1:
-                // Tab 0 is a special tab and includes all except for the once in other tabs
+                // Tab 1 is a special tab and includes all except for the once in other tabs
                 // so we retrieve all apps that are in the database
                 LinkedList<String> ordered_apps = sqlHelper.getAllApps();
 

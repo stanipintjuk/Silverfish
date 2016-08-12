@@ -90,7 +90,7 @@ public class TabFragmentHandler {
                 // Then attach the relevant fragment.
                 for (TabInfo tab : arrTabs) {
 
-                    if (tabId.equals(tab.tag)) {
+                    if (tabId.equals(tab.getTag())) {
                         attachTabFragment(tab, ft);
                         ft.commit();
                         return;
@@ -118,7 +118,7 @@ public class TabFragmentHandler {
 
     private void attachTabFragment(TabInfo tab, FragmentTransaction ft){
         // Retrieve the fragment
-        String fragment_tag = tab.tag;
+        String fragment_tag = tab.getTag();
         AppDrawerTabFragment fragment = (AppDrawerTabFragment)mFragmentManager
                                                               .findFragmentByTag(fragment_tag);
 
@@ -127,7 +127,7 @@ public class TabFragmentHandler {
 
             // send the tab id to each tab
             Bundle args = new Bundle();
-            args.putInt(Constants.TAB_ID, tab.id);
+            args.putInt(Constants.TAB_ID, tab.getId());
 
             fragment = new AppDrawerTabFragment();
             fragment.setArguments(args);
@@ -143,7 +143,7 @@ public class TabFragmentHandler {
         // Detach all tab fragments from UI
         for (TabInfo tab : arrTabs) {
             AppDrawerTabFragment fragment = (AppDrawerTabFragment)
-                                            mFragmentManager.findFragmentByTag(tab.tag);
+                                            mFragmentManager.findFragmentByTag(tab.getTag());
 
             if (fragment != null)
                 ft.detach(fragment);
@@ -172,7 +172,7 @@ public class TabFragmentHandler {
 
             // Create a button for each tab
             Button btn = new Button(mActivity.getApplicationContext());
-            btn.setText(tab.label);
+            btn.setText(tab.getLabel());
             arrButton.add(btn);
 
             // Set the style of the button
@@ -186,8 +186,8 @@ public class TabFragmentHandler {
             tabWidget.addView(btn);
 
             // And create a new tab
-            TabHost.TabSpec tSpecFragmentId = tHost.newTabSpec(tab.tag);
-            tSpecFragmentId.setIndicator(tab.label);
+            TabHost.TabSpec tSpecFragmentId = tHost.newTabSpec(tab.getTag());
+            tSpecFragmentId.setIndicator(tab.getLabel());
             tSpecFragmentId.setContent(new DummyTabContent(mActivity.getBaseContext()));
             tHost.addTab(tSpecFragmentId);
         }
@@ -319,13 +319,13 @@ public class TabFragmentHandler {
 
     //region Rename tab
 
-    public void renameTab(TabInfo tab, int tab_index, String new_name){
+    public void renameTab(TabInfo tab, int tab_index, String new_name) {
         if (new_name == null || new_name.isEmpty()){
             throw new IllegalArgumentException("Tab name cannot be empty");
         } else {
             // update name in database
             LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
-            sql.renameTab(tab.id, new_name);
+            sql.renameTab(tab.getId(), new_name);
 
             // rename the button
             arrButton.get(tab_index).setText(new_name);
