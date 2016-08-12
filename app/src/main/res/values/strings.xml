@@ -21,4 +21,5 @@
     <string name="text_app_drawer">App drawer</string>
     <string name="text_home_screen">Home screen</string>
     <string name="text_empty">Empty</string>
+    <string name="text_add_tab">Add tab</string>
 </resources>

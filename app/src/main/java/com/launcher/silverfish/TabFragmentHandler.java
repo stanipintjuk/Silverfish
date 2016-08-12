@@ -230,6 +230,11 @@ public class TabFragmentHandler {
         // Open last opened tab
         currentOpenTab = getLastTabId();
 
+        // If this tab doesn't exist then simply go to the first tab.
+        if (currentOpenTab >= arrTabs.size() || currentOpenTab < 0) {
+            currentOpenTab = 0;
+        }
+
         // If the tab is the same then onTabChanged won't be trigger,
         // so we have to add the fragment here
         if (currentOpenTab == tHost.getCurrentTab()) {
@@ -317,7 +322,7 @@ public class TabFragmentHandler {
     }
     //endregion
 
-    //region Rename tab
+    //region Rename, remove, add tab
 
     public void renameTab(TabInfo tab, int tab_index, String new_name) {
         if (new_name == null || new_name.isEmpty()){
@@ -333,6 +338,29 @@ public class TabFragmentHandler {
         }
     }
 
+    public void removeTab(TabInfo tab, int tab_index){
+        // don't allow the first tab to be removed
+        if (tab_index == 0){
+            throw new IllegalArgumentException("First tab is not allowed to be removed.");
+        } else {
+            // remove the tab from the database
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            sql.removeTab(tab.getId());
+
+            // hide the tab button
+            Button btn = arrButton.get(tab_index);
+            btn.setVisibility(View.GONE);
+
+            //remove the tab fragment
+            FragmentTransaction ft = mFragmentManager.beginTransaction();
+            ft.remove(mFragmentManager.findFragmentByTag(tab.getTag()));
+
+            //got to first tab
+            setTab(0);
+        }
+
+    }
+
     //endregion
 
     //region Utils
@@ -346,7 +374,11 @@ public class TabFragmentHandler {
         // Loop through all buttons and check if (x, y) is inside one of them
         for (int i = 0; i < arrButton.size(); i++) {
 
+            // ignore all tab buttons that are removed
             Button btn = arrButton.get(i);
+            if (btn.getVisibility() == View.GONE){
+                continue;
+            }
 
             // Get the geometry
             float high_x = btn.getX();

@@ -75,7 +75,45 @@ public class TabbedAppDrawerFragment extends Fragment {
 
     //endregion
 
-    //region Rename tab
+    //region Tab options: rename, remove, add
+
+    private void promptTabOptions(final TabInfo tab, final int tab_index) {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set up tab options
+        CharSequence[] options = new CharSequence[]{
+                getString(R.string.text_rename),
+                getString(R.string.text_remove),
+        };
+
+        // add click listener
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        promptRenameTab(tab, tab_index);
+                        break;
+                    case 1:
+                        removeTab(tab, tab_index);
+                        break;
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    private void removeTab(TabInfo tab, int tab_index){
+        try {
+            tabHandler.removeTab(tab, tab_index);
+        } catch (IllegalArgumentException e) {
+            // This means that the user wanted to remove the first tab
+            // so don't do anything
+        }
+    }
 
     private void promptRenameTab(final TabInfo tab, final int tab_index) {
 
@@ -127,7 +165,7 @@ public class TabbedAppDrawerFragment extends Fragment {
 
             @Override
             public boolean onLongClick(TabInfo tab, int position) {
-                promptRenameTab(tab, position);
+                promptTabOptions(tab, position);
                 return false;
             }
         });

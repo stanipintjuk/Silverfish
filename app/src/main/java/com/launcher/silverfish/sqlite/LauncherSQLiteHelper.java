@@ -114,9 +114,17 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
 
     public void removeTab(int tab_id) {
         SQLiteDatabase db = getWritableDatabase();
+
+        // remove tab from database
         db.delete(TABLE_TABS,
-                KEY_ID+" = "+Integer.toString(tab_id),
+                KEY_ID + " = " + Integer.toString(tab_id),
                 null);
+
+        // remove all apps from the tab
+        db.delete(TABLE_APPS,
+                KEY_TAB_ID + " = " + Integer.toString(tab_id),
+                null);
+
         db.close();
     }
 
