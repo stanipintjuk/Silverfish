@@ -26,12 +26,6 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"></TabWidget>
 
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="+"
-                    android:background="@drawable/tab_style"/>
-
 
             </LinearLayout>
 

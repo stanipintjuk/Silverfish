@@ -94,9 +94,16 @@ public class AppDrawerTabFragment extends Fragment {
     //region Add app
 
     public void addApp(String app_name) {
-        boolean success = addAppToArrayAdapter(app_name);
-        if (tabId != 1 && success)
-            sqlHelper.addAppToTab(app_name, tabId);
+        boolean success = addAppToList(app_name);
+        if (success) {
+            sortAppsList();
+            arrayAdapter.notifyDataSetChanged();
+
+            // add to database only if it is not the first tab
+            if (tabId != 1)
+                sqlHelper.addAppToTab(app_name, tabId);
+        }
+
     }
 
     private boolean addAppToArrayAdapter(String app_name) {
@@ -145,7 +152,6 @@ public class AppDrawerTabFragment extends Fragment {
             sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId);
 
         arrayAdapter.remove(appsList.get(appIndex));
-        //appsList.remove(appIndex);
     }
 
     //endregion
@@ -206,19 +212,12 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
-    //endregion
-
     //region UI
 
     private void loadGridView() {
 
         // First sort the apps list
-        Collections.sort(appsList, new Comparator<AppDetail>() {
-            @Override
-            public int compare(AppDetail app1, AppDetail app2) {
-                return app1.label.toString().compareTo(app2.label.toString());
-            }
-        });
+        sortAppsList();
 
         // Create the array adapter
         arrayAdapter = new ArrayAdapter<AppDetail>(getActivity(),
@@ -290,6 +289,19 @@ public class AppDrawerTabFragment extends Fragment {
             public void onClick(View view) {
                 Intent i = mPacMan.getLaunchIntentForPackage(appName);
                 startActivity(i);
+            }
+        });
+    }
+
+    //endregion
+
+    //region Utils
+
+    private void sortAppsList(){
+        Collections.sort(appsList, new Comparator<AppDetail>() {
+            @Override
+            public int compare(AppDetail app1, AppDetail app2) {
+                return app1.label.toString().compareTo(app2.label.toString());
             }
         });
     }

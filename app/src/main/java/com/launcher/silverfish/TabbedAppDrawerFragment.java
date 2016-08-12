@@ -23,30 +23,17 @@ import android.app.AlertDialog;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.text.InputType;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.TabHost;
-
-import com.launcher.silverfish.dbmodel.TabTable;
-import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class TabbedAppDrawerFragment extends Fragment {
 
@@ -282,7 +269,6 @@ public class TabbedAppDrawerFragment extends Fragment {
 
         // Add app and refresh the tab's layout
         fragment.addApp(app_name);
-        //fragment.loadGridView();
     }
 
     //endregion
