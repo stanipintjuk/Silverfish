@@ -95,8 +95,8 @@ public class AppDrawerTabFragment extends Fragment {
 
     public void addApp(String app_name) {
         boolean success = addAppToArrayAdapter(app_name);
-        if (tabId != 0 && success)
-            sqlHelper.addAppToTab(app_name, tabId + 1);
+        if (tabId != 1 && success)
+            sqlHelper.addAppToTab(app_name, tabId);
     }
 
     private boolean addAppToArrayAdapter(String app_name) {
@@ -141,8 +141,8 @@ public class AppDrawerTabFragment extends Fragment {
     //region Remove app
 
     public void removeApp(int appIndex) {
-        if (tabId != 0)
-            sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId +1);
+        if (tabId != 1)
+            sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId);
 
         arrayAdapter.remove(appsList.get(appIndex));
         //appsList.remove(appIndex);
@@ -161,7 +161,7 @@ public class AppDrawerTabFragment extends Fragment {
         i.addCategory(Intent.CATEGORY_LAUNCHER);
 
         switch (tabId) {
-            case 0:
+            case 1:
                 // Tab 0 is a special tab and includes all except for the once in other tabs
                 // so we retrieve all apps that are in the database
                 LinkedList<String> ordered_apps = sqlHelper.getAllApps();
@@ -190,7 +190,7 @@ public class AppDrawerTabFragment extends Fragment {
                 break;
             default:
                 // All other tabs just query the apps from the database
-                LinkedList<String> app_names = sqlHelper.getAppsForTab(tabId +1);
+                LinkedList<String> app_names = sqlHelper.getAppsForTab(tabId);
                 for (String app_name : app_names) {
 
                     boolean success = addAppToList(app_name);
@@ -198,7 +198,7 @@ public class AppDrawerTabFragment extends Fragment {
                     // so we have to remove it from the database
                     if (!success) {
                         Log.d("DB", "Removing app "+app_name+" from db");
-                        sqlHelper.removeAppFromTab(app_name, this.tabId +1);
+                        sqlHelper.removeAppFromTab(app_name, this.tabId);
                     }
                 }
         }
@@ -266,7 +266,7 @@ public class AppDrawerTabFragment extends Fragment {
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                 ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(appName));
                 data.addItem(new ClipData.Item(Integer.toString(appIndex)));
-                data.addItem(new ClipData.Item(Integer.toString(tabId)));
+                data.addItem(new ClipData.Item(getTag()));
 
                 // The drag shadow is simply the app's  icon
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
