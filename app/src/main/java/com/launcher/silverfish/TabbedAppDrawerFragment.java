@@ -198,19 +198,21 @@ public class TabbedAppDrawerFragment extends Fragment {
                             launchUninstallIntent(app_name);
 
                         } else {
-                            // Retrieve the app name and place it in the tab.
-                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            dropAppInTab(app_name);
-
+                            // retrieve tha drop information  and remove it from the original tab
                             int app_index = Integer.parseInt(
                                     dragEvent.getClipData().getItemAt(1).
                                             getText().toString());
 
                             String tab_tag = dragEvent.getClipData().getItemAt(2)
-                                                                    .getText().toString();
+                                    .getText().toString();
 
-                            // And remove it from the tab it came from
                             removeAppFromTab(app_index, tab_tag);
+
+                            // add it to the new tab
+                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                            dropAppInTab(app_name);
+
+
                         }
                         break;
                     }
