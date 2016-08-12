@@ -20,8 +20,14 @@
 package com.launcher.silverfish;
 
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.Display;
+import android.widget.ImageView;
 
 /**
  * Created by Stanislav Pintjuk on 8/3/16.
@@ -42,5 +48,44 @@ public class Utils {
         // Set the threshold to be 10% of the screen height
         float threshold = 10.0f*screen_height/100.0f;
         return (y >= screen_height - threshold);
+    }
+
+    public static void loadAppIconAsync(final PackageManager pm, final String appInfo, final ImageView im ){
+
+        // Create an async task
+        AsyncTask<Void,Void,Drawable> loadAppIconTask = new AsyncTask<Void, Void, Drawable>() {
+
+            // Keep track of all the exceptions
+            private Exception exception = null;
+
+
+            @Override
+            protected Drawable doInBackground(Void... voids) {
+                // load the icon
+                Drawable app_icon = null;
+                try {
+                    app_icon = pm.getApplicationIcon(appInfo);
+
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                    exception = e;
+                }
+
+                return app_icon;
+            }
+
+            @Override
+            protected void onPostExecute(Drawable app_icon){
+                if (exception == null) {
+                    im.setImageDrawable(app_icon);
+
+                } else {
+                    Log.d("Utils.loadAppIconAsync", "ERROR Could not load app icon.");
+
+                }
+            }
+        };
+
+        loadAppIconTask.execute(null,null,null);
     }
 }
