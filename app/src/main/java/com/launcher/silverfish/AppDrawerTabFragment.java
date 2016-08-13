@@ -94,9 +94,16 @@ public class AppDrawerTabFragment extends Fragment {
     //region Add app
 
     public void addApp(String app_name) {
-        boolean success = addAppToArrayAdapter(app_name);
-        if (tabId != 0 && success)
-            sqlHelper.addAppToTab(app_name, tabId + 1);
+        boolean success = addAppToList(app_name);
+        if (success) {
+            sortAppsList();
+            arrayAdapter.notifyDataSetChanged();
+
+            // add to database only if it is not the first tab
+            if (tabId != 1)
+                sqlHelper.addAppToTab(app_name, tabId);
+        }
+
     }
 
     private boolean addAppToArrayAdapter(String app_name) {
@@ -141,11 +148,10 @@ public class AppDrawerTabFragment extends Fragment {
     //region Remove app
 
     public void removeApp(int appIndex) {
-        if (tabId != 0)
-            sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId +1);
+        if (tabId != 1)
+            sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId);
 
         arrayAdapter.remove(appsList.get(appIndex));
-        //appsList.remove(appIndex);
     }
 
     //endregion
@@ -161,8 +167,8 @@ public class AppDrawerTabFragment extends Fragment {
         i.addCategory(Intent.CATEGORY_LAUNCHER);
 
         switch (tabId) {
-            case 0:
-                // Tab 0 is a special tab and includes all except for the once in other tabs
+            case 1:
+                // Tab 1 is a special tab and includes all except for the once in other tabs
                 // so we retrieve all apps that are in the database
                 LinkedList<String> ordered_apps = sqlHelper.getAllApps();
 
@@ -181,13 +187,16 @@ public class AppDrawerTabFragment extends Fragment {
                     AppDetail app = new AppDetail();
                     app.label = ri.loadLabel(mPacMan);
                     app.name = ri.activityInfo.packageName;
-                    app.icon = ri.activityInfo.loadIcon(mPacMan);
+
+                    // Load the icon later in an async task.
+                    app.icon = null;
+
                     appsList.add(app);
                 }
                 break;
             default:
                 // All other tabs just query the apps from the database
-                LinkedList<String> app_names = sqlHelper.getAppsForTab(tabId +1);
+                LinkedList<String> app_names = sqlHelper.getAppsForTab(tabId);
                 for (String app_name : app_names) {
 
                     boolean success = addAppToList(app_name);
@@ -195,13 +204,11 @@ public class AppDrawerTabFragment extends Fragment {
                     // so we have to remove it from the database
                     if (!success) {
                         Log.d("DB", "Removing app "+app_name+" from db");
-                        sqlHelper.removeAppFromTab(app_name, this.tabId +1);
+                        sqlHelper.removeAppFromTab(app_name, this.tabId);
                     }
                 }
         }
     }
-
-    //endregion
 
     //endregion
 
@@ -210,12 +217,7 @@ public class AppDrawerTabFragment extends Fragment {
     private void loadGridView() {
 
         // First sort the apps list
-        Collections.sort(appsList, new Comparator<AppDetail>() {
-            @Override
-            public int compare(AppDetail app1, AppDetail app2) {
-                return app1.label.toString().compareTo(app2.label.toString());
-            }
-        });
+        sortAppsList();
 
         // Create the array adapter
         arrayAdapter = new ArrayAdapter<AppDetail>(getActivity(),
@@ -223,19 +225,22 @@ public class AppDrawerTabFragment extends Fragment {
                 appsList) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
+                AppDetail app = appsList.get(position);
                 if (convertView == null) {
                     convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item, null);
                 }
 
                 // Set the application icon and label for this view
+
+                // load the app icon in an async task
                 ImageView appIcon = (ImageView) convertView.findViewById(R.id.item_app_icon);
-                appIcon.setImageDrawable(appsList.get(position).icon);
+                Utils.loadAppIconAsync(mPacMan, app.name.toString(), appIcon);
 
                 TextView appLabel = (TextView) convertView.findViewById(R.id.item_app_label);
-                appLabel.setText(appsList.get(position).label);
+                appLabel.setText(app.label);
 
                 // Set various click and touch listeners
-                setClickListeners(convertView, appsList.get(position).name.toString(), position);
+                setClickListeners(convertView, app.name.toString(), position);
 
                 return convertView;
             }
@@ -260,7 +265,7 @@ public class AppDrawerTabFragment extends Fragment {
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                 ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(appName));
                 data.addItem(new ClipData.Item(Integer.toString(appIndex)));
-                data.addItem(new ClipData.Item(Integer.toString(tabId)));
+                data.addItem(new ClipData.Item(getTag()));
 
                 // The drag shadow is simply the app's  icon
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
@@ -284,6 +289,19 @@ public class AppDrawerTabFragment extends Fragment {
             public void onClick(View view) {
                 Intent i = mPacMan.getLaunchIntentForPackage(appName);
                 startActivity(i);
+            }
+        });
+    }
+
+    //endregion
+
+    //region Utils
+
+    private void sortAppsList(){
+        Collections.sort(appsList, new Comparator<AppDetail>() {
+            @Override
+            public int compare(AppDetail app1, AppDetail app2) {
+                return app1.label.toString().compareTo(app2.label.toString());
             }
         });
     }

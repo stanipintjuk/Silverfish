@@ -146,7 +146,10 @@ public class HomeScreenFragment extends Fragment {
             ApplicationInfo appInfo = mPacMan.getApplicationInfo(shortcut.name,PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
-            appDetail.icon = mPacMan.getApplicationIcon(appInfo);
+
+            // load the icon later in an async task
+            appDetail.icon = null;
+
             appDetail.name = shortcut.name;
             appDetail.id = shortcut.id;
 
@@ -193,8 +196,11 @@ public class HomeScreenFragment extends Fragment {
         for (int i = 0; i < appsList.size(); i++) {
             final AppDetail app = appsList.get(i);
             View convertView = getActivity().getLayoutInflater().inflate(R.layout.shortcut_item, null);
+
+            // load the app icon in an async task
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
-            im.setImageDrawable(app.icon);
+            Utils.loadAppIconAsync(mPacMan, app.name.toString(), im);
+
             TextView tv = (TextView)convertView.findViewById(R.id.item_app_label);
             tv.setText(app.label);
             shortcutLayout.addView(convertView);
