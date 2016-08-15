@@ -95,9 +95,8 @@ public class LauncherActivity extends FragmentActivity {
 
         // Create and add the tables to the SQL database
         for (int i = 0; i < 7; i++) {
-            TabTable tab = new TabTable();
-            tab.label = defaultTabNames[i];
-            sql.addTab(tab);
+            String tab_name = defaultTabNames[i];
+            sql.addTab(tab_name);
         }
     }
 

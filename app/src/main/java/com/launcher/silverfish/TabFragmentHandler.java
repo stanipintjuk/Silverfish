@@ -324,6 +324,58 @@ public class TabFragmentHandler {
 
     //region Rename, remove, add tab
 
+    public void addTab(String tab_name){
+        if (tab_name == null || tab_name.isEmpty()) {
+            throw new IllegalArgumentException("Tab name cannot be empty");
+        } else {
+            // add the tab to database
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            TabTable tab_entry = sql.addTab(tab_name);
+
+            final TabInfo tab = new TabInfo(tab_entry);
+            arrTabs.add(tab);
+
+            // create a button for the tab
+            LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
+
+            Button btn = new Button(mActivity.getApplicationContext());
+            btn.setText(tab.getLabel());
+            arrButton.add(btn);
+
+            // Set the style of the button
+            btn.setBackgroundResource(R.drawable.tab_style);
+            btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    1));
+            btn.setTextColor(Color.WHITE);
+
+            // Add the button to the tab widget.
+            tabWidget.addView(btn);
+
+            // And create a new tab
+            TabHost.TabSpec tSpecFragmentId = tHost.newTabSpec(tab.getTag());
+            tSpecFragmentId.setIndicator(tab.getLabel());
+            tSpecFragmentId.setContent(new DummyTabContent(mActivity.getBaseContext()));
+            tHost.addTab(tSpecFragmentId);
+
+            final int tab_id = arrTabs.size() - 1;
+            // add click listener to the button
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    tabButtonClickListener.onClick(tab, tab_id);
+                }
+            });
+            btn.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    return tabButtonClickListener.onLongClick(tab, tab_id);
+                }
+            });
+        }
+
+    }
+
     public void renameTab(TabInfo tab, int tab_index, String new_name) {
         if (new_name == null || new_name.isEmpty()){
             throw new IllegalArgumentException("Tab name cannot be empty");

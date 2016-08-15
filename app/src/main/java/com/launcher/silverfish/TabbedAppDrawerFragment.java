@@ -86,6 +86,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         CharSequence[] options = new CharSequence[]{
                 getString(R.string.text_rename),
                 getString(R.string.text_remove),
+                getString(R.string.text_add_tab),
         };
 
         // add click listener
@@ -99,10 +100,46 @@ public class TabbedAppDrawerFragment extends Fragment {
                     case 1:
                         removeTab(tab, tab_index);
                         break;
+                    case 2:
+                        promptNewTab();
+                        break;
                 }
             }
         });
 
+        builder.show();
+    }
+
+    private void promptNewTab(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set up the dialog
+        builder.setTitle(getString(R.string.text_new_tab_name));
+
+        // Set up the input
+        final EditText input = new EditText(getContext());
+        // Specify the type of input expected
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // setup the buttons
+        builder.setPositiveButton(getString(R.string.text_add_tab), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                try {
+                    tabHandler.addTab(input.getText().toString());
+                } catch (IllegalArgumentException e) {
+                    // This means that the tab name was empty.
+                    // So don't do anything.
+                }
+            }
+        });
+        builder.setNegativeButton(getString(R.string.text_cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
         builder.show();
     }
 

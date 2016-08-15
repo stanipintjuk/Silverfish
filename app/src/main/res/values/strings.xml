@@ -22,4 +22,5 @@
     <string name="text_home_screen">Home screen</string>
     <string name="text_empty">Empty</string>
     <string name="text_add_tab">Add tab</string>
+    <string name="text_new_tab_name">Write the tab name</string>
 </resources>
