@@ -1,5 +1,8 @@
 <resources>
     <string name="text_hold_to_change_widget">Maintenir pour modifier le widget</string>
+    <string name="text_empty_category_notice">Cette catégorie est vide pour le moment. Vous pouvez déplacer des applications depuis les autres catégories en les faisant glisser.</string>
+    <string name="text_cannot_name_empty">L'onglet doit avoir un nom</string>
+    <string name="text_cannot_remove_tab">Impossible de supprimer cet onglet</string>
     <string name="text_remove">Supprimer</string>
     <string name="text_uninstall">Désinstaller</string>
 
