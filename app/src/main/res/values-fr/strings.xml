@@ -1,0 +1,22 @@
+<resources>
+    <string name="text_hold_to_change_widget">Maintenir pour modifier le widget</string>
+    <string name="text_remove">Supprimer</string>
+    <string name="text_uninstall">Désinstaller</string>
+
+    <string name="tab_other">Autre</string>
+    <string name="tab_phone">Téléphone</string>
+    <string name="tab_internet">Internet</string>
+    <string name="tab_games">Jeux</string>
+    <string name="tab_media">Multimédia</string>
+    <string name="tab_accessories">Accessoires</string>
+    <string name="tab_settings">Paramètres</string>
+
+    <string name="text_renaming_tab">Renommer «%s»</string>
+    <string name="text_rename">Renommer</string>
+    <string name="text_cancel">Annuler</string>
+    <string name="text_app_drawer">Tiroir d'applications</string>
+    <string name="text_home_screen">Écran principal</string>
+    <string name="text_empty">Vide</string>
+    <string name="text_add_tab">Ajouter un onglet</string>
+    <string name="text_new_tab_name">Modifier le nom de l'onglet</string>
+</resources>
