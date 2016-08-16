@@ -100,23 +100,39 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         this.onCreate(sqLiteDatabase);
     }
 
-    public void addTab(TabTable tab) {
+    public TabTable addTab(String tab_name) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_LABEL, tab.label);
+        values.put(KEY_LABEL, tab_name);
 
-        db.insert(TABLE_TABS,
-                null,
-                values);
+        long tab_id = db.insert(TABLE_TABS,
+                        null,
+                        values);
+
         db.close();
+
+        // construct the tab to return
+        TabTable tab = new TabTable();
+        tab.id = (int)tab_id;
+        tab.label = tab_name;
+
+        return tab;
     }
 
     public void removeTab(int tab_id) {
         SQLiteDatabase db = getWritableDatabase();
+
+        // remove tab from database
         db.delete(TABLE_TABS,
-                KEY_ID+" = "+Integer.toString(tab_id),
+                KEY_ID + " = " + Integer.toString(tab_id),
                 null);
+
+        // remove all apps from the tab
+        db.delete(TABLE_APPS,
+                KEY_TAB_ID + " = " + Integer.toString(tab_id),
+                null);
+
         db.close();
     }
 
