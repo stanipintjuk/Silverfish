@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public class TabbedAppDrawerFragment extends Fragment {
 
@@ -130,7 +131,7 @@ public class TabbedAppDrawerFragment extends Fragment {
                     tabHandler.addTab(input.getText().toString());
                 } catch (IllegalArgumentException e) {
                     // This means that the tab name was empty.
-                    // So don't do anything.
+                    showToast(getString(R.string.text_cannot_name_empty));
                 }
             }
         });
@@ -148,7 +149,7 @@ public class TabbedAppDrawerFragment extends Fragment {
             tabHandler.removeTab(tab, tab_index);
         } catch (IllegalArgumentException e) {
             // This means that the user wanted to remove the first tab
-            // so don't do anything
+            showToast(getString(R.string.text_cannot_remove_tab));
         }
     }
 
@@ -173,7 +174,8 @@ public class TabbedAppDrawerFragment extends Fragment {
                 try {
                     tabHandler.renameTab(tab, tab_index, input.getText().toString());
                 } catch (IllegalArgumentException e){
-                    /* This means that the user entered an empty name, so don't do anything.*/
+                    /* This means that the user entered an empty name */
+                    showToast(getString(R.string.text_cannot_name_empty));
                 }
             }
         });
@@ -346,6 +348,12 @@ public class TabbedAppDrawerFragment extends Fragment {
         fragment.addApp(app_name);
     }
 
+    //endregion
+
+    //region UI
+    private void showToast(String msg){
+        Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+    }
     //endregion
 
 }

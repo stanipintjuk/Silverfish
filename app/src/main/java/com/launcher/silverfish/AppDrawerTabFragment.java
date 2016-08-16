@@ -41,6 +41,8 @@ import android.widget.Toast;
 
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -137,6 +139,8 @@ public class AppDrawerTabFragment extends Fragment {
             appDetail.icon = mPacMan.getApplicationIcon(appInfo);
             appDetail.name = app_name;
             appsList.add(appDetail);
+
+            hideEmptyCategoryNotice();
             return true;
         } catch (PackageManager.NameNotFoundException e) {
             return false;
@@ -152,6 +156,11 @@ public class AppDrawerTabFragment extends Fragment {
             sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId);
 
         arrayAdapter.remove(appsList.get(appIndex));
+
+        // show empty categry notice if last app was removed
+        if (appsList.size() == 0) {
+            showEmptyCategoryNotice();
+        }
     }
 
     //endregion
@@ -207,12 +216,26 @@ public class AppDrawerTabFragment extends Fragment {
                         sqlHelper.removeAppFromTab(app_name, this.tabId);
                     }
                 }
+
+                // show the empty category notice if this tab is empty
+                if (app_names.size() == 0) {
+                    showEmptyCategoryNotice();
+                }
         }
     }
 
     //endregion
 
     //region UI
+
+    private void showEmptyCategoryNotice(){
+        TextView tv_notice = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
+        tv_notice.setVisibility(View.VISIBLE);
+    }
+    private void hideEmptyCategoryNotice(){
+        TextView tv_notice = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
+        tv_notice.setVisibility(View.GONE);
+    }
 
     private void loadGridView() {
 

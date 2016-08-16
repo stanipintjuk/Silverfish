@@ -4,6 +4,9 @@
     <string name="pref_last_open_tab" translatable="false">pref_last_open_tab</string>
 
     <string name="text_hold_to_change_widget">Hold to change widget</string>
+    <string name="text_empty_category_notice">This category is currently empty. You can move apps between categories by dragging them.</string>
+    <string name="text_cannot_name_empty">The tab must have a non-empty name</string>
+    <string name="text_cannot_remove_tab">Cannot remove this tab</string>
     <string name="text_remove">Remove</string>
     <string name="text_uninstall">Uninstall</string>
 
@@ -22,5 +25,5 @@
     <string name="text_home_screen">Home screen</string>
     <string name="text_empty">Empty</string>
     <string name="text_add_tab">Add tab</string>
-    <string name="text_new_tab_name">Write the tab name</string>
+    <string name="text_new_tab_name">Enter new tab name</string>
 </resources>

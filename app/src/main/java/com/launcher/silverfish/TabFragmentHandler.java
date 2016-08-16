@@ -387,6 +387,8 @@ public class TabFragmentHandler {
             // rename the button
             arrButton.get(tab_index).setText(new_name);
 
+            tab.rename(new_name);
+
         }
     }
 
