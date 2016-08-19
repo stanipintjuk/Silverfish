@@ -42,4 +42,4 @@ Keep in mind that this is just the second beta version so the functionality is v
 * Fixed some bugs
 * Added ability to remove and add tabs
 * App icons now load async so they will not slow down main thread.
-* Added french tranlation
+* Added french translation
