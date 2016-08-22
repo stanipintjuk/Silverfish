@@ -41,8 +41,6 @@ import android.widget.Toast;
 
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

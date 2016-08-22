@@ -2,7 +2,6 @@
     package="com.launcher.silverfish">
 
     <uses-permission android:name="android.permission.BIND_APPWIDGET"/>
-    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
