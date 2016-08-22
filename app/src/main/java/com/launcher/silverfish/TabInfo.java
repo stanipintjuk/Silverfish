@@ -30,4 +30,8 @@ public class TabInfo {
     public String getLabel(){
         return label;
     }
+
+    public void rename(String new_name) {
+        label = new_name;
+    }
 }

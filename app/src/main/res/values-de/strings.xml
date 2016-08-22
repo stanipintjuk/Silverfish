@@ -1,5 +1,8 @@
 <resources>
     <string name="text_hold_to_change_widget">Gedrückt halten um das Widget zu wechseln</string>
+    <string name="text_empty_category_notice">Dieser Tab ist zur Zeit leer. Sie können Tabs verschieben indem Sie die Icons gedrückt halten.</string>
+    <string name="text_cannot_name_empty"> Der Tab nahme darf nicht leer sein.</string>
+    <string name="text_cannot_remove_tab">Dieser Tab kann nicht entfernt werden.</string>
     <string name="text_remove">Entfernen</string>
     <string name="text_uninstall">Deinstallieren</string>
 
@@ -11,10 +14,12 @@
     <string name="tab_accessories">Zubehör</string>
     <string name="tab_settings">Einstellungen</string>
 
-    <string name="text_renaming_tab">Verbleibend «%s»</string>
+    <string name="text_renaming_tab">Umbenennen «%s»</string>
     <string name="text_rename">Umbenennen</string>
     <string name="text_cancel">Abbrechen</string>
     <string name="text_app_drawer">App Drawer</string>
     <string name="text_home_screen">Hauptbildschirm</string>
     <string name="text_empty">Leer</string>
+    <string name="text_add_tab">Tab hinzufügen</string>
+    <string name="text_new_tab_name">Neuen Tab Namen eingeben</string>
 </resources>

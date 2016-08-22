@@ -1,5 +1,8 @@
 <resources>
     <string name="text_hold_to_change_widget">Mantén para cambiar el widget</string>
+    <string name="text_empty_category_notice">Esta pestaña está vacía. Puedes mover aplicaciones entre pestañas arrastrándolas.</string>
+    <string name="text_cannot_name_empty">El nombre de la pestaña no puede estar vacío</string>
+    <string name="text_cannot_remove_tab">No se puede eliminar esta pestaña</string>
     <string name="text_remove">Quitar</string>
     <string name="text_uninstall">Desinstalar</string>
 
@@ -10,10 +13,13 @@
     <string name="tab_media">Media</string>
     <string name="tab_accessories">Accesorios</string>
     <string name="tab_settings">Ajustes</string>
+
     <string name="text_renaming_tab">Renombrando «%s»</string>
-    <string name="text_cancel">Cancelar</string>
     <string name="text_rename">Renombrar</string>
+    <string name="text_cancel">Cancelar</string>
     <string name="text_app_drawer">Cajón de aplicaciones</string>
     <string name="text_home_screen">Pantalla principal</string>
     <string name="text_empty">Vacío</string>
+    <string name="text_add_tab">Añadir pestaña</string>
+    <string name="text_new_tab_name">Introduzca el nuevo nombre</string>
 </resources>
