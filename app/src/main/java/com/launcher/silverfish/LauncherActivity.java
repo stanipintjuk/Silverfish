@@ -142,7 +142,7 @@ public class LauncherActivity extends FragmentActivity {
             ResolveInfo ri = availableActivities.get(j);
 
             String pkg = ri.activityInfo.packageName;
-            String category = PackagesCategories.getCategory(pkg);
+            String category = PackagesCategories.getCategory(getApplicationContext(), pkg);
             int categoryId = getCategoryId(category);
 
             // Only add if not default
