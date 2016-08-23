@@ -20,6 +20,8 @@
 package com.launcher.silverfish;
 
 import android.app.Activity;
+import android.appwidget.AppWidgetHostView;
+import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -30,8 +32,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetHostView;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;

@@ -2,6 +2,7 @@
     package="com.launcher.silverfish">
 
     <uses-permission android:name="android.permission.BIND_APPWIDGET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
