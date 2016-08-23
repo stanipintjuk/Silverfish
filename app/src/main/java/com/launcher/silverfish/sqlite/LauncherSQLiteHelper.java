@@ -30,6 +30,7 @@ import com.launcher.silverfish.ShortcutDetail;
 import com.launcher.silverfish.dbmodel.TabTable;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 public class LauncherSQLiteHelper extends SQLiteOpenHelper {
 
@@ -227,6 +228,18 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TAB_ID, Integer.toString(tab_id));
 
         db.insert(TABLE_APPS, null, values);
+        db.close();
+    }
+
+    public void addAppsToTab(Map<String, Integer> pkg_categoryId) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        for (Map.Entry<String, Integer> entry : pkg_categoryId.entrySet()) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_PACKAGE_NAME, entry.getKey());
+            values.put(KEY_TAB_ID, Integer.toString(entry.getValue()));
+            db.insert(TABLE_APPS, null, values);
+        }
         db.close();
     }
 

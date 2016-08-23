@@ -20,7 +20,10 @@
 package com.launcher.silverfish;
 
 import android.content.ClipDescription;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -29,8 +32,12 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 
-import com.launcher.silverfish.dbmodel.TabTable;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
+import com.launcher.silverfish.utils.PackagesCategories;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the main activity of the launcher
@@ -62,6 +69,7 @@ public class LauncherActivity extends FragmentActivity {
             edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
             edit.apply();
             createDefaultTabs();
+            autoSortApplications();
         }
 
         // Create the pager
@@ -98,6 +106,53 @@ public class LauncherActivity extends FragmentActivity {
             String tab_name = defaultTabNames[i];
             sql.addTab(tab_name);
         }
+    }
+
+    // Retrieve the default tab ID based on the English name
+    private int getCategoryId(String englishName) {
+        switch (englishName)
+        {
+            default: case "Other": return 1;
+            case "Phone": return 2;
+            case "Games": return 3;
+            case "Internet": return 4;
+            case "Media": return 5;
+            case "Accessories": return 6;
+            case "Settings": return 7;
+        }
+    }
+
+    // Auto sorts the applications in their corresponding tabs
+    private void autoSortApplications() {
+
+        // Set up both SQL helper and package manager
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
+
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+
+        PackageManager mPacMan = getApplicationContext().getPackageManager();
+        List<ResolveInfo> availableActivities = mPacMan.queryIntentActivities(i, 0);
+
+        // Store here the packages and their categories IDs
+        // This will allow us to add all the apps at once instead opening the database over and over
+        Map<String, Integer> pkg_categoryId = new HashMap<>();
+
+        for (int j = 0; j < availableActivities.size(); j++) {
+            ResolveInfo ri = availableActivities.get(j);
+
+            String pkg = ri.activityInfo.packageName;
+            String category = PackagesCategories.getCategory(pkg);
+            int categoryId = getCategoryId(category);
+
+            // Only add if not default
+            if (categoryId > 1) {
+                pkg_categoryId.put(pkg, categoryId);
+            }
+        }
+
+        // Then add all the apps to their corresponding tabs at once
+        sql.addAppsToTab(pkg_categoryId);
     }
 
     //endregion
