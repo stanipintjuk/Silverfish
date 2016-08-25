@@ -1,79 +1,156 @@
 package com.launcher.silverfish.utils;
 
 import android.content.Context;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.util.Log;
 
 import com.launcher.silverfish.R;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+
 
 public final class PackagesCategories {
 
-    public static final String DEFAULT_CATEGORY = "Other";
+    //region Helper methods
 
-    public static String getCategory(Context ctx, String pkg) {
+    // Retrieve the default tab ID based on the English name
+    private static int getCategoryId(String englishName) {
+        switch (englishName)
+        {
+            default: case "Other":       return 1;
+                     case "Phone":       return 2;
+                     case "Games":       return 3;
+                     case "Internet":    return 4;
+                     case "Media":       return 5;
+                     case "Accessories": return 6;
+                     case "Settings":    return 7;
+        }
+    }
 
-        // Read the file containing a list in the form of package=category
+    private static boolean containsKeyword(String str, String[] keywords) {
+        for (String keyword : keywords) {
+            if(str.contains(keyword)) return true;
+        }
+        return false;
+    }
+
+    //endregion
+
+    //region Get Categories
+
+    public static HashMap<String, String> getPredefinedCategories(Context ctx)
+    {
+        HashMap<String, String> predefCategories = new HashMap<>();
+
+        InputStream inputStream = ctx.getResources().openRawResource(R.raw.package_category);
+        String line;
+        String[] lineSplit;
+
         try {
-            Resources res = ctx.getResources();
-            InputStream inputStream = res.openRawResource(R.raw.package_category);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
-            // Read each line of the file until we find the right category
-            String line;
             while ((line = reader.readLine()) != null) {
-                // The left side ([0]) of the string contains the package
-                if (pkg.equals(line.split("=")[0])) {
-
-                    // Return the category, contained in the right side ([1])
-                    return line.split("=")[1];
+                if (!line.isEmpty()){
+                    lineSplit = line.split("=");
+                    predefCategories.put(lineSplit[0], lineSplit[1]);
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
 
-
-        // Intelligent fallback: Try to guess the category
-        pkg = pkg.toLowerCase();
-        if (pkg.contains("conv") ||
-                pkg.contains("phone") ||
-                pkg.contains("call")) {
-            return "Phone";
-        }
-        if (pkg.contains("game") ||
-                pkg.contains("play")) {
-            return "Games";
-        }
-        if (pkg.contains("download") ||
-                pkg.contains("mail") ||
-                pkg.contains("vending")) {
-            return "Internet";
-        }
-        if (pkg.contains("pic") ||
-                pkg.contains("photo") ||
-                pkg.contains("cam") ||
-                pkg.contains("tube") ||
-                pkg.contains("radio") ||
-                pkg.contains("tv")) {
-            return "Media";
-        }
-        if (pkg.contains("calc") ||
-                pkg.contains("calendar") ||
-                pkg.contains("organize") ||
-                pkg.contains("clock") ||
-                pkg.contains("time")) {
-            return "Accessories";
-        }
-        if (pkg.contains("settings") ||
-                pkg.contains("config") ||
-                pkg.contains("keyboard") ||
-                pkg.contains("sync") ||
-                pkg.contains("backup")) {
-            return "Settings";
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                if(inputStream != null) inputStream.close();
+            } catch (IOException e) { e.printStackTrace(); }
         }
 
-        // If we could not guess the category, return default
-        return DEFAULT_CATEGORY;
+        return predefCategories;
     }
+
+    //endregion
+
+    //region Get Keywords
+
+    public static HashMap<String, String[]> getKeywords(Context ctx)
+    {
+        HashMap<String, String[]> keywordsDict = new HashMap<>();
+
+        keywordsDict.put("Phone", new String[]{"phone", "conv", "call", "sms", "mms", "contacts", "stk"});  // stk stands for "SIM Toolkit"
+        keywordsDict.put("Games", new String[]{"game", "play"});
+        keywordsDict.put("Internet", new String[]{"download", "mail", "vending", "browser", "maps", "twitter", "whatsapp", "outlook", "dropbox", "chrome", "drive"});
+        keywordsDict.put("Media", new String[]{"pic", "gallery", "photo", "cam", "tube", "radio", "tv", "voice", "video", "music"});
+        keywordsDict.put("Accessories", new String[]{"editor", "calc", "calendar", "organize", "clock", "time", "viewer", "file", "manager", "memo", "note"});
+        keywordsDict.put("Settings", new String[]{"settings", "config", "keyboard", "launcher", "sync", "backup"});
+
+
+        return keywordsDict;
+    }
+
+    //endregion
+
+    //region Set each package category
+
+    public static HashMap<String, Integer> setCategories(Context ctx, List<ResolveInfo> activities)
+    {
+        return setCategories(ctx, activities, getPredefinedCategories(ctx), getKeywords(ctx));
+    }
+
+    public static HashMap<String, Integer> setCategories(Context ctx, List<ResolveInfo> activities,
+                                                         HashMap<String, String> categories,
+                                                         HashMap<String, String[]> keywords)
+    {
+        HashMap<String, Integer> pkg_categoryId = new HashMap<>();
+        String pkg, category = "";
+        int categoryId;
+
+        for (int i = 0; i < activities.size(); i++) {
+            ResolveInfo ri = activities.get(i);
+            pkg = ri.activityInfo.packageName;
+
+
+            if (categories.containsKey(pkg)) {
+                category = categories.get(pkg);
+                categoryId = getCategoryId(category);
+
+                // Only add if not default
+                if (categoryId > 1) {
+                    pkg_categoryId.put(pkg, categoryId);
+                }
+            }
+            // Intelligent fallback: Try to guess the category
+            else {
+                pkg = pkg.toLowerCase();
+                for (String key : keywords.keySet())
+                {
+                    if (containsKeyword(pkg, keywords.get(key)))
+                    {
+                        if(pkg.contains("contacts")) Log.d("PACKAGES", "==== CONTACTS APP ====");
+                        category = key;
+                        pkg_categoryId.put(pkg, getCategoryId(key));
+                    }
+                }
+            }
+            Log.d("PACKAGES",
+                    "*  Package: " + pkg +
+                    "\n   Activity: " + ri.activityInfo.name +
+                    "\n   Name: " + ri.loadLabel(ctx.getPackageManager()) +
+                    "\n   ResolvePackageName: " + ri.resolvePackageName +
+                    "\n   PackageName: " + ri.activityInfo.packageName +
+                    "\n   AppPackageName : " + ri.activityInfo.applicationInfo.packageName +
+                    "\n   AppLabel: " + ri.activityInfo.applicationInfo.loadLabel(ctx.getPackageManager()) +
+                    "\n   Category: " + category
+            );
+        }
+
+        return pkg_categoryId;
+    }
+
+    //endregion
+
 }
