@@ -12,9 +12,10 @@
 
         <activity
             android:name=".LauncherActivity"
-            android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+            android:theme="@style/AppTheme.ActionBar.Transparent"
             android:label="Silverfish Launcher"
             >
+            <!--android:theme="@android:style/Theme.Wallpaper.NoTitleBar"-->
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -4,4 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#ffffff</color>
+    <color name="appLabelColor">#ffffff</color>
+    <color name="shadowColor">#000000</color>
+    <color name="darkTint">#99000000</color>
 </resources>

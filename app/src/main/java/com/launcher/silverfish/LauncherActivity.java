@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -81,6 +82,7 @@ public class LauncherActivity extends FragmentActivity {
         mViewPager.setCurrentItem(1);
 
         setDragListener();
+
     }
 
     //endregion

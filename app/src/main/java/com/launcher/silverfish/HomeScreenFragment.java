@@ -172,20 +172,8 @@ public class HomeScreenFragment extends Fragment {
         int size = (int)Math.ceil(Math.sqrt(count));
         shortcutLayout.removeAllViews();
 
-        switch (size) {
-            case 0:
-                // Special case: if appsList is empty
-                shortcutLayout.setSize(1);
-                return;
-            case 1:
-                // Just make it look better when there are just a few apps
-                shortcutLayout.setPadding(0, 200, 0, 0);
-                break;
-            case 2:
-                shortcutLayout.setPadding(0, 100, 0, 0);
-                break;
-            default:
-                shortcutLayout.setPadding(0, 0, 0, 0);
+        if (size == 0) {
+            size = 1;
         }
 
         // Redraw the layout

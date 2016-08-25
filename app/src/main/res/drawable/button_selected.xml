@@ -4,7 +4,6 @@
         <solid
             android:color="#000000"/>
 
-
     </shape>
 
     <item android:top="-2dp" android:bottom="-2dp" android:left="-2dp">
