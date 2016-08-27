@@ -22,4 +22,7 @@
     <string name="text_empty">Vacío</string>
     <string name="text_add_tab">Añadir pestaña</string>
     <string name="text_new_tab_name">Introduzca el nuevo nombre</string>
+    <string name="text_move_tab">Mover</string>
+    <string name="text_move_tab_toast">Toque la otra pestaña con la que se intercambiará, o la misma para cancelar</string>
+    <string name="text_operation_cancelled">Operación cancelada</string>
 </resources>

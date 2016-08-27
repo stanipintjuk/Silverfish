@@ -43,6 +43,11 @@ public class TabbedAppDrawerFragment extends Fragment {
     private View rootView;
     private TabFragmentHandler tabHandler;
 
+    // Are we swapping tabs? This will be consumed by the tab.onClick event
+    private boolean isSwappingTabs;
+    private TabInfo swappingTab;
+    private int swappingTabIndex = -1;
+
     //endregion
 
     //region Android lifecycle
@@ -86,8 +91,9 @@ public class TabbedAppDrawerFragment extends Fragment {
         // Set up tab options
         CharSequence[] options = new CharSequence[]{
                 getString(R.string.text_rename),
+                getString(R.string.text_move_tab),
                 getString(R.string.text_remove),
-                getString(R.string.text_add_tab),
+                getString(R.string.text_add_tab)
         };
 
         // add click listener
@@ -99,9 +105,12 @@ public class TabbedAppDrawerFragment extends Fragment {
                         promptRenameTab(tab, tab_index);
                         break;
                     case 1:
-                        removeTab(tab, tab_index);
+                        prepareMoveTab(tab, tab_index);
                         break;
                     case 2:
+                        removeTab(tab, tab_index);
+                        break;
+                    case 3:
                         promptNewTab();
                         break;
                 }
@@ -131,7 +140,7 @@ public class TabbedAppDrawerFragment extends Fragment {
                     tabHandler.addTab(input.getText().toString());
                 } catch (IllegalArgumentException e) {
                     // This means that the tab name was empty.
-                    showToast(getString(R.string.text_cannot_name_empty));
+                    showToast(R.string.text_cannot_name_empty);
                 }
             }
         });
@@ -149,7 +158,7 @@ public class TabbedAppDrawerFragment extends Fragment {
             tabHandler.removeTab(tab, tab_index);
         } catch (IllegalArgumentException e) {
             // This means that the user wanted to remove the first tab
-            showToast(getString(R.string.text_cannot_remove_tab));
+            showToast(R.string.text_cannot_remove_tab);
         }
     }
 
@@ -175,7 +184,7 @@ public class TabbedAppDrawerFragment extends Fragment {
                     tabHandler.renameTab(tab, tab_index, input.getText().toString());
                 } catch (IllegalArgumentException e){
                     /* This means that the user entered an empty name */
-                    showToast(getString(R.string.text_cannot_name_empty));
+                    showToast(R.string.text_cannot_name_empty);
                 }
             }
         });
@@ -189,6 +198,28 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.show();
     }
 
+    private void prepareMoveTab(final TabInfo tab, final int tabIndex) {
+        isSwappingTabs = true;
+        swappingTab = tab;
+        swappingTabIndex = tabIndex;
+        showLongToast(R.string.text_move_tab_toast);
+    }
+
+    private void endMoveTab(final TabInfo tab, final int tabIndex) {
+        if (swappingTabIndex != tabIndex) {
+            tabHandler.swapTabs(swappingTab, swappingTabIndex, tab, tabIndex);
+        } else {
+            showToast(R.string.text_operation_cancelled);
+        }
+        consumeMoveTab();
+    }
+
+    private void consumeMoveTab() {
+        isSwappingTabs = false;
+        swappingTab = null;
+        swappingTabIndex = -1;
+    }
+
     //endregion
 
     //region Listeners
@@ -199,6 +230,10 @@ public class TabbedAppDrawerFragment extends Fragment {
 
             @Override
             public void onClick(TabInfo tab, int position) {
+                if (isSwappingTabs) {
+                    endMoveTab(tab, position);
+                }
+                // Don't add an else clause, so we also update the tab position to refresh the apps
                 tabHandler.setTab(position);
             }
 
@@ -351,9 +386,15 @@ public class TabbedAppDrawerFragment extends Fragment {
     //endregion
 
     //region UI
-    private void showToast(String msg){
-        Toast.makeText(getActivity().getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
+    private void showToast(int stringId) {
+        Toast.makeText(getContext(), getString(stringId), Toast.LENGTH_SHORT).show();
     }
+
+    private void showLongToast(int stringId) {
+        Toast.makeText(getContext(), getString(stringId), Toast.LENGTH_LONG).show();
+    }
+
     //endregion
 
 }

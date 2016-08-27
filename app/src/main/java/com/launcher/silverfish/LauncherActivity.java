@@ -108,8 +108,6 @@ public class LauncherActivity extends FragmentActivity {
         }
     }
 
-
-
     // Auto sorts the applications in their corresponding tabs
     private void autoSortApplications() {
 
@@ -228,4 +226,3 @@ public class LauncherActivity extends FragmentActivity {
 
     //endregion
 }
-

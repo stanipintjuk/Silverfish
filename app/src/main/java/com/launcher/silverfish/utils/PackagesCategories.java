@@ -2,7 +2,6 @@ package com.launcher.silverfish.utils;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.util.Log;
 
 import com.launcher.silverfish.R;
@@ -136,16 +135,6 @@ public final class PackagesCategories {
                     }
                 }
             }
-            Log.d("PACKAGES",
-                    "*  Package: " + pkg +
-                    "\n   Activity: " + ri.activityInfo.name +
-                    "\n   Name: " + ri.loadLabel(ctx.getPackageManager()) +
-                    "\n   ResolvePackageName: " + ri.resolvePackageName +
-                    "\n   PackageName: " + ri.activityInfo.packageName +
-                    "\n   AppPackageName : " + ri.activityInfo.applicationInfo.packageName +
-                    "\n   AppLabel: " + ri.activityInfo.applicationInfo.loadLabel(ctx.getPackageManager()) +
-                    "\n   Category: " + category
-            );
         }
 
         return pkg_categoryId;
