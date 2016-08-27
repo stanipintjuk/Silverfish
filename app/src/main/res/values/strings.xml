@@ -21,9 +21,12 @@
     <string name="text_renaming_tab">Renaming «%s»</string>
     <string name="text_rename">Rename</string>
     <string name="text_cancel">Cancel</string>
+    <string name="text_operation_cancelled">Operation cancelled</string>
     <string name="text_app_drawer">App drawer</string>
     <string name="text_home_screen">Home screen</string>
     <string name="text_empty">Empty</string>
     <string name="text_add_tab">Add tab</string>
     <string name="text_new_tab_name">Enter new tab name</string>
+    <string name="text_move_tab">Move</string>
+    <string name="text_move_tab_toast">Please tap the tab to be swapped, or the same to cancel</string>
 </resources>

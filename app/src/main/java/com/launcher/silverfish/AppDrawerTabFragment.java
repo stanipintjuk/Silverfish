@@ -98,12 +98,10 @@ public class AppDrawerTabFragment extends Fragment {
         if (success) {
             sortAppsList();
             arrayAdapter.notifyDataSetChanged();
-
             // add to database only if it is not the first tab
             if (tabId != 1)
                 sqlHelper.addAppToTab(app_name, tabId);
         }
-
     }
 
     private boolean addAppToArrayAdapter(String app_name) {

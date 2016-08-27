@@ -20,12 +20,10 @@
 package com.launcher.silverfish;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -38,8 +36,9 @@ import com.launcher.silverfish.dbmodel.TabTable;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.lang.IllegalAccessException;
+import java.util.Map;
 
 /**
  * Created by Stanislav Pintjuk on 8/12/16.
@@ -284,7 +283,7 @@ public class TabFragmentHandler {
 
     //endregion
 
-    //region click listener
+    //region Click listener
 
     public void setOnTabButtonClickListener(TabButtonClickListener clickListener){
         tabButtonClickListener = clickListener;
@@ -322,7 +321,46 @@ public class TabFragmentHandler {
     }
     //endregion
 
-    //region Rename, remove, add tab
+    //region Rename, move, remove, add tab
+
+    public void swapTabs(TabInfo left, int leftIndex, TabInfo right, int rightIndex) {
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+
+        // Get their original names
+        String leftName = sql.getTabName(left.getId());
+        String rightName = sql.getTabName(right.getId());
+
+        // Swap the names, from SQL
+        sql.renameTab(left.getId(), rightName);
+        sql.renameTab(right.getId(), leftName);
+        // From the array buttons
+        arrButton.get(leftIndex).setText(rightName);
+        arrButton.get(rightIndex).setText(leftName);
+        // And from the TabInfo
+        left.rename(rightName);
+        right.rename(leftName);
+
+        // And now swap the applications by updating their category
+        Map<String, Integer> leftApps = new HashMap<String, Integer>();
+        for (String app : sql.getAppsForTab(left.getId())) {
+            int category = rightIndex + 1; // Categories start one over
+            leftApps.put(app, category);
+        }
+
+        Map<String, Integer> rightApps = new HashMap<String, Integer>();
+        for (String app : sql.getAppsForTab(right.getId())) {
+            int category = leftIndex + 1; // Categories start one over
+            rightApps.put(app, category);
+        }
+
+        // First remove the apps from their original tab, we don't want duplicates!
+        sql.removeAppsFromTab(sql.getAppsForTab(left.getId()), left.getId());
+        sql.removeAppsFromTab(sql.getAppsForTab(right.getId()), right.getId());
+
+        // Finally, move the applications
+        sql.addAppsToTab(leftApps);
+        sql.addAppsToTab(rightApps);
+    }
 
     public void addTab(String tab_name){
         if (tab_name == null || tab_name.isEmpty()) {
@@ -388,7 +426,6 @@ public class TabFragmentHandler {
             arrButton.get(tab_index).setText(new_name);
 
             tab.rename(new_name);
-
         }
     }
 

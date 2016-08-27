@@ -30,6 +30,7 @@ import com.launcher.silverfish.ShortcutDetail;
 import com.launcher.silverfish.dbmodel.TabTable;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class LauncherSQLiteHelper extends SQLiteOpenHelper {
@@ -135,6 +136,17 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                 null);
 
         db.close();
+    }
+
+    public String getTabName(int tab_id) {
+        // Select all tabs from database
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT "+KEY_LABEL+" FROM "+ TABLE_TABS+" WHERE "+KEY_ID+" = "+Integer.toString(tab_id);
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            return cursor.getString(0);
+        }
+        throw new IndexOutOfBoundsException("The given tab_id is not valid");
     }
 
     public int renameTab(int tab_id, String new_name) {
@@ -250,6 +262,17 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                 KEY_PACKAGE_NAME + " = ? AND "+
                         KEY_TAB_ID+" = ?",
                 new String[]{app_name, Integer.toString(tab_id)});
+        db.close();
+    }
+
+    public void removeAppsFromTab(List<String> appNames, int tabId) {
+        SQLiteDatabase db = getWritableDatabase();
+        for (String appName : appNames) {
+            db.delete(TABLE_APPS,
+                    KEY_PACKAGE_NAME + " = ? AND " +
+                            KEY_TAB_ID + " = ?",
+                    new String[]{appName, Integer.toString(tabId)});
+        }
         db.close();
     }
 
