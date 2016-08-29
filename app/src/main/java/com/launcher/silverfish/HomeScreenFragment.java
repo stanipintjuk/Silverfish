@@ -32,9 +32,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -44,11 +46,12 @@ import android.widget.TextView;
 
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HomeScreenFragment extends Fragment {
+public class HomeScreenFragment extends Fragment  {
 
     //region Fields
 
@@ -68,6 +71,11 @@ public class HomeScreenFragment extends Fragment {
     private ArrayList<AppDetail> appsList;
     private SquareGridLayout shortcutLayout;
 
+    // Save the last X and Y position on the touch events, for later calculating the speed of change
+    private float lastX, lastY;
+    private boolean touchConsumed; // Did we consume the touch event yet? This will avoid calling it twice
+    private final float speedThreshold = 20; // Arbitrary speed threshold (could and should be a setting)
+
     //endregion
 
     //region Android lifecycle
@@ -78,7 +86,7 @@ public class HomeScreenFragment extends Fragment {
 
         sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
 
-        //initiate global variables
+        // Initiate global variables
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getBaseContext());
         mAppWidgetHost = new LauncherAppWidgetHost(getActivity().getApplicationContext(), WIDGET_HOST_ID);
         mAppWidgetHost.startListening();
@@ -87,6 +95,9 @@ public class HomeScreenFragment extends Fragment {
         appsList = new ArrayList<AppDetail>();
 
         rootView = inflater.inflate(R.layout.activity_home, container, false);
+        // Listen for touch events, such as swipe
+        rootView.setOnTouchListener(onTouchListener);
+
         shortcutLayout = (SquareGridLayout)rootView.findViewById(R.id.shortcut_area);
 
         // Start listening for shortcut additions
@@ -484,6 +495,57 @@ public class HomeScreenFragment extends Fragment {
             if (appWidgetId != -1) {
                 mAppWidgetHost.deleteAppWidgetId(appWidgetId);
             }
+        }
+    }
+
+    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent event) {
+            switch(MotionEventCompat.getActionMasked(event)) {
+                case MotionEvent.ACTION_DOWN:
+                    lastX = event.getX();
+                    lastY = event.getY();
+                    touchConsumed = false;
+                    break;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (!touchConsumed) {
+                        // Also subtract the X: we want to trigger if we scroll down, not to the sides
+                        float downSpeed = event.getY() - lastY - Math.abs(lastX - event.getX());
+                        if (downSpeed > speedThreshold) {
+                            // The user swiped down, show the status bar and consume the event
+                            expandNotificationPanel();
+                            touchConsumed = true;
+                        } else {
+                            lastX = event.getX();
+                            lastY = event.getY();
+                        }
+                    }
+                    break;
+            }
+
+            return true;
+        }
+    };
+
+    //endregion
+
+    //region UI
+
+    void expandNotificationPanel() {
+        try
+        {
+            //noinspection WrongConstant
+            Object service = getActivity().getSystemService("statusbar");
+            Class<?> clazz = Class.forName("android.app.StatusBarManager");
+            Method expand = Build.VERSION.SDK_INT <= 16 ?
+                    clazz.getMethod("expand") :
+                    clazz.getMethod("expandNotificationsPanel");
+
+            expand.invoke(service);
+        }
+        catch (Exception localException) {
+            localException.printStackTrace();
         }
     }
 
