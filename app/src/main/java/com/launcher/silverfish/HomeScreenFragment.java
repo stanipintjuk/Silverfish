@@ -38,6 +38,7 @@ import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
@@ -74,7 +75,7 @@ public class HomeScreenFragment extends Fragment  {
     // Save the last X and Y position on the touch events, for later calculating the speed of change
     private float lastX, lastY;
     private boolean touchConsumed; // Did we consume the touch event yet? This will avoid calling it twice
-    private final float speedThreshold = 20; // Arbitrary speed threshold (could and should be a setting)
+    private float touchSlop;
 
     //endregion
 
@@ -95,8 +96,9 @@ public class HomeScreenFragment extends Fragment  {
         appsList = new ArrayList<AppDetail>();
 
         rootView = inflater.inflate(R.layout.activity_home, container, false);
-        // Listen for touch events, such as swipe
-        rootView.setOnTouchListener(onTouchListener);
+        // Set touch slop and listen for touch events, such as swipe
+        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+        rootView.setOnTouchListener(onRootTouchListener);
 
         shortcutLayout = (SquareGridLayout)rootView.findViewById(R.id.shortcut_area);
 
@@ -204,11 +206,28 @@ public class HomeScreenFragment extends Fragment  {
             tv.setText(app.label);
             shortcutLayout.addView(convertView);
 
-            convertView.setOnClickListener(new View.OnClickListener() {
+            convertView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View view) {
-                    Intent i = mPacMan.getLaunchIntentForPackage(app.name.toString());
-                    startActivity(i);
+                public boolean onTouch(View view, MotionEvent event) {
+                    switch(MotionEventCompat.getActionMasked(event)) {
+                        case MotionEvent.ACTION_DOWN:
+                            updateTouchDown(event);
+                            break;
+
+                        case MotionEvent.ACTION_MOVE:
+                            tryConsumeSwipe(event);
+                            break;
+
+                        case MotionEvent.ACTION_UP:
+                            // We only want to launch the activity if the touch was not consumed yet!
+                            if (!touchConsumed) {
+                                Intent i = mPacMan.getLaunchIntentForPackage(app.name.toString());
+                                startActivity(i);
+                            }
+                            break;
+                    }
+
+                    return touchConsumed;
                 }
             });
 
@@ -396,7 +415,9 @@ public class HomeScreenFragment extends Fragment  {
             Bundle args = new Bundle();
             args.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER, cn);
-            args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE, null);
+            if (Build.VERSION.SDK_INT >= 21) {
+                args.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER_PROFILE, null);
+            }
             i.putExtras(args);
             startActivityForResult(i, REQUEST_BIND_APPWIDGET);
             return;
@@ -498,29 +519,16 @@ public class HomeScreenFragment extends Fragment  {
         }
     }
 
-    View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+    View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent event) {
             switch(MotionEventCompat.getActionMasked(event)) {
                 case MotionEvent.ACTION_DOWN:
-                    lastX = event.getX();
-                    lastY = event.getY();
-                    touchConsumed = false;
+                    updateTouchDown(event);
                     break;
 
                 case MotionEvent.ACTION_MOVE:
-                    if (!touchConsumed) {
-                        // Also subtract the X: we want to trigger if we scroll down, not to the sides
-                        float downSpeed = event.getY() - lastY - Math.abs(lastX - event.getX());
-                        if (downSpeed > speedThreshold) {
-                            // The user swiped down, show the status bar and consume the event
-                            expandNotificationPanel();
-                            touchConsumed = true;
-                        } else {
-                            lastX = event.getX();
-                            lastY = event.getY();
-                        }
-                    }
+                    tryConsumeSwipe(event);
                     break;
             }
 
@@ -531,6 +539,26 @@ public class HomeScreenFragment extends Fragment  {
     //endregion
 
     //region UI
+
+    void updateTouchDown(MotionEvent event) {
+        lastX = event.getX();
+        lastY = event.getY();
+        touchConsumed = false;
+    }
+
+    void tryConsumeSwipe(MotionEvent event) {
+        if (!touchConsumed) {
+            // Also subtract the X: we want to trigger if we scroll down, not to the sides
+            float downSpeed = event.getY() - lastY - Math.abs(lastX - event.getX());
+            if (downSpeed > touchSlop) {
+                // The user swiped down, show the status bar and consume the event
+                expandNotificationPanel();
+                touchConsumed = true;
+            } else {
+                updateTouchDown(event);
+            }
+        }
+    }
 
     void expandNotificationPanel() {
         try
