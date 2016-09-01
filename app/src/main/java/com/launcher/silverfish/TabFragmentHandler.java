@@ -324,42 +324,47 @@ public class TabFragmentHandler {
     //region Rename, move, remove, add tab
 
     public void swapTabs(TabInfo left, int leftIndex, TabInfo right, int rightIndex) {
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+        // Don't allow the first tab to be moved
+        if (leftIndex == 0 || rightIndex == 0){
+            throw new IllegalArgumentException("First tab is not allowed to be moved.");
+        } else {
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
 
-        // Get their original names
-        String leftName = sql.getTabName(left.getId());
-        String rightName = sql.getTabName(right.getId());
+            // Get their original names
+            String leftName = sql.getTabName(left.getId());
+            String rightName = sql.getTabName(right.getId());
 
-        // Swap the names, from SQL
-        sql.renameTab(left.getId(), rightName);
-        sql.renameTab(right.getId(), leftName);
-        // From the array buttons
-        arrButton.get(leftIndex).setText(rightName);
-        arrButton.get(rightIndex).setText(leftName);
-        // And from the TabInfo
-        left.rename(rightName);
-        right.rename(leftName);
+            // Swap the names, from SQL
+            sql.renameTab(left.getId(), rightName);
+            sql.renameTab(right.getId(), leftName);
+            // From the array buttons
+            arrButton.get(leftIndex).setText(rightName);
+            arrButton.get(rightIndex).setText(leftName);
+            // And from the TabInfo
+            left.rename(rightName);
+            right.rename(leftName);
 
-        // And now swap the applications by updating their category
-        Map<String, Integer> leftApps = new HashMap<String, Integer>();
-        for (String app : sql.getAppsForTab(left.getId())) {
-            int category = rightIndex + 1; // Categories start one over
-            leftApps.put(app, category);
+            // And now swap the applications by updating their category
+            Map<String, Integer> leftApps = new HashMap<String, Integer>();
+            for (String app : sql.getAppsForTab(left.getId())) {
+                int category = rightIndex + 1; // Categories start one over
+                leftApps.put(app, category);
+            }
+
+            Map<String, Integer> rightApps = new HashMap<String, Integer>();
+            for (String app : sql.getAppsForTab(right.getId())) {
+                int category = leftIndex + 1; // Categories start one over
+                rightApps.put(app, category);
+            }
+
+            // First remove the apps from their original tab, we don't want duplicates!
+            sql.removeAppsFromTab(sql.getAppsForTab(left.getId()), left.getId());
+            sql.removeAppsFromTab(sql.getAppsForTab(right.getId()), right.getId());
+
+            // Finally, move the applications
+            sql.addAppsToTab(leftApps);
+            sql.addAppsToTab(rightApps);
         }
-
-        Map<String, Integer> rightApps = new HashMap<String, Integer>();
-        for (String app : sql.getAppsForTab(right.getId())) {
-            int category = leftIndex + 1; // Categories start one over
-            rightApps.put(app, category);
-        }
-
-        // First remove the apps from their original tab, we don't want duplicates!
-        sql.removeAppsFromTab(sql.getAppsForTab(left.getId()), left.getId());
-        sql.removeAppsFromTab(sql.getAppsForTab(right.getId()), right.getId());
-
-        // Finally, move the applications
-        sql.addAppsToTab(leftApps);
-        sql.addAppsToTab(rightApps);
     }
 
     public void addTab(String tab_name){
@@ -429,24 +434,24 @@ public class TabFragmentHandler {
         }
     }
 
-    public void removeTab(TabInfo tab, int tab_index){
-        // don't allow the first tab to be removed
+    public void removeTab(TabInfo tab, int tab_index) {
+        // Don't allow the first tab to be removed
         if (tab_index == 0){
             throw new IllegalArgumentException("First tab is not allowed to be removed.");
         } else {
-            // remove the tab from the database
+            // Remove the tab from the database
             LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
             sql.removeTab(tab.getId());
 
-            // hide the tab button
+            // Hide the tab button
             Button btn = arrButton.get(tab_index);
             btn.setVisibility(View.GONE);
 
-            //remove the tab fragment
+            // Remove the tab fragment
             FragmentTransaction ft = mFragmentManager.beginTransaction();
             ft.remove(mFragmentManager.findFragmentByTag(tab.getTag()));
 
-            //got to first tab
+            // Go to the first tab
             setTab(0);
         }
 

@@ -207,7 +207,12 @@ public class TabbedAppDrawerFragment extends Fragment {
 
     private void endMoveTab(final TabInfo tab, final int tabIndex) {
         if (swappingTabIndex != tabIndex) {
-            tabHandler.swapTabs(swappingTab, swappingTabIndex, tab, tabIndex);
+            try {
+                tabHandler.swapTabs(swappingTab, swappingTabIndex, tab, tabIndex);
+            } catch (IllegalArgumentException e) {
+                // This means that the user wanted to remove the first tab
+                showToast(R.string.text_cannot_move_tab);
+            }
         } else {
             showToast(R.string.text_operation_cancelled);
         }
