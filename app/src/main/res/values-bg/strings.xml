@@ -1,0 +1,27 @@
+<resources>
+    <string name="text_hold_to_change_widget">Задръжте за смяна на приспособлението</string>
+    <string name="text_empty_category_notice">Този раздел е празен. Можете да местите приложения между раздели като ги влачите.</string>
+    <string name="text_cannot_name_empty">Разделът трябва да има име</string>
+    <string name="text_cannot_remove_tab">Не можете да премахнете този раздел</string>
+    <string name="text_remove">Премахни</string>
+    <string name="text_uninstall">Деинсталирай</string>
+    <string name="tab_other">Други</string>
+    <string name="tab_phone">Телефон</string>
+    <string name="tab_internet">Интернет</string>
+    <string name="tab_games">Игри</string>
+    <string name="tab_media">Медия</string>
+    <string name="tab_accessories">Аксесоари</string>
+    <string name="tab_settings">Настройки</string>
+    <string name="text_renaming_tab">Преименуване на «%s»</string>
+    <string name="text_rename">Преименувай</string>
+    <string name="text_cancel">Отказ</string>
+    <string name="text_operation_cancelled">Операция прекратена</string>
+    <string name="text_app_drawer">Меню с приложения</string>
+    <string name="text_home_screen">Начален екран</string>
+    <string name="text_empty">Празно</string>
+    <string name="text_add_tab">Добави раздел</string>
+    <string name="text_new_tab_name">Въведете име на раздел</string>
+    <string name="text_move_tab">Премести</string>
+    <string name="text_move_tab_toast">Докоснете раздела, с който искате да размените, или същия за отказ</string>
+	<string name="text_cannot_move_tab">Не можете да преместите този раздел</string>
+</resources>
