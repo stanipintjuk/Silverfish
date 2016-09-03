@@ -25,4 +25,5 @@
     <string name="text_move_tab">Mover</string>
     <string name="text_move_tab_toast">Toque la otra pestaña con la que se intercambiará, o la misma para cancelar</string>
     <string name="text_operation_cancelled">Operación cancelada</string>
+    <string name="text_cannot_move_tab">No se puede mover esta pestaña</string>
 </resources>

@@ -7,6 +7,7 @@
     <string name="text_empty_category_notice">This tab is currently empty. You can move apps between tabs by dragging them.</string>
     <string name="text_cannot_name_empty">The tab must have a non-empty name</string>
     <string name="text_cannot_remove_tab">Cannot remove this tab</string>
+    <string name="text_cannot_move_tab">Cannot move this tab</string>
     <string name="text_remove">Remove</string>
     <string name="text_uninstall">Uninstall</string>
 
