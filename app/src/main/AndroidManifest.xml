@@ -14,7 +14,7 @@
 
         <activity
             android:name=".LauncherActivity"
-            android:theme="@style/AppTheme.ActionBar.Transparent"
+            android:theme="@style/AppTheme"
             android:label="Silverfish Launcher"
             >
             <!--android:theme="@android:style/Theme.Wallpaper.NoTitleBar"-->
