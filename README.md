@@ -4,7 +4,7 @@ This is a simple and lightweight launcher for Android (... and heavily inspired 
 
 [<img src="https://f-droid.org/badge/get-it-on.png"
       alt="Get it on F-Droid"
-      height="80">](https://f-droid.org/app/YOUR.APP.ID)
+      height="80">](https://f-droid.org/app/com.launcher.silverfish)
 
 
 
