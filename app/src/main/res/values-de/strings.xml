@@ -22,4 +22,8 @@
     <string name="text_empty">Leer</string>
     <string name="text_add_tab">Tab hinzufügen</string>
     <string name="text_new_tab_name">Neuen Tab Namen eingeben</string>
+    <string name="text_move_tab">Verschieben</string>
+    <string name="text_cannot_move_tab">Kann diesen Tab nicht verschieben</string>
+    <string name="text_move_tab_toast">Bitte drücken Sie auf den Tab, welcher ausgetauscht werden soll, oder selbigen und abzubrechen.</string>
+    <string name="text_operation_cancelled">Vorgang abgebrochen</string>
 </resources>

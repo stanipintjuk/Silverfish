@@ -22,4 +22,8 @@
     <string name="text_empty">Vide</string>
     <string name="text_add_tab">Ajouter un onglet</string>
     <string name="text_new_tab_name">Modifier le nom de l\'onglet</string>
+    <string name="text_cannot_move_tab">Vous ne pouvez pas déplacer cet onglet</string>
+    <string name="text_move_tab">Déplacer</string>
+    <string name="text_move_tab_toast">Appuyez sur un autre onglet pour échanger la position des deux onglets ou appuyez sur le même onglet pour annuler l\'opération.</string>
+    <string name="text_operation_cancelled">Opération annulée</string>
 </resources>
