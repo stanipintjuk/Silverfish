@@ -477,6 +477,23 @@ public class HomeScreenFragment extends Fragment  {
                 return true;
             }
         });
+
+        hostView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                switch(MotionEventCompat.getActionMasked(event)) {
+                    case MotionEvent.ACTION_DOWN:
+                        updateTouchDown(event);
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        tryConsumeSwipe(event);
+                        break;
+                }
+
+                return touchConsumed;
+            }
+        });
     }
 
     //endregion
