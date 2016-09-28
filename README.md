@@ -1,5 +1,11 @@
-#Silverfish Launcher v0.3
+#Silverfish Launcher v0.4
 This is a simple and lightweight launcher for Android (... and heavily inspired by SmartLauncher)
+
+
+[<img src="https://f-droid.org/badge/get-it-on.png"
+      alt="Get it on F-Droid"
+      height="80">](https://f-droid.org/app/YOUR.APP.ID)
+
 
 
 # Usage
@@ -14,12 +20,12 @@ You can add shortcuts to the homescreen by going to the app drawer (swipe right)
 The homescreen will automatically position your shortcuts in such a way that they will form a square.
 
 
-The app drawer is devided into multiple tabs for different application types, like SmartLauncher. Unlike SmartLauncher the apps are not automatically placed in their corresponding tabs, so you will have to place them there yourself :( 
+The app drawer is devided into multiple tabs for different application types, like SmartLauncher. Unlike Smart Launcher Silverfish isn't smart and doesn't sort your apps automatically very well, so you will have to sort your apps yourself :(
 
-You can add, remova or rename a tab by simply long clicking it.
+You can add, remove or rename a tab by long clicking it.
 
 #Notes
-Keep in mind that this is just the second beta version so the functionality is very limited and bugs are expected. I mostly wrote it to scratch my own itch. As my itch gets worse more functionality will be implemented. If you have an itch that you want to scratch then your commits are welcome :)
+I mostly wrote it to scratch my own itch. As my itch gets worse more functionality will be implemented. If you have an itch that you want to scratch then your commits are welcome :)
 
 #Todo 
 * Make the launcher functional and stable - ✓
@@ -38,8 +44,11 @@ Keep in mind that this is just the second beta version so the functionality is v
     - Change shortcut layout
     - Change the tab icons.
 
-# Changes since last version (v0.2 Alpha)
-* Fixed some bugs
-* Added ability to remove and add tabs
-* App icons now load async so they will not slow down main thread.
-* Added french translation
+# Changes since last version (v0.3 Alpha)
+* Added the ability to move tabs
+* Added the ability to swipe down on homescreen to show the notification panel
+* Added bulgarian translation
+
+#Thanks to...
+Thank you @Teyro, @Pierre-lbt, @ImAnnoying, @AlbertWDev and @XyLoNaMiyX for your contributions! :)
+
