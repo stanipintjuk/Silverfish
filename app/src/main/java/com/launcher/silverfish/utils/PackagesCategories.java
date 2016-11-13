@@ -134,13 +134,13 @@ public final class PackagesCategories {
                         if(pkg.contains("contacts")) Log.d("PACKAGES", "==== CONTACTS APP ====");
                         category = key;
                         pkg_categoryId.put(pkg, getCategoryId(key));
-                        System.out.println(pkg + " -> " + category);
+                        //System.out.println(pkg + " -> " + category);
                         hit = true;
                     }
                 }
             }
 
-            if (!hit) System.out.println(pkg);
+           // if (!hit) System.out.println(pkg);
         }
 
         return pkg_categoryId;
