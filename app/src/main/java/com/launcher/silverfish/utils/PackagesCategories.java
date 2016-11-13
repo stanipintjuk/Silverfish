@@ -81,9 +81,9 @@ public final class PackagesCategories {
         HashMap<String, String[]> keywordsDict = new HashMap<>();
 
         keywordsDict.put("Phone", new String[]{"phone", "conv", "call", "sms", "mms", "contacts", "stk"});  // stk stands for "SIM Toolkit"
-        keywordsDict.put("Games", new String[]{"game", "play"});
+        keywordsDict.put("Games", new String[]{"game", "play", "puzz"});
         keywordsDict.put("Internet", new String[]{"download", "mail", "vending", "browser", "maps", "twitter", "whatsapp", "outlook", "dropbox", "chrome", "drive"});
-        keywordsDict.put("Media", new String[]{"pic", "gallery", "photo", "cam", "tube", "radio", "tv", "voice", "video", "music"});
+        keywordsDict.put("Media", new String[]{"pic", "gallery", "photo", "cam", "tube", "radio", "tv", "voice", "video", "music", "mp3"});
         keywordsDict.put("Accessories", new String[]{"editor", "calc", "calendar", "organize", "clock", "time", "viewer", "file", "manager", "memo", "note"});
         keywordsDict.put("Settings", new String[]{"settings", "config", "keyboard", "launcher", "sync", "backup"});
 
@@ -111,7 +111,7 @@ public final class PackagesCategories {
         for (int i = 0; i < activities.size(); i++) {
             ResolveInfo ri = activities.get(i);
             pkg = ri.activityInfo.packageName;
-
+            boolean hit = false;
 
             if (categories.containsKey(pkg)) {
                 category = categories.get(pkg);
@@ -120,10 +120,12 @@ public final class PackagesCategories {
                 // Only add if not default
                 if (categoryId > 1) {
                     pkg_categoryId.put(pkg, categoryId);
+                    hit = true;
                 }
             }
+
             // Intelligent fallback: Try to guess the category
-            else {
+            if (!hit) {
                 pkg = pkg.toLowerCase();
                 for (String key : keywords.keySet())
                 {
@@ -132,9 +134,13 @@ public final class PackagesCategories {
                         if(pkg.contains("contacts")) Log.d("PACKAGES", "==== CONTACTS APP ====");
                         category = key;
                         pkg_categoryId.put(pkg, getCategoryId(key));
+                        System.out.println(pkg + " -> " + category);
+                        hit = true;
                     }
                 }
             }
+
+            if (!hit) System.out.println(pkg);
         }
 
         return pkg_categoryId;
