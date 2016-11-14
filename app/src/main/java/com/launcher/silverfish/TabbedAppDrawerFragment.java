@@ -297,7 +297,7 @@ public class TabbedAppDrawerFragment extends Fragment {
                     case DragEvent.ACTION_DROP: {
 
                         // If app is dropped on the uninstall indicator uninstall the app
-                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
+                        if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
                             String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
                             launchUninstallIntent(app_name);
 

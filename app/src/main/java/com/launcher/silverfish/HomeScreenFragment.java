@@ -292,7 +292,7 @@ public class HomeScreenFragment extends Fragment  {
                     case DragEvent.ACTION_DROP:
 
                         // If outside of bound, remove the app
-                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
+                        if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
                             String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
                             String appIndex = dragEvent.getClipData().getItemAt(1).getText().toString();
                             removeApp(Integer.parseInt(appIndex), Long.parseLong(appId));
