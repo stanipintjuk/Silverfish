@@ -6,5 +6,5 @@
         android:type="radial"
         android:centerX=".5"
         android:centerY="1"
-        android:gradientRadius="100%"/>
+        android:gradientRadius="100%p"/>
 </shape>
