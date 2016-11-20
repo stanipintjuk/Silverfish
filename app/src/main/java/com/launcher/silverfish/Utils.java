@@ -49,6 +49,16 @@ public class Utils {
         return (y >= screen_height - threshold);
     }
 
+    public static boolean onBottomCenterScreenEdge(Activity activity, float x, float y) {
+        Point screensize = getScreenDimensions(activity);
+        int screen_width = screensize.x;
+        int screen_height = screensize.y;
+        // Set the threshold to be 10% of the screen height
+        float thresholdx = 20.0f*screen_height/100.0f;
+        float thresholdy = 10.0f*screen_height/100.0f;
+        return (y >= screen_height - thresholdy && x <= screen_width - thresholdx && x >= 0+thresholdx);
+    }
+
     public static void loadAppIconAsync(final PackageManager pm, final String appInfo, final ImageView im ){
 
         // Create an async task
