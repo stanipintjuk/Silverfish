@@ -1,0 +1,30 @@
+<resources>
+
+    <string name="text_hold_to_change_widget">長押ししてウィジェットを変更</string>
+    <string name="text_empty_category_notice">このタブは現在空です。 アプリをドラッグしてタブの間を移動することができます。</string>
+    <string name="text_cannot_name_empty">タブの名前は空にすることはできません</string>
+    <string name="text_cannot_remove_tab">このタブは削除できません</string>
+    <string name="text_cannot_move_tab">このタブは移動できません</string>
+    <string name="text_remove">削除</string>
+    <string name="text_uninstall">アンインストール</string>
+
+    <string name="tab_other">その他</string>
+    <string name="tab_phone">電話</string>
+    <string name="tab_internet">インターネット</string>
+    <string name="tab_games">ゲーム</string>
+    <string name="tab_media">メディア</string>
+    <string name="tab_accessories">アクセサリー</string>
+    <string name="tab_settings">設定</string>
+
+    <string name="text_renaming_tab">残り «%s»</string>
+    <string name="text_rename">名前の変更</string>
+    <string name="text_cancel">キャンセル</string>
+    <string name="text_operation_cancelled">操作をキャンセルしました</string>
+    <string name="text_app_drawer">アプリ ドロワー</string>
+    <string name="text_home_screen">ホーム画面</string>
+    <string name="text_empty">空</string>
+    <string name="text_add_tab">タブを追加</string>
+    <string name="text_new_tab_name">新しいタブ名を入力してください</string>
+    <string name="text_move_tab">移動</string>
+    <string name="text_move_tab_toast">交換するタブをタップしてください。同じものをタップするとキャンセルします</string>
+</resources>
