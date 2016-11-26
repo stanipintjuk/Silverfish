@@ -31,6 +31,10 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
     private CheckForLongPress mPendingCheckForLongPress;
     private LayoutInflater mInflater;
 
+    // Store both the X and Y coordinate on touch events to determine whether the finger moved
+    private float xOnDown, yOnDown;
+    private float xCurrent, yCurrent;
+
     //endregion
 
     //region Constructor
@@ -67,6 +71,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
     };
 
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+
         // Consume any touch events for ourselves after long press is triggered
         if (mHasPerformedLongPress) {
             mHasPerformedLongPress = false;
@@ -77,7 +82,19 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
         // users can always pick up this widget
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                // Pass the location so we can later check whether the user moved the finger
                 postCheckForLongClick();
+
+                // Store the initial position
+                xOnDown = ev.getX();
+                yOnDown = ev.getY();
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                // Store the current position
+                xCurrent = ev.getX();
+                yCurrent = ev.getY();
                 break;
             }
 
@@ -107,6 +124,21 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
 
     //endregion
 
+    //region Utils
+
+    /** Determines whether the finger has moved under a threshold.
+     * If so, we can consider the long click as valid
+     * @return True if the finger is under the threshold
+     */
+    boolean movementUnderThreshold() {
+        float xDist = Math.abs(xOnDown - xCurrent);
+        float yDist = Math.abs(yOnDown - yCurrent);
+        float distance = (float)Math.sqrt(xDist * xDist + yDist * yDist);
+        return distance < Constants.MOVE_THRESHOLD;
+    }
+
+    //endregion
+
     //region Subclasses
 
     class CheckForLongPress implements Runnable {
@@ -116,7 +148,10 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
             if ((getParent() != null) && hasWindowFocus()
                     && mOriginalWindowAttachCount == getWindowAttachCount()
                     && !mHasPerformedLongPress) {
-                if (performLongClick()) {
+
+                // If the finger movement is under the threshold (i.e. didn't move)
+                // and we performed a long click, notify
+                if (movementUnderThreshold() && performLongClick()) {
                     mHasPerformedLongPress = true;
                 }
             }

@@ -24,10 +24,13 @@ package com.launcher.silverfish;
  * Class with static variables used across the application.
  */
 public class Constants {
-    public static String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
-    public static String DRAG_APP_MOVE = "app_move";
+    public static final String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
+    public static final String DRAG_APP_MOVE = "app_move";
 
-    public static String TAB_ID = "tab_id";
+    public static final String TAB_ID = "tab_id";
 
-    public static int SCREEN_CORNER_THRESHOLD = 40;
+    public static final int SCREEN_CORNER_THRESHOLD = 40;
+
+    // Threshold for finger maximum movement (i.e. widget long press)
+    public static final int MOVE_THRESHOLD = 40;
 }
