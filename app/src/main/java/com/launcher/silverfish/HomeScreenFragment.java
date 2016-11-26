@@ -221,8 +221,10 @@ public class HomeScreenFragment extends Fragment  {
                         case MotionEvent.ACTION_UP:
                             // We only want to launch the activity if the touch was not consumed yet!
                             if (!touchConsumed) {
-                                Intent i = mPacMan.getLaunchIntentForPackage(app.name.toString());
-                                startActivity(i);
+                                if (isIconHit(view, event)) {
+                                    Intent i = mPacMan.getLaunchIntentForPackage(app.name.toString());
+                                    startActivity(i);
+                                }
                             }
                             break;
                     }
@@ -268,6 +270,25 @@ public class HomeScreenFragment extends Fragment  {
     }
 
     //endregion
+
+    public static boolean isIconHit(View view, MotionEvent event) {
+        System.out.print(event.getX() + "," + event.getY() + " : ");
+        System.out.println(view.getWidth() + "," + view.getHeight());
+
+
+        int iconsz = (int)view.getResources().getDimension(R.dimen.app_icon_size);
+
+        int centerx = view.getWidth()/2;
+        int centery = view.getHeight()/2;
+        float ex = event.getX();
+        float ey = event.getY();
+        if (    ex > centerx-iconsz && ex < centerx+iconsz &&
+                ey > centery-iconsz && ey < centery+iconsz) {
+            return true;
+        }
+
+        return false;
+    }
 
     //region Listeners
 
