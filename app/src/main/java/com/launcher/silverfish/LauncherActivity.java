@@ -51,6 +51,9 @@ public class LauncherActivity extends FragmentActivity {
     // Used for telling home screen when a shortcut is added.
     private ShortcutAddListener shortcutAddListener;
 
+    // Used when the intent is created to specify an starting page index
+    public static final String START_PAGE = "start_page";
+
     //endregion
 
     //region Android lifecycle
@@ -77,10 +80,9 @@ public class LauncherActivity extends FragmentActivity {
                         getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
 
         setDragListener();
-
     }
 
     //endregion

@@ -57,6 +57,7 @@ public class HomeScreenFragment extends Fragment  {
     //region Fields
 
     LauncherSQLiteHelper sqlHelper;
+    private Settings settings;
 
     // Constant variables for communication with AppWidgetManager
     final private int WIDGET_HOST_ID = 1339;
@@ -86,6 +87,7 @@ public class HomeScreenFragment extends Fragment  {
                              Bundle savedInstanceState) {
 
         sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        settings = new Settings(getContext());
 
         // Initiate global variables
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getBaseContext());
@@ -129,6 +131,14 @@ public class HomeScreenFragment extends Fragment  {
         updateShortcuts();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        boolean visible = settings.isWidgetVisible();
+        FrameLayout widget_area = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        widget_area.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     @Override

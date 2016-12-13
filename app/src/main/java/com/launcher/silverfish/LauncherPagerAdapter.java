@@ -54,6 +54,9 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
             case 1: // Second page is the 'home screen'
                 return new HomeScreenFragment();
 
+            case 2: // Third page is the 'settings activity'
+                return new SettingsScreenFragment();
+
             default: // Any other page (such as last) is an empty fragment
                 return new Fragment();
         }
@@ -61,7 +64,7 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -71,6 +74,8 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
                 return _context.getString(R.string.text_app_drawer);
             case 1:
                 return _context.getString(R.string.text_home_screen);
+            case 2:
+                return "Settings screen";
             default:
                 return _context.getString(R.string.text_empty);
         }
