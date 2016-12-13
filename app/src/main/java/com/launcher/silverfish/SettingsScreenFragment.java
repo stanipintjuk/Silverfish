@@ -1,6 +1,6 @@
 package com.launcher.silverfish;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,15 +12,24 @@ import android.widget.Toast;
 
 public class SettingsScreenFragment extends Fragment  {
 
+    //region Interfaces
+
+    public interface SettingChanged {
+        void onWidgetVisibilityChanged(boolean visible);
+    }
+
+    //endregion
+
     //region Fields
 
     private View rootView;
     private Settings settings;
 
+    private SettingChanged callback;
+
     //endregion
 
     //region Android lifecycle
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,7 +56,7 @@ public class SettingsScreenFragment extends Fragment  {
                 } else {
                     Toast.makeText(getContext(), R.string.widget_now_invisible, Toast.LENGTH_SHORT).show();
                 }
-                restartActivity();
+                callback.onWidgetVisibilityChanged(visible);
             }
         });
 
@@ -56,14 +65,25 @@ public class SettingsScreenFragment extends Fragment  {
 
     //endregion
 
-    //region Settings utilities
+    //region Fragment communication
 
-    // Some settings require the activity to restart to take effect
-    void restartActivity() {
-        Intent intent = getActivity().getIntent();
-        getActivity().finish();
-        intent.putExtra(LauncherActivity.START_PAGE, 2); // 2 = Settings screen
-        startActivity(intent);
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // Ensure the parent activity implements SettingChanged
+        try {
+            callback = (SettingChanged)getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(getActivity().toString()
+                    + " must implement SettingChanged");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        callback = null;
+        super.onDetach();
     }
 
     //endregion

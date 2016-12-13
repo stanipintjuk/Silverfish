@@ -39,7 +39,8 @@ import java.util.List;
 /**
  * This is the main activity of the launcher
  */
-public class LauncherActivity extends FragmentActivity {
+public class LauncherActivity extends FragmentActivity
+        implements SettingsScreenFragment.SettingChanged {
 
     //region Fields
 
@@ -126,6 +127,18 @@ public class LauncherActivity extends FragmentActivity {
 
         // Then add all the apps to their corresponding tabs at once
         sql.addAppsToTab(pkg_categoryId);
+    }
+
+    //endregion
+
+    //region Fragment communication
+
+    @Override
+    public void onWidgetVisibilityChanged(boolean visible) {
+        HomeScreenFragment homeScreenFragment = (HomeScreenFragment)
+                mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
+
+        homeScreenFragment.setWidgetVisibility(visible);
     }
 
     //endregion

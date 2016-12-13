@@ -75,7 +75,7 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return _context.getString(R.string.text_home_screen);
             case 2:
-                return "Settings screen";
+                return _context.getString(R.string.text_settings_screen);
             default:
                 return _context.getString(R.string.text_empty);
         }

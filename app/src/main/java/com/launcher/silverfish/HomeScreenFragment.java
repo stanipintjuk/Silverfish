@@ -136,9 +136,7 @@ public class HomeScreenFragment extends Fragment  {
     @Override
     public void onResume() {
         super.onResume();
-        boolean visible = settings.isWidgetVisible();
-        FrameLayout widget_area = (FrameLayout)rootView.findViewById(R.id.widget_area);
-        widget_area.setVisibility(visible ? View.VISIBLE : View.GONE);
+        setWidgetVisibility(settings.isWidgetVisible());
     }
 
     @Override
@@ -566,6 +564,11 @@ public class HomeScreenFragment extends Fragment  {
     //endregion
 
     //region UI
+
+    public void setWidgetVisibility(boolean visible) {
+        FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        widgetArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
 
     void updateTouchDown(MotionEvent event) {
         lastX = event.getX();
