@@ -1,6 +1,7 @@
 package com.launcher.silverfish;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -68,6 +69,17 @@ public class SettingsScreenFragment extends Fragment  {
             @Override
             public void onClick(View view) {
                 callback.onWidgetChangeRequested();
+            }
+        });
+
+        Button changeWallpaperButton = (Button)
+                rootView.findViewById(R.id.change_wallpaper_button);
+
+        changeWallpaperButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+                startActivity(Intent.createChooser(intent, getString(R.string.select_wallpaper)));
             }
         });
 

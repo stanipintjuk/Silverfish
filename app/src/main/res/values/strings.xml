@@ -33,4 +33,7 @@
     <string name="widget">Widget</string>
     <string name="toggle_widget_visibility">Toggle widget visibility</string>
     <string name="text_settings_screen">Settings screen</string>
+    <string name="select_wallpaper">Select wallpaper</string>
+    <string name="change_wallpaper">Change wallpaper</string>
+    <string name="wallpaper">Wallpaper</string>
 </resources>

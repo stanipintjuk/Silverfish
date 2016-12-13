@@ -5,7 +5,7 @@
     android:background="@drawable/tintbackground"
     android:padding="8dp">
 
-
+    <!-- Widget related settings -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +14,7 @@
         android:text="@string/widget"
         android:background="@drawable/tintbackground"
         android:textAppearance="?android:textAppearanceLarge"
-        android:gravity="start"
+        android:gravity="center"
         android:textColor="@color/white"/>
 
     <Button
@@ -36,6 +36,30 @@
         android:padding="8dp"
         android:layout_margin="4dp"
         android:text="Change widget"
+        android:background="@drawable/tintbackground"
+        android:textAppearance="?android:textAppearanceSmall"
+        android:gravity="start"
+        android:textColor="@color/white"/>
+
+    <!-- Wallpaper related settings -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:layout_margin="4dp"
+        android:text="@string/wallpaper"
+        android:background="@drawable/tintbackground"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:gravity="center"
+        android:textColor="@color/white"/>
+
+    <Button
+        android:id="@+id/change_wallpaper_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_margin="4dp"
+        android:text="@string/change_wallpaper"
         android:background="@drawable/tintbackground"
         android:textAppearance="?android:textAppearanceSmall"
         android:gravity="start"
