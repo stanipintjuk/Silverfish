@@ -21,11 +21,9 @@ package com.launcher.silverfish;
 
 import android.content.ClipDescription;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.DragEvent;
@@ -64,12 +62,9 @@ public class LauncherActivity extends FragmentActivity {
 
         // Check if the app is started for the first time. If it is then we have to
         // populate the database with some default values.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
-        if(!previouslyStarted) {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-            edit.apply();
+        Settings settings = new Settings(this);
+        if (!settings.wasPreviouslyStarted()) {
+            settings.setPreviouslyStarted(true);
             createDefaultTabs();
             autoSortApplications();
         }

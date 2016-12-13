@@ -20,10 +20,8 @@
 package com.launcher.silverfish;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -48,6 +46,8 @@ public class TabFragmentHandler {
 
     //region Fields
 
+    private Settings settings;
+
     private TabHost tHost;
     private FragmentManager mFragmentManager;
     private View rootView;
@@ -59,12 +59,13 @@ public class TabFragmentHandler {
     private TabButtonClickListener tabButtonClickListener;
 
     // Store the last open tab in RAM until end of lifecycle
-    // to not waste precious I/O every time a tab is changed.
+    // not to waste precious I/O every time a tab is changed.
     private int currentOpenTab = -1;
 
     //endregion
 
-    public TabFragmentHandler(FragmentManager fm, View view, Activity activity){
+    public TabFragmentHandler(FragmentManager fm, View view, Activity activity) {
+        settings = new Settings(activity);
 
         mFragmentManager = fm;
         rootView = view;
@@ -255,16 +256,11 @@ public class TabFragmentHandler {
     }
 
     private int getLastTabId() {
-
         // If currentOpenTab is already loaded, do not try to load it from preferences again.
-        if (currentOpenTab != -1) {
+        if (currentOpenTab != -1)
             return currentOpenTab;
-        }
-
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mActivity.getBaseContext());
-
-        return prefs.getInt(mActivity.getString(R.string.pref_last_open_tab), 0);
+        else
+            return settings.getLastOpenTab();
     }
 
     /**
@@ -272,13 +268,7 @@ public class TabFragmentHandler {
      * @param tabId
      */
     private void setLastTabId(int tabId) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mActivity.getBaseContext());
-
-        SharedPreferences.Editor edit = prefs.edit();
-
-        edit.putInt(mActivity.getString(R.string.pref_last_open_tab), tabId);
-        edit.apply();
+        settings.setLastOpenTab(tabId);
     }
 
     //endregion
