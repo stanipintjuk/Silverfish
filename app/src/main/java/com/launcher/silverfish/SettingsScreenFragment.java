@@ -16,6 +16,7 @@ public class SettingsScreenFragment extends Fragment  {
 
     public interface SettingChanged {
         void onWidgetVisibilityChanged(boolean visible);
+        void onWidgetChangeRequested();
     }
 
     //endregion
@@ -57,6 +58,16 @@ public class SettingsScreenFragment extends Fragment  {
                     Toast.makeText(getContext(), R.string.widget_now_invisible, Toast.LENGTH_SHORT).show();
                 }
                 callback.onWidgetVisibilityChanged(visible);
+            }
+        });
+
+        Button changeWidgetButton = (Button)
+                rootView.findViewById(R.id.change_widget_button);
+
+        changeWidgetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callback.onWidgetChangeRequested();
             }
         });
 

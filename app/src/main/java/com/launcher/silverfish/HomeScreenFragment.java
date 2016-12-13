@@ -326,7 +326,7 @@ public class HomeScreenFragment extends Fragment  {
         widget_area.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });
@@ -338,8 +338,7 @@ public class HomeScreenFragment extends Fragment  {
 
     //region Widget selection
 
-    private void selectWidget() {
-
+    public void popupSelectWidget() {
         // Allocate widget id and start widget selection activity
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
@@ -481,7 +480,7 @@ public class HomeScreenFragment extends Fragment  {
         hostView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });

@@ -135,10 +135,16 @@ public class LauncherActivity extends FragmentActivity
 
     @Override
     public void onWidgetVisibilityChanged(boolean visible) {
-        HomeScreenFragment homeScreenFragment = (HomeScreenFragment)
-                mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
+        getHomeScreenFragment().setWidgetVisibility(visible);
+    }
 
-        homeScreenFragment.setWidgetVisibility(visible);
+    @Override
+    public void onWidgetChangeRequested() {
+        getHomeScreenFragment().popupSelectWidget();
+    }
+
+    HomeScreenFragment getHomeScreenFragment() {
+        return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
     //endregion
