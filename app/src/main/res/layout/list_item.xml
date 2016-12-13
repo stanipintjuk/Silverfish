@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@color/appLabelColor"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:ellipsize="end" />
     </LinearLayout>
 </FrameLayout>
