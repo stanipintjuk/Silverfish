@@ -144,7 +144,9 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         String query = "SELECT "+KEY_LABEL+" FROM "+ TABLE_TABS+" WHERE "+KEY_ID+" = "+Integer.toString(tab_id);
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
-            return cursor.getString(0);
+            String result = cursor.getString(0);
+            cursor.close();
+            return result;
         }
         throw new IndexOutOfBoundsException("The given tab_id is not valid");
     }
@@ -163,14 +165,14 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public LinkedList<TabTable> getAllTabs() {
-        LinkedList<TabTable> tabs = new LinkedList<TabTable>();
+        LinkedList<TabTable> tabs = new LinkedList<>();
 
         // Select all tabs from database
         SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT * FROM "+ TABLE_TABS;
         Cursor cursor = db.rawQuery(query, null);
 
-        TabTable tab = null;
+        TabTable tab;
         if (cursor.moveToFirst()) {
            do {
                tab = new TabTable();
@@ -180,11 +182,13 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                tabs.add(tab);
            } while (cursor.moveToNext());
         }
+
+        cursor.close();
         return tabs;
     }
 
     public LinkedList<String> getAppsForTab(int tab_id) {
-        LinkedList<String> app_names = new LinkedList<String>();
+        LinkedList<String> app_names = new LinkedList<>();
 
         SQLiteDatabase db = getReadableDatabase();
 
@@ -198,18 +202,20 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                         null,
                         null);
 
-        String app_name = null;
+        String app_name;
         if (cursor.moveToFirst()) {
             do {
                 app_name = cursor.getString(0);
                 app_names.add(app_name);
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
+
+        cursor.close();
         return app_names;
     }
 
     public LinkedList<String> getAllApps() {
-        LinkedList<String> app_names = new LinkedList<String>();
+        LinkedList<String> app_names = new LinkedList<>();
 
         SQLiteDatabase db = getReadableDatabase();
 
@@ -222,13 +228,15 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                         null,
                         null);
 
-        String app_name = null;
+        String app_name;
         if (cursor.moveToFirst()) {
             do {
                 app_name = cursor.getString(0);
                 app_names.add(app_name);
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
+
+        cursor.close();
         return app_names;
     }
 
@@ -294,7 +302,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public LinkedList<ShortcutDetail> getAllShortcuts() {
-        LinkedList<ShortcutDetail> shortcuts = new LinkedList<ShortcutDetail>();
+        LinkedList<ShortcutDetail> shortcuts = new LinkedList<>();
 
         String query = "SELECT * FROM "+TABLE_SHORTCUTS;
         SQLiteDatabase db = getReadableDatabase();
@@ -306,9 +314,10 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
                 shortcut.name = cursor.getString(1);
                 shortcut.id = cursor.getInt(0);
                 shortcuts.add(shortcut);
-            }while(cursor.moveToNext());
+            } while(cursor.moveToNext());
         }
 
+        cursor.close();
         return shortcuts;
     }
 
@@ -326,6 +335,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         ComponentName cn = new ComponentName(cursor.getString(0), cursor.getString(1));
 
+        cursor.close();
         return cn;
     }
 

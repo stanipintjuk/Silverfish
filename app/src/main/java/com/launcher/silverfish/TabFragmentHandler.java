@@ -46,12 +46,12 @@ public class TabFragmentHandler {
 
     //region Fields
 
-    private Settings settings;
+    private final Settings settings;
 
-    private TabHost tHost;
-    private FragmentManager mFragmentManager;
-    private View rootView;
-    private Activity mActivity;
+    private final TabHost tHost;
+    private final FragmentManager mFragmentManager;
+    private final View rootView;
+    private final Activity mActivity;
 
     private List<TabInfo> arrTabs;
     private List<Button> arrButton;
@@ -158,8 +158,8 @@ public class TabFragmentHandler {
      * Loads all tabs from the database.
      */
     public void loadTabs(){
-        arrButton = new ArrayList<Button>();
-        arrTabs = new ArrayList<TabInfo>();
+        arrButton = new ArrayList<>();
+        arrTabs = new ArrayList<>();
 
         LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
 
@@ -265,7 +265,7 @@ public class TabFragmentHandler {
 
     /**
      * Saves the last opened tab's id in the apps preferences
-     * @param tabId
+     * @param tabId The id of the tab to be saved
      */
     private void setLastTabId(int tabId) {
         settings.setLastOpenTab(tabId);
@@ -300,11 +300,8 @@ public class TabFragmentHandler {
 
                 @Override
                 public boolean onLongClick(View view) {
-                    if (tabButtonClickListener != null) {
-                        return tabButtonClickListener.onLongClick(tab, position);
-                    } else {
-                        return false;
-                    }
+                    return tabButtonClickListener != null &&
+                            tabButtonClickListener.onLongClick(tab, position);
                 }
             });
         }
@@ -335,13 +332,13 @@ public class TabFragmentHandler {
             right.rename(leftName);
 
             // And now swap the applications by updating their category
-            Map<String, Integer> leftApps = new HashMap<String, Integer>();
+            Map<String, Integer> leftApps = new HashMap<>();
             for (String app : sql.getAppsForTab(left.getId())) {
                 int category = rightIndex + 1; // Categories start one over
                 leftApps.put(app, category);
             }
 
-            Map<String, Integer> rightApps = new HashMap<String, Integer>();
+            Map<String, Integer> rightApps = new HashMap<>();
             for (String app : sql.getAppsForTab(right.getId())) {
                 int category = leftIndex + 1; // Categories start one over
                 rightApps.put(app, category);
@@ -440,6 +437,7 @@ public class TabFragmentHandler {
             // Remove the tab fragment
             FragmentTransaction ft = mFragmentManager.beginTransaction();
             ft.remove(mFragmentManager.findFragmentByTag(tab.getTag()));
+            ft.commit();
 
             // Go to the first tab
             setTab(0);
@@ -482,7 +480,7 @@ public class TabFragmentHandler {
 
     /**
      * Returns the current open tab
-     * @return
+     * @return currently open tab
      */
     public TabInfo getCurrentTab(){
         return arrTabs.get(currentOpenTab);

@@ -95,7 +95,7 @@ public class HomeScreenFragment extends Fragment  {
         mAppWidgetHost.startListening();
 
         mPacMan = getActivity().getPackageManager();
-        appsList = new ArrayList<AppDetail>();
+        appsList = new ArrayList<>();
 
         rootView = inflater.inflate(R.layout.activity_home, container, false);
         // Set touch slop and listen for touch events, such as swipe
@@ -543,7 +543,7 @@ public class HomeScreenFragment extends Fragment  {
         }
     }
 
-    View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
+    final View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent event) {
             switch(MotionEventCompat.getActionMasked(event)) {

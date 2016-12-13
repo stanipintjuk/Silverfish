@@ -7,8 +7,8 @@ import com.launcher.silverfish.dbmodel.TabTable;
  * E-mail: stanislav.pintjuk@gmail.com
  */
 public class TabInfo {
-    private int id;
-    private String tag;
+    private final int id;
+    private final String tag;
     private String label;
 
     public TabInfo(TabTable tab){

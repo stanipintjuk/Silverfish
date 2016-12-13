@@ -42,13 +42,6 @@ public class Utils {
         return size;
     }
 
-    public static boolean onBottomScreenEdge(Activity activity, float y) {
-        int screen_height = getScreenDimensions(activity).y;
-        // Set the threshold to be 10% of the screen height
-        float threshold = 10.0f*screen_height/100.0f;
-        return (y >= screen_height - threshold);
-    }
-
     public static boolean onBottomCenterScreenEdge(Activity activity, float x, float y) {
         Point screensize = getScreenDimensions(activity);
         int screen_width = screensize.x;

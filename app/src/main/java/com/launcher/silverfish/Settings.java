@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 public class Settings {
     // Android doesn't seem to like static Context, so this
     // class cannot be a singleton with a .getInstance() method
-    private SharedPreferences mPrefs;
+    private final SharedPreferences mPrefs;
 
     private static final String KEY_WIDGET_VISIBLE = "widget_visible";
     private static final String KEY_PREVIOUSLY_STARTED = "pref_previously_started";

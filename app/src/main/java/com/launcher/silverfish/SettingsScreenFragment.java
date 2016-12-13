@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 public class SettingsScreenFragment extends Fragment  {
@@ -24,9 +23,7 @@ public class SettingsScreenFragment extends Fragment  {
 
     //region Fields
 
-    private View rootView;
     private Settings settings;
-
     private SettingChanged callback;
 
     //endregion
@@ -43,47 +40,63 @@ public class SettingsScreenFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.activity_settings, container, false);
+        View rootView = inflater.inflate(R.layout.activity_settings, container, false);
 
-        Button toggleWidgetVisibilityButton = (Button)
-                rootView.findViewById(R.id.toggle_widget_visibility_button);
-
-        toggleWidgetVisibilityButton.setOnClickListener(new View.OnClickListener() {
+        // Toggle widget visibility button
+        rootView.findViewById(R.id.toggle_widget_visibility_button)
+                .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean visible = !settings.isWidgetVisible();
-                settings.setWidgetVisible(visible);
-                if (visible) {
-                    Toast.makeText(getContext(), R.string.widget_now_visible, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), R.string.widget_now_invisible, Toast.LENGTH_SHORT).show();
-                }
-                callback.onWidgetVisibilityChanged(visible);
+                toggleWidgetVisibility();
             }
         });
 
-        Button changeWidgetButton = (Button)
-                rootView.findViewById(R.id.change_widget_button);
-
-        changeWidgetButton.setOnClickListener(new View.OnClickListener() {
+        // Change widget button
+        rootView.findViewById(R.id.change_widget_button)
+                .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callback.onWidgetChangeRequested();
+                changeWidget();
             }
         });
 
-        Button changeWallpaperButton = (Button)
-                rootView.findViewById(R.id.change_wallpaper_button);
-
-        changeWallpaperButton.setOnClickListener(new View.OnClickListener() {
+        // Change wallpaper button
+        rootView.findViewById(R.id.change_wallpaper_button)
+                .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
-                startActivity(Intent.createChooser(intent, getString(R.string.select_wallpaper)));
+                changeWallpaper();
             }
         });
 
         return rootView;
+    }
+
+    //endregion
+
+    //region Actions
+
+    private void toggleWidgetVisibility() {
+        boolean visible = !settings.isWidgetVisible();
+        settings.setWidgetVisible(visible);
+        if (visible) {
+            Toast.makeText(getContext(), R.string.widget_now_visible, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), R.string.widget_now_invisible, Toast.LENGTH_SHORT).show();
+        }
+        callback.onWidgetVisibilityChanged(visible);
+    }
+
+    private void changeWidget() {
+        if (!settings.isWidgetVisible())
+            toggleWidgetVisibility();
+
+            callback.onWidgetChangeRequested();
+    }
+
+    private void changeWallpaper() {
+        Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+        startActivity(Intent.createChooser(intent, getString(R.string.select_wallpaper)));
     }
 
     //endregion

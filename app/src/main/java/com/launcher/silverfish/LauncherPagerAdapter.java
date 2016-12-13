@@ -29,7 +29,7 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
     //region Fields
 
     // Store a context so we can use getString in later methods
-    private Context _context;
+    final private Context _context;
 
     //endregion
 

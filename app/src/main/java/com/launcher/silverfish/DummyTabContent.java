@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.TabHost;
 
 public class DummyTabContent implements TabHost.TabContentFactory {
-    private Context mContext;
+    private final Context mContext;
 
     public DummyTabContent(Context context) {
         mContext = context;
@@ -33,7 +33,6 @@ public class DummyTabContent implements TabHost.TabContentFactory {
 
     @Override
     public View createTabContent(String tag) {
-        View v = new View(mContext);
-        return v;
+        return new View(mContext);
     }
 }

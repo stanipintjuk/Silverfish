@@ -28,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,7 +79,7 @@ public class AppDrawerTabFragment extends Fragment {
         appsView = (GridView) rootView.findViewById(R.id.apps_grid);
 
         mPacMan = getActivity().getPackageManager();
-        appsList = new ArrayList<AppDetail>();
+        appsList = new ArrayList<>();
 
         // Load the apps and update the view
         loadApps();
@@ -243,7 +244,7 @@ public class AppDrawerTabFragment extends Fragment {
                 R.layout.list_item,
                 appsList) {
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
                 AppDetail app = appsList.get(position);
                 if (convertView == null) {
                     convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item, null);
