@@ -30,4 +30,6 @@
     <string name="text_move_tab_toast">Please tap the tab to be swapped, or the same to cancel</string>
     <string name="widget_now_visible">The widget is now visible.</string>
     <string name="widget_now_invisible">The widget has been hidden.</string>
+    <string name="widget">Widget</string>
+    <string name="toggle_widget_visibility">Toggle widget visibility</string>
 </resources>
