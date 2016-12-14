@@ -1,4 +1,4 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.models;
 
 import com.launcher.silverfish.dbmodel.TabTable;
 

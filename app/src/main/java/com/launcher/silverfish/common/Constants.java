@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2016 Stanislav Pintjuk
  * E-mail: stanislav.pintjuk@gmail.com
@@ -17,12 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
-import android.graphics.drawable.Drawable;
+package com.launcher.silverfish.common;
 
-public class AppDetail {
-    CharSequence label;
-    CharSequence name;
-    Drawable icon;
-    long id;
+/**
+ * Class with static variables used across the application.
+ */
+public class Constants {
+    public final static String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
+    public final static String DRAG_APP_MOVE = "app_move";
+
+    public final static String TAB_ID = "tab_id";
+
+    public final static int SCREEN_CORNER_THRESHOLD = 40;
 }

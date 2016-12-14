@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.models;
+import android.graphics.drawable.Drawable;
 
-/**
- * Used for communication between the launcher activity and the home screen fragment.
- */
-public interface ShortcutAddListener {
-    void OnShortcutAdd(String appName);
+public class AppDetail {
+    public CharSequence label;
+    public CharSequence name;
+    public Drawable icon;
+    public long id;
 }

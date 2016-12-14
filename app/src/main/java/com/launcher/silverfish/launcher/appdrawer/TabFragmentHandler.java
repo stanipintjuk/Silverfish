@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.appdrawer;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -30,7 +30,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.launcher.appdrawer.AppDrawerTabFragment;
+import com.launcher.silverfish.launcher.appdrawer.DummyTabContent;
+import com.launcher.silverfish.models.TabInfo;
+import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
@@ -56,7 +62,7 @@ public class TabFragmentHandler {
     private List<TabInfo> arrTabs;
     private List<Button> arrButton;
 
-    private TabButtonClickListener tabButtonClickListener;
+    private AppDrawerTabFragment.TabButtonClickListener tabButtonClickListener;
 
     // Store the last open tab in RAM until end of lifecycle
     // not to waste precious I/O every time a tab is changed.
@@ -275,7 +281,7 @@ public class TabFragmentHandler {
 
     //region Click listener
 
-    public void setOnTabButtonClickListener(TabButtonClickListener clickListener){
+    public void setOnTabButtonClickListener(AppDrawerTabFragment.TabButtonClickListener clickListener){
         tabButtonClickListener = clickListener;
     }
 

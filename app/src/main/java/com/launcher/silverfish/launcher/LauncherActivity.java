@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher;
 
 import android.content.ClipDescription;
 import android.content.Intent;
@@ -30,6 +30,13 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
+import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
+import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
+import com.launcher.silverfish.shared.Settings;
+import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 

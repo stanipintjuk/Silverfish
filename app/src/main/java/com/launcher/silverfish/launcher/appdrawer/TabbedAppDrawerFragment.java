@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.appdrawer;
 
 import android.app.AlertDialog;
 import android.content.ClipDescription;
@@ -35,6 +35,11 @@ import android.view.animation.AlphaAnimation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.models.TabInfo;
+import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.common.Constants;
 
 public class TabbedAppDrawerFragment extends Fragment {
 
@@ -231,7 +236,7 @@ public class TabbedAppDrawerFragment extends Fragment {
 
     private void addOnClickListener() {
 
-        tabHandler.setOnTabButtonClickListener(new TabButtonClickListener(){
+        tabHandler.setOnTabButtonClickListener(new AppDrawerTabFragment.TabButtonClickListener(){
 
             @Override
             public void onClick(TabInfo tab, int position) {

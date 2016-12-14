@@ -26,7 +26,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.launcher.silverfish.ShortcutDetail;
+import com.launcher.silverfish.models.ShortcutDetail;
 import com.launcher.silverfish.dbmodel.TabTable;
 
 import java.util.LinkedList;

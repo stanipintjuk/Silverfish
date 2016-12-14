@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.homescreen;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -45,6 +45,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.launcher.silverfish.launcher.LauncherActivity;
+import com.launcher.silverfish.models.AppDetail;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.shared.Settings;
+import com.launcher.silverfish.models.ShortcutDetail;
+import com.launcher.silverfish.layouts.SquareGridLayout;
+import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.lang.reflect.Method;

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.appdrawer;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -40,6 +40,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.launcher.silverfish.models.AppDetail;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
@@ -327,4 +332,13 @@ public class AppDrawerTabFragment extends Fragment {
     }
 
     //endregion
+
+    /**
+     * Created by Stanislav Pintjuk on 8/12/16.
+     * E-mail: stanislav.pintjuk@gmail.com
+     */
+    public static interface TabButtonClickListener {
+        void onClick(TabInfo tab, int position);
+        boolean onLongClick(TabInfo tab, int position);
+    }
 }

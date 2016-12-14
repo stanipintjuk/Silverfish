@@ -14,7 +14,7 @@
         android:fullBackupContent="true">
 
         <activity
-            android:name=".LauncherActivity"
+            android:name=".launcher.LauncherActivity"
             android:theme="@style/AppTheme"
             android:label="Silverfish Launcher"
             >

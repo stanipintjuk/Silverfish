@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.homescreen;
 
 import android.appwidget.AppWidgetHostView;
 import android.content.Context;

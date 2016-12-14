@@ -1,4 +1,4 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.shared;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,7 +19,7 @@ public class Settings {
 
     //region Constructor
 
-    public Settings(Context context) {
+    public Settings(final Context context) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -43,15 +43,15 @@ public class Settings {
 
     //region Setters
 
-    public void setWidgetVisible(boolean visible) {
+    public void setWidgetVisible(final boolean visible) {
         mPrefs.edit().putBoolean(KEY_WIDGET_VISIBLE, visible).apply();
     }
 
-    public void setPreviouslyStarted(boolean firstTime) {
+    public void setPreviouslyStarted(final boolean firstTime) {
         mPrefs.edit().putBoolean(KEY_PREVIOUSLY_STARTED, firstTime).apply();
     }
 
-    public void setLastOpenTab(int tab) {
+    public void setLastOpenTab(final int tab) {
         mPrefs.edit().putInt(KEY_LAST_OPEN_TAB, tab).apply();
     }
 

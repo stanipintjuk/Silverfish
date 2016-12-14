@@ -1,4 +1,4 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.settings;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.shared.Settings;
 
 public class SettingsScreenFragment extends Fragment  {
 

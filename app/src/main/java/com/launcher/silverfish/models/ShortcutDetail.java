@@ -1,4 +1,4 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.models;
 
 /**
  * Created by Stanislav Pintjuk on 7/19/16.

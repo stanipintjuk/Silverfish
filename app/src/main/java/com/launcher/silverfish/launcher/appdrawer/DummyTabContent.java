@@ -18,16 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.appdrawer;
 
-/**
- * Class with static variables used across the application.
- */
-public class Constants {
-    public final static String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
-    public final static String DRAG_APP_MOVE = "app_move";
+import android.content.Context;
+import android.view.View;
+import android.widget.TabHost;
 
-    public final static String TAB_ID = "tab_id";
+public class DummyTabContent implements TabHost.TabContentFactory {
+    private final Context mContext;
 
-    public final static int SCREEN_CORNER_THRESHOLD = 40;
+    public DummyTabContent(Context context) {
+        mContext = context;
+    }
+
+    @Override
+    public View createTabContent(String tag) {
+        return new View(mContext);
+    }
 }

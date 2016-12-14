@@ -17,12 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.launcher.appdrawer.TabbedAppDrawerFragment;
+import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
+import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
 
 public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 
