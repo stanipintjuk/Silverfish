@@ -31,10 +31,11 @@
     <string name="widget_now_visible">The widget is now visible.</string>
     <string name="widget_now_invisible">The widget has been hidden.</string>
     <string name="widget">Widget</string>
-    <string name="toggle_widget_visibility">Toggle widget visibility</string>
+    <string name="toggle_widget_visibility">Toggle visibility</string>
     <string name="text_settings_screen">Settings screen</string>
     <string name="select_wallpaper">Select wallpaper</string>
     <string name="change_wallpaper">Change wallpaper</string>
     <string name="wallpaper">Wallpaper</string>
     <string name="app_icon">Application icon</string>
+    <string name="change">Change</string>
 </resources>
