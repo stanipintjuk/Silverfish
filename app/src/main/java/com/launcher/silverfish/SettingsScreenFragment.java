@@ -80,9 +80,9 @@ public class SettingsScreenFragment extends Fragment  {
         boolean visible = !settings.isWidgetVisible();
         settings.setWidgetVisible(visible);
         if (visible) {
-            Toast.makeText(getContext(), R.string.widget_now_visible, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.hint_widget_now_visible, Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), R.string.widget_now_invisible, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.hint_widget_now_invisible, Toast.LENGTH_SHORT).show();
         }
         callback.onWidgetVisibilityChanged(visible);
     }
@@ -96,7 +96,7 @@ public class SettingsScreenFragment extends Fragment  {
 
     private void changeWallpaper() {
         Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
-        startActivity(Intent.createChooser(intent, getString(R.string.select_wallpaper)));
+        startActivity(Intent.createChooser(intent, getString(R.string.setting_select_wallpaper)));
     }
 
     //endregion

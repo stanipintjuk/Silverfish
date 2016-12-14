@@ -13,7 +13,7 @@
             android:layout_width="@dimen/app_icon_size"
             android:layout_height="@dimen/app_icon_size"
             android:layout_gravity="center"
-            android:contentDescription="@string/app_icon"/>
+            android:contentDescription="@string/text_app_icon"/>
 
         <TextView
             android:id="@+id/item_app_label"
