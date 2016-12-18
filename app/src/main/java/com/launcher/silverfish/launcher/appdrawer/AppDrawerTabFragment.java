@@ -20,15 +20,11 @@
 
 package com.launcher.silverfish.launcher.appdrawer;
 
-import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,12 +32,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
-import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
@@ -55,7 +49,7 @@ import java.util.List;
 
 public class AppDrawerTabFragment extends Fragment {
 
-    //region Fields
+    //region Members
 
     LauncherSQLiteHelper sqlHelper;
     Settings settings;
@@ -72,7 +66,7 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
-    //region Android lifecycle
+    //region Initialization
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -101,9 +95,9 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
-    //region App management
+    //region Applications
 
-    //region Add app
+    //region Adding applications
 
     public void addApp(String app_name) {
         boolean success = addAppToList(app_name);
@@ -137,7 +131,7 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
-    //region Remove app
+    //region Removing applications
 
     public void removeApp(int appIndex) {
         if (tabId != 1)
@@ -153,7 +147,7 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
-    //region Load apps
+    //region Loading applications
 
     /**
      * Loads apps from the database
@@ -231,91 +225,13 @@ public class AppDrawerTabFragment extends Fragment {
     }
 
     private void loadGridView() {
-
         // First sort the apps list
         sortAppsList();
 
-        // Cache the font color not to invoke the settings all the time
-        final int fontColor = settings.getFontFgColor();
-
         // Create the array adapter
-        arrayAdapter = new ArrayAdapter<AppDetail>(getActivity(),
-                R.layout.list_item,
-                appsList) {
-            @Override
-            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-                AppDetail app = appsList.get(position);
-                if (convertView == null) {
-                    convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item, null);
-                }
-
-                // Set the application icon and label for this view
-
-                // load the app icon in an async task
-                ImageView appIcon = (ImageView) convertView.findViewById(R.id.item_app_icon);
-                Utils.loadAppIconAsync(mPacMan, app.name.toString(), appIcon);
-
-                TextView appLabel = (TextView) convertView.findViewById(R.id.item_app_label);
-                appLabel.setTextColor(fontColor);
-                appLabel.setText(app.label);
-
-                // Set various click and touch listeners
-                setClickListeners(convertView, app.name.toString(), position);
-
-                return convertView;
-            }
-        };
-        // Add the array adapter
+        arrayAdapter = new AppArrayAdapter(getActivity(), R.layout.list_item, appsList, getTag());
         appsView.setAdapter(arrayAdapter);
     }
-
-    //endregion
-
-    //region Listeners
-
-    @SuppressWarnings("deprecation")
-    private void setClickListeners(View view, final String appName, final int appIndex) {
-
-        // Start a drag action when icon is long clicked
-        view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-
-                // Add data to the clipboard
-                String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-                ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(appName));
-                data.addItem(new ClipData.Item(Integer.toString(appIndex)));
-                data.addItem(new ClipData.Item(getTag()));
-
-                // The drag shadow is simply the app's  icon
-                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
-                        view.findViewById(R.id.item_app_icon));
-
-                // "This method was deprecated in API level 24. Use startDragAndDrop()
-                // for newer platform versions."
-                if (Build.VERSION.SDK_INT < 24) {
-                    view.startDrag(data, shadowBuilder, view, 0);
-                } else {
-                    view.startDragAndDrop(data, shadowBuilder, view, 0);
-                }
-                return true;
-
-            }
-        });
-
-        // Start the app activity when icon is clicked.
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = mPacMan.getLaunchIntentForPackage(appName);
-                startActivity(i);
-            }
-        });
-    }
-
-    //endregion
-
-    //region Utils
 
     private void sortAppsList(){
         Collections.sort(appsList, new Comparator<AppDetail>() {
@@ -325,8 +241,6 @@ public class AppDrawerTabFragment extends Fragment {
             }
         });
     }
-
-    //endregion
 
     /**
      * Created by Stanislav Pintjuk on 8/12/16.

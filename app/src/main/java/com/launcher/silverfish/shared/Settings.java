@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -91,16 +92,14 @@ public class Settings {
         stateListDrawable.addState(new int[]{android.R.attr.state_pressed}, pressedDrawable);
 
         // Selected state (category selected)
-        ShapeDrawable selectedDrawable = new ShapeDrawable(rectShape);
-        selectedDrawable.getPaint().setColor(darkTintColor);
+        // ShapeDrawable doesn't have Stroke, use GradientDrawable
+        GradientDrawable gd = new GradientDrawable();
+        gd.setColor(darkTintColor);
+        gd.setStroke(BUTTON_BORDER, getFontFgColor());
 
-        ShapeDrawable selectedDrawableBorder = new ShapeDrawable(rectShape);
-        selectedDrawableBorder.getPaint().setColor(shouldUseWhite(darkTintColor) ? Color.WHITE : Color.BLACK);
-
-        LayerDrawable ld = new LayerDrawable(new Drawable[] { selectedDrawableBorder, selectedDrawable });
-        ld.setLayerInset(0, BUTTON_BORDER, 0, 0, 0);
-        ld.setLayerInset(1, 0, 0, BUTTON_BORDER, 0); // Inset the opposite side to leave space for the border
-
+        // GradientDrawable doesn't have Inset, use LayerDrawable
+        LayerDrawable ld = new LayerDrawable(new Drawable[] { gd });
+        ld.setLayerInset(0, -BUTTON_BORDER, -BUTTON_BORDER, 0, -BUTTON_BORDER);
         stateListDrawable.addState(new int[]{android.R.attr.state_selected}, ld);
 
         // Normal state (tab not selected)
@@ -149,21 +148,6 @@ public class Settings {
             darken = 255;
 
         return Color.argb(darken, Color.red(color), Color.green(color), Color.blue(color));
-    }
-
-    // Used to determine the best foreground color (black or white) given a background color
-    private static boolean shouldUseWhite(int color) {
-        float r, g, b;
-        r = Color.red(color);
-        g = Color.green(color);
-        b = Color.blue(color);
-
-        double brightness = Math.sqrt(
-                r * r * .299 +
-                        g * g * .587 +
-                        b * b * .114);
-
-        return brightness < BRIGHTNESS_CUTOFF;
     }
 
     //endregion

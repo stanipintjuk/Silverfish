@@ -20,7 +20,6 @@
 package com.launcher.silverfish.launcher.appdrawer;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -184,7 +183,7 @@ public class TabFragmentHandler {
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                                               ViewGroup.LayoutParams.MATCH_PARENT,
                                                               1));
-            btn.setTextColor(Color.WHITE);
+            btn.setTextColor(settings.getFontFgColor());
 
             // Add the button to the tab widget.
             tabWidget.addView(btn);
@@ -381,7 +380,7 @@ public class TabFragmentHandler {
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));
-            btn.setTextColor(Color.WHITE);
+            btn.setTextColor(settings.getFontFgColor());
 
             // Add the button to the tab widget.
             tabWidget.addView(btn);
