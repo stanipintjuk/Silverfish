@@ -30,13 +30,13 @@ import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 
-import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
 import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
 import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
 import com.launcher.silverfish.shared.Settings;
-import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
@@ -148,6 +148,14 @@ public class LauncherActivity extends FragmentActivity
     @Override
     public void onWidgetChangeRequested() {
         getHomeScreenFragment().popupSelectWidget();
+    }
+
+    @Override
+    public void onColorChanged(int drawerBg, int widgetBg, int fontFg) {
+        // There is no need to notify the app drawer fragment that the colors changed.
+        // This tab is at #0, and the settings tab is #2. Only 2 tabs (#1 and #2) are
+        // kept in memory, so as soon as #0 gets created, its colors will get updated.
+        getHomeScreenFragment().setWidgetBackground(widgetBg);
     }
 
     HomeScreenFragment getHomeScreenFragment() {

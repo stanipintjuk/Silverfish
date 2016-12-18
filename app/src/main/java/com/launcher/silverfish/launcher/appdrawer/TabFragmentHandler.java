@@ -31,11 +31,9 @@ import android.widget.LinearLayout;
 import android.widget.TabHost;
 
 import com.launcher.silverfish.R;
-import com.launcher.silverfish.launcher.appdrawer.AppDrawerTabFragment;
-import com.launcher.silverfish.launcher.appdrawer.DummyTabContent;
-import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
@@ -182,7 +180,7 @@ public class TabFragmentHandler {
             arrButton.add(btn);
 
             // Set the style of the button
-            btn.setBackgroundResource(R.drawable.tab_style);
+            btn.setBackground(settings.getTabButtonStyle());
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                                               ViewGroup.LayoutParams.MATCH_PARENT,
                                                               1));
@@ -379,7 +377,7 @@ public class TabFragmentHandler {
             arrButton.add(btn);
 
             // Set the style of the button
-            btn.setBackgroundResource(R.drawable.tab_style);
+            btn.setBackground(settings.getTabButtonStyle());
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));

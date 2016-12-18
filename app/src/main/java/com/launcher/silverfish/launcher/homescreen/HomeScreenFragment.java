@@ -45,14 +45,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.launcher.silverfish.launcher.LauncherActivity;
-import com.launcher.silverfish.models.AppDetail;
-import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.R;
-import com.launcher.silverfish.shared.Settings;
-import com.launcher.silverfish.models.ShortcutDetail;
-import com.launcher.silverfish.layouts.SquareGridLayout;
+import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.launcher.LauncherActivity;
+import com.launcher.silverfish.layouts.SquareGridLayout;
+import com.launcher.silverfish.models.AppDetail;
+import com.launcher.silverfish.models.ShortcutDetail;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.lang.reflect.Method;
@@ -135,16 +135,12 @@ public class HomeScreenFragment extends Fragment  {
         setOnDragListener();
 
         loadWidget();
+        setWidgetBackground(settings.getWidgetBgColor());
+        setWidgetVisibility(settings.isWidgetVisible());
         loadApps();
         updateShortcuts();
 
         return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        setWidgetVisibility(settings.isWidgetVisible());
     }
 
     @Override
@@ -575,6 +571,11 @@ public class HomeScreenFragment extends Fragment  {
     public void setWidgetVisibility(boolean visible) {
         FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
         widgetArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setWidgetBackground(int color) {
+        FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        widgetArea.setBackgroundColor(color);
     }
 
     void updateTouchDown(MotionEvent event) {

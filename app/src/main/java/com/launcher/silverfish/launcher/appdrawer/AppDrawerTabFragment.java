@@ -38,13 +38,13 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.launcher.silverfish.models.AppDetail;
-import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.models.TabInfo;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
@@ -58,8 +58,10 @@ public class AppDrawerTabFragment extends Fragment {
     //region Fields
 
     LauncherSQLiteHelper sqlHelper;
+    Settings settings;
 
     private View rootView;
+    private TextView emptyCategoryTextView;
 
     private PackageManager mPacMan;
     private List<AppDetail> appsList;
@@ -76,7 +78,10 @@ public class AppDrawerTabFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // get the sql database helper and the view of this tab
         sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        settings = new Settings(getContext());
+
         rootView = inflater.inflate(R.layout.activity_app_drawer_tab, container, false);
+        emptyCategoryTextView = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
 
         // Get this tab's ID.
         Bundle args = getArguments();
@@ -86,10 +91,11 @@ public class AppDrawerTabFragment extends Fragment {
         mPacMan = getActivity().getPackageManager();
         appsList = new ArrayList<>();
 
+        setColors(settings.getDrawerBgColor(), settings.getFontFgColor());
+
         // Load the apps and update the view
         loadApps();
         loadGridView();
-
         return rootView;
     }
 
@@ -107,26 +113,6 @@ public class AppDrawerTabFragment extends Fragment {
             // add to database only if it is not the first tab
             if (tabId != 1)
                 sqlHelper.addAppToTab(app_name, tabId);
-        }
-    }
-
-    private boolean addAppToArrayAdapter(String app_name) {
-        try {
-            // Get the information about the app
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(app_name,PackageManager.GET_META_DATA);
-            AppDetail appDetail = new AppDetail();
-
-            // And add it to the array adapter.
-            appDetail.label = mPacMan.getApplicationLabel(appInfo);
-            appDetail.icon = mPacMan.getApplicationIcon(appInfo);
-            appDetail.name = app_name;
-            arrayAdapter.add(appDetail);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            Toast.makeText(getActivity().getBaseContext(),
-                    "Error: Could not retrieve information about the app",
-                    Toast.LENGTH_LONG).show();
-            return false;
         }
     }
 
@@ -228,21 +214,29 @@ public class AppDrawerTabFragment extends Fragment {
 
     //endregion
 
+    //endregion
+
     //region UI
 
-    private void showEmptyCategoryNotice(){
-        TextView tv_notice = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
-        tv_notice.setVisibility(View.VISIBLE);
+    private void setColors(int background, int foreground) {
+        rootView.setBackgroundColor(background);
+        emptyCategoryTextView.setTextColor(foreground);
     }
-    private void hideEmptyCategoryNotice(){
-        TextView tv_notice = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
-        tv_notice.setVisibility(View.GONE);
+
+    private void showEmptyCategoryNotice() {
+        emptyCategoryTextView.setVisibility(View.VISIBLE);
+    }
+    private void hideEmptyCategoryNotice() {
+        emptyCategoryTextView.setVisibility(View.GONE);
     }
 
     private void loadGridView() {
 
         // First sort the apps list
         sortAppsList();
+
+        // Cache the font color not to invoke the settings all the time
+        final int fontColor = settings.getFontFgColor();
 
         // Create the array adapter
         arrayAdapter = new ArrayAdapter<AppDetail>(getActivity(),
@@ -262,6 +256,7 @@ public class AppDrawerTabFragment extends Fragment {
                 Utils.loadAppIconAsync(mPacMan, app.name.toString(), appIcon);
 
                 TextView appLabel = (TextView) convertView.findViewById(R.id.item_app_label);
+                appLabel.setTextColor(fontColor);
                 appLabel.setText(app.label);
 
                 // Set various click and touch listeners

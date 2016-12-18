@@ -37,9 +37,9 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.launcher.silverfish.R;
-import com.launcher.silverfish.models.TabInfo;
-import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.models.TabInfo;
 
 public class TabbedAppDrawerFragment extends Fragment {
 

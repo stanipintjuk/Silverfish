@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.shared.Settings;
 
+import yuku.ambilwarna.AmbilWarnaDialog;
+
 public class SettingsScreenFragment extends Fragment  {
 
     //region Interfaces
@@ -20,6 +22,7 @@ public class SettingsScreenFragment extends Fragment  {
     public interface SettingChanged {
         void onWidgetVisibilityChanged(boolean visible);
         void onWidgetChangeRequested();
+        void onColorChanged(int drawerBg, int widgetBg, int fontFg);
     }
 
     //endregion
@@ -72,6 +75,33 @@ public class SettingsScreenFragment extends Fragment  {
             }
         });
 
+        // Change colors, app drawer background
+        rootView.findViewById(R.id.change_drawer_color)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        changeDrawerColor();
+                    }
+                });
+
+        // Change colors, widget background
+        rootView.findViewById(R.id.change_widget_color)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        changeWidgetColor();
+                    }
+                });
+
+        // Change colors, font foreground
+        rootView.findViewById(R.id.change_font_color)
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        changeFontColor();
+                    }
+                });
+
         return rootView;
     }
 
@@ -100,6 +130,51 @@ public class SettingsScreenFragment extends Fragment  {
     private void changeWallpaper() {
         Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
         startActivity(Intent.createChooser(intent, getString(R.string.setting_select_wallpaper)));
+    }
+
+    private void changeDrawerColor() {
+        new AmbilWarnaDialog(getContext(), settings.getDrawerBgColor(), true,
+                new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) { /* Do nothing */ }
+
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        settings.setDrawerBgColor(color);
+                        callback.onColorChanged(
+                                color, settings.getWidgetBgColor(), settings.getFontFgColor());
+                    }
+                }).show();
+    }
+
+    private void changeWidgetColor() {
+        new AmbilWarnaDialog(getContext(), settings.getWidgetBgColor(), true,
+                new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) { /* Do nothing */ }
+
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        settings.setWidgetBgColor(color);
+                        callback.onColorChanged(
+                                settings.getDrawerBgColor(), color, settings.getFontFgColor());
+                    }
+                }).show();
+    }
+
+    private void changeFontColor() {
+        new AmbilWarnaDialog(getContext(), settings.getFontFgColor(), false,
+                new AmbilWarnaDialog.OnAmbilWarnaListener() {
+                    @Override
+                    public void onCancel(AmbilWarnaDialog dialog) { /* Do nothing */ }
+
+                    @Override
+                    public void onOk(AmbilWarnaDialog dialog, int color) {
+                        settings.setFontFgColor(color);
+                        callback.onColorChanged(
+                                settings.getDrawerBgColor(), settings.getWidgetBgColor(), color);
+                    }
+                }).show();
     }
 
     //endregion
