@@ -26,4 +26,18 @@
     <string name="text_cannot_move_tab">Kann diesen Tab nicht verschieben</string>
     <string name="text_move_tab_toast">Bitte drücken Sie auf den Tab, welcher ausgetauscht werden soll, oder selbigen und abzubrechen.</string>
     <string name="text_operation_cancelled">Vorgang abgebrochen</string>
+    <string name="text_app_icon">Applikationsbild</string>
+    <string name="text_change_colors">Farbe ändern</string>
+    <string name="text_font">Schriftart</string>
+    <string name="text_settings_screen">Einstellungsmenu</string>
+    <string name="text_wallpaper">Hintergrund</string>
+    <string name="text_widget">Widget</string>
+
+    <string name="setting_change_wallpaper">Hintergrund ändern</string>
+    <string name="setting_change_widget">Widget ändern</string>
+    <string name="setting_select_wallpaper">Hintergrund auswählen</string>
+    <string name="setting_toggle_visibility">Sichtbarkeit umschalten</string>
+
+    <string name="hint_widget_now_invisible">Dieses Widget wurde versteckt.</string>
+    <string name="hint_widget_now_visible">Dieses Widget ist jetzt sichtbar.</string>
 </resources>
