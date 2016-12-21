@@ -19,13 +19,13 @@
 
 package com.launcher.silverfish.launcher.appdrawer;
 
-import android.app.AlertDialog;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -125,7 +125,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.show();
     }
 
-    private void promptNewTab(){
+    private void promptNewTab() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 
         // Set up the dialog
@@ -158,7 +158,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.show();
     }
 
-    private void removeTab(TabInfo tab, int tab_index){
+    private void removeTab(TabInfo tab, int tab_index) {
         try {
             tabHandler.removeTab(tab, tab_index);
         } catch (IllegalArgumentException e) {

@@ -1,9 +1,11 @@
 <resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Wallpaper and AppCompat: http://stackoverflow.com/a/31041238/4759433 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowShowWallpaper">true</item>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="@android:style/Theme.Wallpaper.NoTitleBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 </resources>
