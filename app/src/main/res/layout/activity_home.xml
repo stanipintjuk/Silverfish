@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/text_hold_to_change_widget"
-            android:id="@+id/textView"
+            android:id="@+id/no_widget_notice"
             android:layout_gravity="center" />
     </FrameLayout>
 

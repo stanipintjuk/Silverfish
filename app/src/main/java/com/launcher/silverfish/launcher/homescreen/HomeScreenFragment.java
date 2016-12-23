@@ -134,9 +134,10 @@ public class HomeScreenFragment extends Fragment  {
         addWidgetOnClickListener();
         setOnDragListener();
 
-        loadWidget();
-        setWidgetBackground(settings.getWidgetBgColor());
+        setWidgetColors(settings.getWidgetBgColor(), settings.getFontFgColor());
         setWidgetVisibility(settings.isWidgetVisible());
+        loadWidget();
+
         loadApps();
         updateShortcuts();
 
@@ -569,13 +570,18 @@ public class HomeScreenFragment extends Fragment  {
     //region UI
 
     public void setWidgetVisibility(boolean visible) {
-        FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        final FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
         widgetArea.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    public void setWidgetBackground(int color) {
-        FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
-        widgetArea.setBackgroundColor(color);
+    public void setWidgetColors(int background, int foreground) {
+        final FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        final TextView noWidgetNotice = (TextView)rootView.findViewById(R.id.no_widget_notice);
+
+        widgetArea.setBackgroundColor(background);
+        // The no-widget notice will be null if a widget is set
+        if (noWidgetNotice != null)
+            noWidgetNotice.setTextColor(foreground);
     }
 
     void updateTouchDown(MotionEvent event) {

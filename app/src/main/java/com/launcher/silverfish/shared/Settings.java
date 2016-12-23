@@ -15,7 +15,6 @@ public class Settings {
     // Android doesn't seem to like static Context, so this
     // class cannot be a singleton with a .getInstance() method
     private final SharedPreferences mPrefs;
-    private Drawable mTabButtonStyleDrawable;
 
     private static final String KEY_WIDGET_VISIBLE = "widget_visible";
     private static final String KEY_PREVIOUSLY_STARTED = "pref_previously_started";
@@ -30,8 +29,6 @@ public class Settings {
     private static final int DEFAULT_DRAWER_BG_COLOR = 0x99000000; // "Dark tint"
     private static final int DEFAULT_WIDGET_BG_COLOR = 0x99000000; // "Dark tint"
     private static final int DEFAULT_FONT_FG_COLOR = 0xffffffff; // White
-
-    private final static double BRIGHTNESS_CUTOFF = 130.0;
 
     // Tab selected border
     private static final int BUTTON_BORDER = 4;

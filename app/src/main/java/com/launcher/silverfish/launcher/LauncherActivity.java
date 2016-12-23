@@ -155,7 +155,7 @@ public class LauncherActivity extends FragmentActivity
         // There is no need to notify the app drawer fragment that the colors changed.
         // This tab is at #0, and the settings tab is #2. Only 2 tabs (#1 and #2) are
         // kept in memory, so as soon as #0 gets created, its colors will get updated.
-        getHomeScreenFragment().setWidgetBackground(widgetBg);
+        getHomeScreenFragment().setWidgetColors(widgetBg, fontFg);
     }
 
     HomeScreenFragment getHomeScreenFragment() {
