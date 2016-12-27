@@ -1,7 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.view.ViewPager
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:fitsSystemWindows="true"
-    android:id="@+id/pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:fitsSystemWindows="true"
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/pager_drag_layout"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+            <FrameLayout
+                android:layout_weight="4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/pager_drag_layout_tl"
+                ></FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:id="@+id/pager_drag_layout_tm"
+                ></FrameLayout>
+
+            <FrameLayout
+                android:layout_weight="4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/pager_drag_layout_tr"
+                ></FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <FrameLayout
+                android:layout_weight="4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/pager_drag_layout_ml"
+                ></FrameLayout>
+            <FrameLayout
+                android:layout_weight="1"
+                android:id="@+id/pager_drag_layout_mm"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"></FrameLayout>
+            <FrameLayout
+                android:layout_weight="4"
+                android:id="@+id/pager_drag_layout_mr"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                ></FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="horizontal">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_weight="4"
+                android:layout_height="match_parent"
+                android:id="@+id/pager_drag_layout_bl"
+                ></FrameLayout>
+            <FrameLayout
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:id="@+id/pager_drag_layout_bm"
+                android:layout_height="match_parent"
+                ></FrameLayout>
+            <FrameLayout
+                android:layout_weight="4"
+                android:layout_width="match_parent"
+                android:id="@+id/pager_drag_layout_br"
+                android:layout_height="match_parent"
+                ></FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

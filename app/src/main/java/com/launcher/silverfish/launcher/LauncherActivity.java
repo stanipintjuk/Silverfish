@@ -19,10 +19,14 @@
 
 package com.launcher.silverfish.launcher;
 
+import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -60,6 +64,8 @@ public class LauncherActivity extends FragmentActivity
     // Used when the intent is created to specify an starting page index
     public static final String START_PAGE = "start_page";
 
+    private PagerDragDropListener mDragDropper;
+
     //endregion
 
     //region Android lifecycle
@@ -85,7 +91,19 @@ public class LauncherActivity extends FragmentActivity
         mViewPager.setAdapter(mCollectionPagerAdapter);
         mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
 
-        setDragListener();
+        mDragDropper = new PagerDragDropListener(this.findViewById(R.id.pager_drag_layout),
+                new PagerDragDropListener.DragDirectionCallback() {
+            @Override
+            public void draggedLeft() {
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem()-1);
+            }
+
+            @Override
+            public void draggedRight() {
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
+            }
+        });
+        //setDragListener();
     }
 
     //endregion
@@ -256,4 +274,46 @@ public class LauncherActivity extends FragmentActivity
     }
 
     //endregion
+    class DragDetector extends DragAndDropBase {
+        final private View mView;
+        final private Drawable mHLBackground;
+        final private Drawable mDefaultBackground;
+        public DragDetector(View view) {
+            mView = view;
+            mHLBackground = new ColorDrawable(Color.RED);
+            mDefaultBackground = new ColorDrawable(Color.TRANSPARENT);
+        }
+
+        @Override
+        protected boolean dragEnded(ClipDescription clipDescription, Object localState) {
+            return true;
+        }
+
+        @Override
+        protected boolean drop(ClipDescription clipDescription, Object localState, float x, float y, ClipData clipData) {
+            return true;
+        }
+
+        @Override
+        protected boolean dragExited(ClipDescription clipDescription, Object localState) {
+            mView.setBackground(mDefaultBackground);
+            return true;
+        }
+
+        @Override
+        protected boolean dragLocation(ClipDescription clipDescription, Object localState, float x, float y) {
+            return true;
+        }
+
+        @Override
+        protected boolean dragEntered(ClipDescription clipDescription, Object localState, float x, float y) {
+            mView.setBackground(mHLBackground);
+            return true;
+        }
+
+        @Override
+        protected boolean dragStarted(ClipDescription clipDescription, Object localState, float x, float y) {
+            return true;
+        }
+    }
 }
