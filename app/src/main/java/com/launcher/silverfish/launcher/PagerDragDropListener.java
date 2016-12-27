@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
 
 /**
  * Created by stani on 2016-12-27.
@@ -22,7 +23,6 @@ public class PagerDragDropListener {
         View topMid = rootView.findViewById(R.id.pager_drag_layout_tm);
         View topRight = rootView.findViewById(R.id.pager_drag_layout_tr);
         View midLeft = rootView.findViewById(R.id.pager_drag_layout_ml);
-        View midMid = rootView.findViewById(R.id.pager_drag_layout_mm);
         View midRight = rootView.findViewById(R.id.pager_drag_layout_mr);
         View botLeft = rootView.findViewById(R.id.pager_drag_layout_bl);
         View botMid = rootView.findViewById(R.id.pager_drag_layout_bm);
@@ -120,6 +120,7 @@ public class PagerDragDropListener {
 
         @Override
         final protected boolean dragEnded(ClipDescription clipDescription, Object localState) {
+            mView.setBackground(mDefaultBackground);
             return true;
         }
 
@@ -150,7 +151,11 @@ public class PagerDragDropListener {
 
         @Override
         final protected boolean dragStarted(ClipDescription clipDescription, Object localState, float x, float y) {
-            return true;
+            final String clipLabel = clipDescription.getLabel().toString();
+            if (!clipLabel.equals(Constants.DRAG_APP_MOVE))
+                return false;
+            else
+                return true;
         }
 
         protected abstract void dragExitedCallback(ClipDescription clipDescription, Object localState);

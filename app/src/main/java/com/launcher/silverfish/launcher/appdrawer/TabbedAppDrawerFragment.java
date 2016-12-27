@@ -65,7 +65,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         tabHandler = new TabFragmentHandler(getChildFragmentManager(), rootView, getActivity());
 
         addOnClickListener();
-        setOnDragListener();
+        //setOnDragListener();
 
         return rootView;
     }

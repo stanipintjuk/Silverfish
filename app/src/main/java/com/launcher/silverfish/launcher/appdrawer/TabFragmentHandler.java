@@ -20,9 +20,12 @@
 package com.launcher.silverfish.launcher.appdrawer;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +35,7 @@ import android.widget.TabHost;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.launcher.DragAndDropBase;
 import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
@@ -40,6 +44,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 /**
  * Created by Stanislav Pintjuk on 8/12/16.
@@ -79,6 +85,48 @@ public class TabFragmentHandler {
 
         loadTabs();
         setClickListener();
+        for (int i = 0; i < arrButton.size(); i++) {
+            final int index = i;
+            final Button btn = arrButton.get(i);
+            btn.setOnDragListener(new DragAndDropBase() {
+                @Override
+                protected boolean dragEnded(ClipDescription clipDescription, Object localState) {
+                    Log.d("TabFragmentHandler", "dragEnded");
+                    return true;
+                }
+
+                @Override
+                protected boolean drop(ClipDescription clipDescription, Object localState, float x, float y, ClipData clipData) {
+                    Log.d("TabFragmentHandler", "drop");
+                    return true;
+                }
+
+                @Override
+                protected boolean dragExited(ClipDescription clipDescription, Object localState) {
+                    Log.d("TabFragmentHandler", "dragExited");
+                    return true;
+                }
+
+                @Override
+                protected boolean dragLocation(ClipDescription clipDescription, Object localState, float x, float y) {
+                    Log.d("TabFragmentHandler", "dragLocation");
+                    return true;
+                }
+
+                @Override
+                protected boolean dragEntered(ClipDescription clipDescription, Object localState, float x, float y) {
+                    Log.d("TabFragmentHandler", "dragEntered");
+                    setTab(index);
+                    return true;
+                }
+
+                @Override
+                protected boolean dragStarted(ClipDescription clipDescription, Object localState, float x, float y) {
+                    Log.d("TabFragmentHandler", "dragStarted");
+                    return true;
+                }
+            });
+        }
 
         /** Defining Tab Change Listener event. This is invoked when tab is changed */
         TabHost.OnTabChangeListener tabChangeListener = new TabHost.OnTabChangeListener() {

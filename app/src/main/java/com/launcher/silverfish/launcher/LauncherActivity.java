@@ -53,7 +53,6 @@ import java.util.List;
 public class LauncherActivity extends FragmentActivity
         implements SettingsScreenFragment.SettingChanged {
 
-    //region Fields
 
     LauncherPagerAdapter mCollectionPagerAdapter;
     ViewPager mViewPager;
@@ -65,10 +64,6 @@ public class LauncherActivity extends FragmentActivity
     public static final String START_PAGE = "start_page";
 
     private PagerDragDropListener mDragDropper;
-
-    //endregion
-
-    //region Android lifecycle
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,12 +98,9 @@ public class LauncherActivity extends FragmentActivity
                 mViewPager.setCurrentItem(mViewPager.getCurrentItem()+1);
             }
         });
-        //setDragListener();
+
     }
 
-    //endregion
-
-    //region First time setup
 
     private void createDefaultTabs() {
         LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
@@ -154,10 +146,6 @@ public class LauncherActivity extends FragmentActivity
         sql.addAppsToTab(pkg_categoryId);
     }
 
-    //endregion
-
-    //region Fragment communication
-
     @Override
     public void onWidgetVisibilityChanged(boolean visible) {
         getHomeScreenFragment().setWidgetVisibility(visible);
@@ -180,40 +168,6 @@ public class LauncherActivity extends FragmentActivity
         return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
-    //endregion
-
-    //region Listeners
-
-    private void setDragListener() {
-        mViewPager.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()) {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        // Only care about the DRAG_APP_MOVE description.
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
-                            return false;
-                        break;
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        // Don't do anything
-                        break;
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        changePage(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DROP:
-                        dropItem(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        // Don't do anything
-                        break;
-
-                }
-                return true;
-            }
-        });
-    }
-
     public ShortcutAddListener getFragShortcutAddListenerRefreshListener() {
         return shortcutAddListener;
     }
@@ -222,10 +176,6 @@ public class LauncherActivity extends FragmentActivity
         this.shortcutAddListener = shortcutAddListener;
     }
 
-    //endregion
-
-    //region Events
-
     private void dropItem(DragEvent dragEvent) {
         if (mViewPager.getCurrentItem() == 1) {
             String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
@@ -233,21 +183,6 @@ public class LauncherActivity extends FragmentActivity
             if(getFragShortcutAddListenerRefreshListener() != null) {
                 getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
             }
-        }
-    }
-
-    private void changePage(DragEvent dragEvent) {
-        // Change page mid drag if drag is within threshold
-        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-
-        // Get display size
-        int width = Utils.getScreenDimensions(this).x;
-
-        // Change page
-        if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold) {
-            mViewPager.setCurrentItem(1);
-        } else if(mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold) {
-            mViewPager.setCurrentItem(0);
         }
     }
 
@@ -273,47 +208,4 @@ public class LauncherActivity extends FragmentActivity
         return super.onKeyUp(keyCode, event);
     }
 
-    //endregion
-    class DragDetector extends DragAndDropBase {
-        final private View mView;
-        final private Drawable mHLBackground;
-        final private Drawable mDefaultBackground;
-        public DragDetector(View view) {
-            mView = view;
-            mHLBackground = new ColorDrawable(Color.RED);
-            mDefaultBackground = new ColorDrawable(Color.TRANSPARENT);
-        }
-
-        @Override
-        protected boolean dragEnded(ClipDescription clipDescription, Object localState) {
-            return true;
-        }
-
-        @Override
-        protected boolean drop(ClipDescription clipDescription, Object localState, float x, float y, ClipData clipData) {
-            return true;
-        }
-
-        @Override
-        protected boolean dragExited(ClipDescription clipDescription, Object localState) {
-            mView.setBackground(mDefaultBackground);
-            return true;
-        }
-
-        @Override
-        protected boolean dragLocation(ClipDescription clipDescription, Object localState, float x, float y) {
-            return true;
-        }
-
-        @Override
-        protected boolean dragEntered(ClipDescription clipDescription, Object localState, float x, float y) {
-            mView.setBackground(mHLBackground);
-            return true;
-        }
-
-        @Override
-        protected boolean dragStarted(ClipDescription clipDescription, Object localState, float x, float y) {
-            return true;
-        }
-    }
 }
