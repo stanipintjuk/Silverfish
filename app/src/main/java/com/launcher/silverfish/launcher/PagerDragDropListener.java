@@ -28,6 +28,13 @@ public class PagerDragDropListener {
         View botMid = rootView.findViewById(R.id.pager_drag_layout_bm);
         View botRight = rootView.findViewById(R.id.pager_drag_layout_br);
 
+        topLeft.setOnDragListener(new DragHighlighter(topLeft));
+        topMid.setOnDragListener(new DragHighlighter(topMid));
+        topRight.setOnDragListener(new DragHighlighter(topRight));
+        botLeft.setOnDragListener(new DragHighlighter(topLeft));
+        botMid.setOnDragListener(new DragHighlighter(topMid));
+        botRight.setOnDragListener(new DragHighlighter(topRight));
+
         midRight.setOnDragListener(new RightDragDetector(midRight));
         midLeft.setOnDragListener(new LeftDragDetector(midLeft));
     }
@@ -38,6 +45,23 @@ public class PagerDragDropListener {
 
     private void draggedToRight() {
         mCallback.draggedRight();
+    }
+
+    private class DragHighlighter extends DragDetector {
+
+        public DragHighlighter(View view) {
+            super(view);
+        }
+
+        @Override
+        protected void dragExitedCallback(ClipDescription clipDescription, Object localState) {
+
+        }
+
+        @Override
+        protected void dragEnteredCallback(ClipDescription clipDescription, Object localState, float x, float y) {
+
+        }
     }
 
     private class RightDragDetector extends DragDetector {

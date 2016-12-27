@@ -4,6 +4,7 @@
     android:layout_width="match_parent">
 
     <android.support.v4.view.ViewPager
+        android:padding="@dimen/pager_margin"
         android:fitsSystemWindows="true"
         android:id="@+id/pager"
         android:layout_width="match_parent"
@@ -17,8 +18,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_height="@dimen/pager_margin"
             android:orientation="horizontal">
             <FrameLayout
                 android:layout_weight="4"
@@ -42,34 +42,33 @@
                 ></FrameLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_weight="1"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
             <FrameLayout
-                android:layout_weight="4"
-                android:layout_width="match_parent"
+                android:layout_alignParentLeft="true"
                 android:layout_height="match_parent"
+                android:layout_width="@dimen/pager_margin"
                 android:id="@+id/pager_drag_layout_ml"
                 ></FrameLayout>
             <FrameLayout
-                android:layout_weight="1"
+                android:layout_toRightOf="@+id/pager_drag_layout_ml"
+                android:layout_toLeftOf="@+id/pager_drag_layout_mr"
                 android:id="@+id/pager_drag_layout_mm"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"></FrameLayout>
             <FrameLayout
-                android:layout_weight="4"
                 android:id="@+id/pager_drag_layout_mr"
-                android:layout_width="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_width="@dimen/pager_margin"
                 android:layout_height="match_parent"
                 ></FrameLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="5"
+            android:layout_height="@dimen/pager_margin"
             android:orientation="horizontal">
             <FrameLayout
                 android:layout_width="match_parent"
