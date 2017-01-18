@@ -27,7 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.launcher.silverfish.models.ShortcutDetail;
-import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.dbmodel.OldTabTable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -102,7 +102,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         this.onCreate(sqLiteDatabase);
     }
 
-    public TabTable addTab(String tab_name) {
+    public OldTabTable addTab(String tab_name) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -115,7 +115,7 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         db.close();
 
         // construct the tab to return
-        TabTable tab = new TabTable();
+        OldTabTable tab = new OldTabTable();
         tab.id = (int)tab_id;
         tab.label = tab_name;
 
@@ -164,18 +164,18 @@ public class LauncherSQLiteHelper extends SQLiteOpenHelper {
         return i;
     }
 
-    public LinkedList<TabTable> getAllTabs() {
-        LinkedList<TabTable> tabs = new LinkedList<>();
+    public LinkedList<OldTabTable> getAllTabs() {
+        LinkedList<OldTabTable> tabs = new LinkedList<>();
 
         // Select all tabs from database
         SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT * FROM "+ TABLE_TABS;
         Cursor cursor = db.rawQuery(query, null);
 
-        TabTable tab;
+        OldTabTable tab;
         if (cursor.moveToFirst()) {
            do {
-               tab = new TabTable();
+               tab = new OldTabTable();
                tab.id = Integer.parseInt(cursor.getString(0));
                tab.label = cursor.getString(1);
 

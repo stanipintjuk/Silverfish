@@ -31,7 +31,7 @@ import android.widget.TabHost;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
-import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.dbmodel.OldTabTable;
 import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
@@ -167,9 +167,9 @@ public class TabFragmentHandler {
         LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
 
         LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
-        List<TabTable> tabTables = sql.getAllTabs();
+        List<OldTabTable> tabTables = sql.getAllTabs();
 
-        for (TabTable tabEntry : tabTables) {
+        for (OldTabTable tabEntry : tabTables) {
             TabInfo tab = new TabInfo(tabEntry);
             arrTabs.add(tab);
 
@@ -363,7 +363,7 @@ public class TabFragmentHandler {
         } else {
             // add the tab to database
             LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
-            TabTable tab_entry = sql.addTab(tab_name);
+            OldTabTable tab_entry = sql.addTab(tab_name);
 
             final TabInfo tab = new TabInfo(tab_entry);
             arrTabs.add(tab);
