@@ -10,14 +10,14 @@ import org.greenrobot.greendao.annotation.Generated;
         @Index(value = "label")
 })
 public class TabTable {
-    @Id
-    private Integer id;
+    @Id(autoincrement = true)
+    private Long id;
 
     @NotNull
     private String label;
 
-    @Generated(hash = 1452784914)
-    public TabTable(Integer id, @NotNull String label) {
+    @Generated(hash = 1581068435)
+    public TabTable(Long id, @NotNull String label) {
         this.id = id;
         this.label = label;
     }
@@ -26,11 +26,11 @@ public class TabTable {
     public TabTable() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

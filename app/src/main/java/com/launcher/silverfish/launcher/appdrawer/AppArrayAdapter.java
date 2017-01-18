@@ -56,7 +56,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         }
 
         // load the app icon in an async task
-        Utils.loadAppIconAsync(mPackageManager, app.name.toString(), viewHolder.appIcon);
+        Utils.loadAppIconAsync(mPackageManager, app.packageName.toString(), viewHolder.appIcon);
 
         //final TextView appLabel = (TextView) view.findViewById(R.id.item_app_label);
         viewHolder.appLabel.setText(app.label);
@@ -68,7 +68,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
 
                 // Add data to the clipboard
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
-                ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(app.name.toString()));
+                ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(app.packageName.toString()));
                 data.addItem(new ClipData.Item(Integer.toString(position)));
                 data.addItem(new ClipData.Item(mTag));
 
@@ -92,7 +92,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = mPackageManager.getLaunchIntentForPackage(app.name.toString());
+                Intent i = mPackageManager.getLaunchIntentForPackage(app.packageName.toString());
                 mActivity.startActivity(i);
             }
         });

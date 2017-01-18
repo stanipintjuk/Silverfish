@@ -93,7 +93,7 @@ public class LauncherActivity extends FragmentActivity
     //region First time setup
 
     private void createDefaultTabs() {
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
 
         // Load default names for the tab
         String[] defaultTabNames = new String[] {
@@ -117,7 +117,7 @@ public class LauncherActivity extends FragmentActivity
     private void autoSortApplications() {
 
         // Set up both SQL helper and package manager
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
         PackageManager mPacMan = getApplicationContext().getPackageManager();
 
         // Set MAIN and LAUNCHER filters, so we only get activities with that defined on their manifest
@@ -130,7 +130,8 @@ public class LauncherActivity extends FragmentActivity
 
         // Store here the packages and their categories IDs
         // This will allow us to add all the apps at once instead opening the database over and over
-        HashMap<String, Integer> pkg_categoryId = PackagesCategories.setCategories(getApplicationContext(), availableActivities);
+        HashMap<String, Long> pkg_categoryId =
+                PackagesCategories.setCategories(getApplicationContext(), availableActivities);
 
         // Then add all the apps to their corresponding tabs at once
         sql.addAppsToTab(pkg_categoryId);

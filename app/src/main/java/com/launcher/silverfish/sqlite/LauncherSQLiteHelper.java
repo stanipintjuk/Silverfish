@@ -19,339 +19,107 @@
 
 package com.launcher.silverfish.sqlite;
 
-import android.content.ComponentName;
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import com.launcher.silverfish.dbmodel.AppTable;
+import com.launcher.silverfish.dbmodel.AppTableDao;
+import com.launcher.silverfish.dbmodel.DaoSession;
+import com.launcher.silverfish.dbmodel.ShortcutTable;
+import com.launcher.silverfish.dbmodel.ShortcutTableDao;
+import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.dbmodel.TabTableDao;
+import com.launcher.silverfish.launcher.App;
 
-import com.launcher.silverfish.models.ShortcutDetail;
-import com.launcher.silverfish.dbmodel.OldTabTable;
+import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class LauncherSQLiteHelper extends SQLiteOpenHelper {
+public class LauncherSQLiteHelper {
+    private DaoSession mSession;
 
-    // Database information
-    private static final int DATABASE_VERSION=1;
-    private static final String DATABASE_NAME="LauncherDB";
-
-    //tables
-    private static final String TABLE_TABS = "tabs";
-    private static final String TABLE_APPS = "apps";
-    private static final String TABLE_SHORTCUTS = "shortcuts";
-    private static final String TABLE_WIDGET = "widget";
-
-    // keys
-    private static final String KEY_ID = "id";
-    private static final String KEY_TAB_ID = "tab_id";
-    private static final String KEY_LABEL = "label";
-    private static final String KEY_PACKAGE_NAME = "package_name";
-    private static final String KEY_CLASS_NAME = "class_name";
-
-
-    public LauncherSQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create the tab table
-        String CREATE_TAB_TABLE = "CREATE TABLE "+ TABLE_TABS +" ( "+
-                KEY_ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                KEY_LABEL+" TEXT )";
-
-        // Create the apps table
-        String CREATE_APPS_TABLE = "CREATE TABLE "+ TABLE_APPS +" (" +
-                KEY_ID +" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                KEY_PACKAGE_NAME+" TEXT, " +
-                KEY_TAB_ID+" INTEGER )";
-
-        String CREATE_SHORTCUTS_TABLE = "CREATE TABLE "+TABLE_SHORTCUTS+" (" +
-                KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                KEY_PACKAGE_NAME + " TEXT )";
-
-        String CREATE_WIDGET_TABLE = "CREATE TABLE "+TABLE_WIDGET+" (" +
-                KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                KEY_PACKAGE_NAME + " TEXT," +
-                KEY_CLASS_NAME + " TEXT )";
-
-        sqLiteDatabase.execSQL(CREATE_TAB_TABLE);
-        sqLiteDatabase.execSQL(CREATE_APPS_TABLE);
-        sqLiteDatabase.execSQL(CREATE_SHORTCUTS_TABLE);
-        sqLiteDatabase.execSQL(CREATE_WIDGET_TABLE);
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_PACKAGE_NAME, "");
-        values.put(KEY_CLASS_NAME, "");
-
-        sqLiteDatabase.insert(TABLE_WIDGET, null, values);
+    public LauncherSQLiteHelper(App app) {
+        mSession = app.getDaoSession();
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // Drop all tables when update - for now...
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ TABLE_TABS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ TABLE_APPS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ TABLE_SHORTCUTS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS "+ TABLE_WIDGET);
-
-        // create fresh tables
-        this.onCreate(sqLiteDatabase);
+    public TabTable addTab(String tabName) {
+        TabTable newTab = new TabTable(null, tabName);
+        mSession.getTabTableDao().insert(newTab);
+        return newTab;
     }
 
-    public OldTabTable addTab(String tab_name) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_LABEL, tab_name);
-
-        long tab_id = db.insert(TABLE_TABS,
-                        null,
-                        values);
-
-        db.close();
-
-        // construct the tab to return
-        OldTabTable tab = new OldTabTable();
-        tab.id = (int)tab_id;
-        tab.label = tab_name;
-
-        return tab;
+    public void removeTab(long tabId) {
+        mSession.getTabTableDao().deleteByKey(tabId);
     }
 
-    public void removeTab(int tab_id) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        // remove tab from database
-        db.delete(TABLE_TABS,
-                KEY_ID + " = " + Integer.toString(tab_id),
-                null);
-
-        // remove all apps from the tab
-        db.delete(TABLE_APPS,
-                KEY_TAB_ID + " = " + Integer.toString(tab_id),
-                null);
-
-        db.close();
+    public String getTabName(long tabId) {
+        return mSession.getTabTableDao().queryBuilder()
+                .where(TabTableDao.Properties.Id.eq(tabId))
+                .uniqueOrThrow().getLabel();
     }
 
-    public String getTabName(int tab_id) {
-        // Select all tabs from database
-        SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT "+KEY_LABEL+" FROM "+ TABLE_TABS+" WHERE "+KEY_ID+" = "+Integer.toString(tab_id);
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor.moveToFirst()) {
-            String result = cursor.getString(0);
-            cursor.close();
-            return result;
+    public long renameTab(long tabId, String newName) {
+        return mSession.insertOrReplace(new TabTable(tabId, newName));
+    }
+
+    public List<TabTable> getAllTabs() {
+        return mSession.getTabTableDao().loadAll();
+    }
+
+    public List<AppTable> getAppsForTab(long tabId) {
+        return mSession.getAppTableDao().queryBuilder()
+                .where(AppTableDao.Properties.TabId.eq(tabId))
+                .list();
+    }
+
+    public List<AppTable> getAllApps() {
+        return mSession.getAppTableDao().loadAll();
+    }
+
+    public boolean containsApp(String packageName) {
+        return mSession.getAppTableDao().queryBuilder()
+                .where(AppTableDao.Properties.PackageName.eq(packageName))
+                .unique() != null;
+    }
+
+    public void addAppToTab(String packageName, long tabId) {
+        mSession.getAppTableDao().insert(new AppTable(null, packageName, tabId));
+    }
+
+    public void addAppsToTab(Map<String, Long> pkg_categoryId) {
+        List<AppTable> apps = new LinkedList<>();
+        for (Map.Entry<String, Long> entry : pkg_categoryId.entrySet()) {
+            apps.add(new AppTable(null, entry.getKey(), entry.getValue()));
         }
-        throw new IndexOutOfBoundsException("The given tab_id is not valid");
+        mSession.getAppTableDao().insertInTx(apps);
     }
 
-    public int renameTab(int tab_id, String new_name) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_LABEL, new_name);
+    public void removeAppFromTab(String packageName, long tabId) {
+        QueryBuilder qb = mSession.getAppTableDao().queryBuilder();
+        AppTable app = (AppTable)qb.where(qb.and(AppTableDao.Properties.TabId.eq(tabId),
+                AppTableDao.Properties.PackageName.eq(packageName))).unique();
 
-        int i = db.update(TABLE_TABS,
-                values,
-                KEY_ID+" = "+Integer.toString(tab_id),
-                null);
-        db.close();
-        return i;
+        if (app != null)
+            mSession.getAppTableDao().delete(app);
     }
 
-    public LinkedList<OldTabTable> getAllTabs() {
-        LinkedList<OldTabTable> tabs = new LinkedList<>();
-
-        // Select all tabs from database
-        SQLiteDatabase db = getReadableDatabase();
-        String query = "SELECT * FROM "+ TABLE_TABS;
-        Cursor cursor = db.rawQuery(query, null);
-
-        OldTabTable tab;
-        if (cursor.moveToFirst()) {
-           do {
-               tab = new OldTabTable();
-               tab.id = Integer.parseInt(cursor.getString(0));
-               tab.label = cursor.getString(1);
-
-               tabs.add(tab);
-           } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return tabs;
+    public void removeApps(List<AppTable> apps) {
+        mSession.getAppTableDao().deleteInTx(apps);
     }
 
-    public LinkedList<String> getAppsForTab(int tab_id) {
-        LinkedList<String> app_names = new LinkedList<>();
-
-        SQLiteDatabase db = getReadableDatabase();
-
-        String selection = KEY_TAB_ID+" = "+Integer.toString(tab_id);
-        Cursor cursor =
-                db.query(TABLE_APPS,
-                        new String[]{KEY_PACKAGE_NAME},
-                        selection,
-                        null,
-                        null,
-                        null,
-                        null);
-
-        String app_name;
-        if (cursor.moveToFirst()) {
-            do {
-                app_name = cursor.getString(0);
-                app_names.add(app_name);
-            } while(cursor.moveToNext());
-        }
-
-        cursor.close();
-        return app_names;
+    public long addShortcut(String packageName) {
+        return mSession.getShortcutTableDao().insert(new ShortcutTable(null, packageName));
     }
 
-    public LinkedList<String> getAllApps() {
-        LinkedList<String> app_names = new LinkedList<>();
+    public void removeShortcut(long id) {
+        ShortcutTable app = mSession.getShortcutTableDao().queryBuilder()
+                .where(ShortcutTableDao.Properties.Id.eq(id))
+                .unique();
 
-        SQLiteDatabase db = getReadableDatabase();
-
-        Cursor cursor =
-                db.query(TABLE_APPS,
-                        new String[]{KEY_PACKAGE_NAME},
-                        null,
-                        null,
-                        null,
-                        null,
-                        null);
-
-        String app_name;
-        if (cursor.moveToFirst()) {
-            do {
-                app_name = cursor.getString(0);
-                app_names.add(app_name);
-            } while(cursor.moveToNext());
-        }
-
-        cursor.close();
-        return app_names;
+        if (app != null)
+            mSession.getShortcutTableDao().delete(app);
     }
 
-    public void addAppToTab(String app_name, int tab_id) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_PACKAGE_NAME, app_name);
-        values.put(KEY_TAB_ID, Integer.toString(tab_id));
-
-        db.insert(TABLE_APPS, null, values);
-        db.close();
+    public List<ShortcutTable> getAllShortcuts() {
+        return mSession.getShortcutTableDao().loadAll();
     }
-
-    public void addAppsToTab(Map<String, Integer> pkg_categoryId) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        for (Map.Entry<String, Integer> entry : pkg_categoryId.entrySet()) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_PACKAGE_NAME, entry.getKey());
-            values.put(KEY_TAB_ID, Integer.toString(entry.getValue()));
-            db.insert(TABLE_APPS, null, values);
-        }
-        db.close();
-    }
-
-    public void removeAppFromTab(String app_name, int tab_id) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.delete(TABLE_APPS,
-                KEY_PACKAGE_NAME + " = ? AND "+
-                        KEY_TAB_ID+" = ?",
-                new String[]{app_name, Integer.toString(tab_id)});
-        db.close();
-    }
-
-    public void removeAppsFromTab(List<String> appNames, int tabId) {
-        SQLiteDatabase db = getWritableDatabase();
-        for (String appName : appNames) {
-            db.delete(TABLE_APPS,
-                    KEY_PACKAGE_NAME + " = ? AND " +
-                            KEY_TAB_ID + " = ?",
-                    new String[]{appName, Integer.toString(tabId)});
-        }
-        db.close();
-    }
-
-    public long addShortcut(String app_name) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_PACKAGE_NAME, app_name);
-
-        long id = db.insert(TABLE_SHORTCUTS, null, values);
-        db.close();
-
-        return id;
-    }
-
-    public void removeShorcut(long id) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_SHORTCUTS, KEY_ID + " = " + Long.toString(id),null);
-        db.close();
-    }
-
-    public LinkedList<ShortcutDetail> getAllShortcuts() {
-        LinkedList<ShortcutDetail> shortcuts = new LinkedList<>();
-
-        String query = "SELECT * FROM "+TABLE_SHORTCUTS;
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery(query, null);
-
-        if (cursor.moveToFirst()) {
-            do {
-                ShortcutDetail shortcut = new ShortcutDetail();
-                shortcut.name = cursor.getString(1);
-                shortcut.id = cursor.getInt(0);
-                shortcuts.add(shortcut);
-            } while(cursor.moveToNext());
-        }
-
-        cursor.close();
-        return shortcuts;
-    }
-
-    public ComponentName getWidgetContentName() {
-        SQLiteDatabase db = getReadableDatabase();
-
-        String selection = KEY_ID+" = 1";
-        Cursor cursor = db.query(TABLE_WIDGET,
-                new String[]{KEY_PACKAGE_NAME, KEY_CLASS_NAME},
-                selection,
-                null,
-                null,
-                null,
-                null);
-        cursor.moveToFirst();
-        ComponentName cn = new ComponentName(cursor.getString(0), cursor.getString(1));
-
-        cursor.close();
-        return cn;
-    }
-
-    public int updateWidget(String pkg, String cls) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(KEY_PACKAGE_NAME, pkg);
-        values.put(KEY_CLASS_NAME, cls);
-
-        int i = db.update(TABLE_WIDGET,
-                values,
-                KEY_ID+ " = 1",
-                null);
-        db.close();
-        return i;
-    }
-
 }
-

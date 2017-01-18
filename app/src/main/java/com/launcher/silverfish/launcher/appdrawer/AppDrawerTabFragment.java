@@ -36,6 +36,8 @@ import android.widget.TextView;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.dbmodel.AppTable;
+import com.launcher.silverfish.launcher.App;
 import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
@@ -44,7 +46,6 @@ import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 public class AppDrawerTabFragment extends Fragment {
@@ -62,7 +63,7 @@ public class AppDrawerTabFragment extends Fragment {
     private GridView appsView;
     private ArrayAdapter<AppDetail> arrayAdapter;
 
-    private int tabId;
+    private long tabId;
 
     //endregion
 
@@ -71,7 +72,7 @@ public class AppDrawerTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // get the sql database helper and the view of this tab
-        sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        sqlHelper = new LauncherSQLiteHelper((App)getActivity().getApplication());
         settings = new Settings(getContext());
 
         rootView = inflater.inflate(R.layout.activity_app_drawer_tab, container, false);
@@ -79,7 +80,7 @@ public class AppDrawerTabFragment extends Fragment {
 
         // Get this tab's ID.
         Bundle args = getArguments();
-        tabId = args.getInt(Constants.TAB_ID);
+        tabId = args.getLong(Constants.TAB_ID);
         appsView = (GridView) rootView.findViewById(R.id.apps_grid);
 
         mPacMan = getActivity().getPackageManager();
@@ -99,27 +100,28 @@ public class AppDrawerTabFragment extends Fragment {
 
     //region Adding applications
 
-    public void addApp(String app_name) {
-        boolean success = addAppToList(app_name);
+    public void addApp(String packageName) {
+        boolean success = addAppToList(packageName);
         if (success) {
             sortAppsList();
             arrayAdapter.notifyDataSetChanged();
             // add to database only if it is not the first tab
             if (tabId != 1)
-                sqlHelper.addAppToTab(app_name, tabId);
+                sqlHelper.addAppToTab(packageName, tabId);
         }
     }
 
-    private boolean addAppToList(String app_name) {
+    private boolean addAppToList(String packageName) {
         try {
             // Get the information about the app
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(app_name,PackageManager.GET_META_DATA);
+            ApplicationInfo appInfo = mPacMan.getApplicationInfo(
+                    packageName, PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
 
             // And add it to the list.
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
             appDetail.icon = mPacMan.getApplicationIcon(appInfo);
-            appDetail.name = app_name;
+            appDetail.packageName = packageName;
             appsList.add(appDetail);
 
             hideEmptyCategoryNotice();
@@ -135,7 +137,7 @@ public class AppDrawerTabFragment extends Fragment {
 
     public void removeApp(int appIndex) {
         if (tabId != 1)
-            sqlHelper.removeAppFromTab(appsList.get(appIndex).name.toString(), tabId);
+            sqlHelper.removeAppFromTab(appsList.get(appIndex).packageName.toString(), tabId);
 
         arrayAdapter.remove(appsList.get(appIndex));
 
@@ -157,27 +159,22 @@ public class AppDrawerTabFragment extends Fragment {
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        switch (tabId) {
+        switch ((int)tabId) {
             case 1:
-                // Tab 1 is a special tab and includes all except for the once in other tabs
-                // so we retrieve all apps that are in the database
-                LinkedList<String> ordered_apps = sqlHelper.getAllApps();
-
-                // And all installed apps on the device
+                // Tab 1 is a special tab and includes all except for the ones in other tabs
+                // Retrieve all installed apps on the device
                 List<ResolveInfo> availableActivities = mPacMan.queryIntentActivities(i, 0);
                 
                 // And only add those that are not in the database
                 for (int j = 0; j < availableActivities.size(); j++)    {
                     ResolveInfo ri = availableActivities.get(j);
 
-                    // Skip the apps that are in the database
-                    if (ordered_apps.contains(ri.activityInfo.packageName)) {
+                    if (sqlHelper.containsApp(ri.activityInfo.packageName))
                         continue;
-                    }
 
                     AppDetail app = new AppDetail();
                     app.label = ri.loadLabel(mPacMan);
-                    app.name = ri.activityInfo.packageName;
+                    app.packageName = ri.activityInfo.packageName;
 
                     // Load the icon later in an async task.
                     app.icon = null;
@@ -187,20 +184,20 @@ public class AppDrawerTabFragment extends Fragment {
                 break;
             default:
                 // All other tabs just query the apps from the database
-                LinkedList<String> app_names = sqlHelper.getAppsForTab(tabId);
-                for (String app_name : app_names) {
+                List<AppTable> apps = sqlHelper.getAppsForTab(tabId);
+                for (AppTable app : apps) {
 
-                    boolean success = addAppToList(app_name);
+                    boolean success = addAppToList(app.getPackageName());
                     // If the app could not be added then it was probably uninstalled,
                     // so we have to remove it from the database
                     if (!success) {
-                        Log.d("DB", "Removing app "+app_name+" from db");
-                        sqlHelper.removeAppFromTab(app_name, this.tabId);
+                        Log.d("DB", "Removing app "+app.getPackageName()+" from db");
+                        sqlHelper.removeAppFromTab(app.getPackageName(), this.tabId);
                     }
                 }
 
                 // show the empty category notice if this tab is empty
-                if (app_names.size() == 0) {
+                if (apps.size() == 0) {
                     showEmptyCategoryNotice();
                 }
         }

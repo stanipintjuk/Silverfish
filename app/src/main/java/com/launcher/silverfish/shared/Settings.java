@@ -1,5 +1,6 @@
 package com.launcher.silverfish.shared;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,6 +18,8 @@ public class Settings {
     private final SharedPreferences mPrefs;
 
     private static final String KEY_WIDGET_VISIBLE = "widget_visible";
+    private static final String KEY_WIDGET_PACKAGE_NAME = "widget_package_name";
+    private static final String KEY_WIDGET_CLASS_NAME = "widget_class_name";
     private static final String KEY_PREVIOUSLY_STARTED = "pref_previously_started";
     private static final String KEY_LAST_OPEN_TAB = "pref_last_open_tab";
     private static final String KEY_DRAWER_BG_COLOR = "app_drawer_background_color";
@@ -68,6 +71,13 @@ public class Settings {
 
     public int getFontFgColor() {
         return mPrefs.getInt(KEY_FONT_FG_COLOR, DEFAULT_FONT_FG_COLOR);
+    }
+
+    public ComponentName getWidget() {
+        String packageName = mPrefs.getString(KEY_WIDGET_PACKAGE_NAME, "");
+        String className = mPrefs.getString(KEY_WIDGET_CLASS_NAME, "");
+
+        return new ComponentName(packageName, className);
     }
 
     public Drawable getTabButtonStyle() {
@@ -133,6 +143,13 @@ public class Settings {
 
     public void setFontFgColor(final int color) {
         mPrefs.edit().putInt(KEY_FONT_FG_COLOR, color).apply();
+    }
+
+    public void setWidget(String packageName, String className) {
+        mPrefs.edit()
+                .putString(KEY_WIDGET_PACKAGE_NAME, packageName)
+                .putString(KEY_WIDGET_CLASS_NAME, className)
+                .apply();
     }
 
     //endregion

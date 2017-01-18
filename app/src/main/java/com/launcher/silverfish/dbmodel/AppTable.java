@@ -10,18 +10,17 @@ import org.greenrobot.greendao.annotation.Generated;
         @Index(value = "packageName", unique = true)
 })
 public class AppTable {
-    @Id
-    private Integer id;
+    @Id(autoincrement = true)
+    private Long id;
 
     @NotNull
     private String packageName;
 
     @NotNull
-    private Integer tabId;
+    private Long tabId;
 
-    @Generated(hash = 178348991)
-    public AppTable(Integer id, @NotNull String packageName,
-            @NotNull Integer tabId) {
+    @Generated(hash = 1161766823)
+    public AppTable(Long id, @NotNull String packageName, @NotNull Long tabId) {
         this.id = id;
         this.packageName = packageName;
         this.tabId = tabId;
@@ -31,11 +30,11 @@ public class AppTable {
     public AppTable() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -47,11 +46,11 @@ public class AppTable {
         this.packageName = packageName;
     }
 
-    public Integer getTabId() {
+    public Long getTabId() {
         return this.tabId;
     }
 
-    public void setTabId(Integer tabId) {
+    public void setTabId(Long tabId) {
         this.tabId = tabId;
     }
 }

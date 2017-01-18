@@ -1,25 +1,25 @@
 package com.launcher.silverfish.models;
 
-import com.launcher.silverfish.dbmodel.OldTabTable;
+import com.launcher.silverfish.dbmodel.TabTable;
 
 /**
  * Created by Stanislav Pintjuk on 8/12/16.
  * E-mail: stanislav.pintjuk@gmail.com
  */
 public class TabInfo {
-    private final int id;
+    private final long id;
     private final String tag;
     private String label;
 
-    public TabInfo(OldTabTable tab){
-        this.id = tab.id;
-        this.label = tab.label;
+    public TabInfo(TabTable tab){
+        this.id = tab.getId();
+        this.label = tab.getLabel();
 
-        // let the tag simply be the id of the tab
-        tag = Integer.toString(id);
+        // Let the tag simply be the id of the tab
+        tag = Long.toString(id);
     }
 
-    public int getId(){
+    public long getId(){
         return id;
     }
 
