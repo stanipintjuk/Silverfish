@@ -1,6 +1,6 @@
 package com.launcher.silverfish.models;
 
-import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.dbmodel.OldTabTable;
 
 /**
  * Created by Stanislav Pintjuk on 8/12/16.
@@ -11,7 +11,7 @@ public class TabInfo {
     private final String tag;
     private String label;
 
-    public TabInfo(TabTable tab){
+    public TabInfo(OldTabTable tab){
         this.id = tab.id;
         this.label = tab.label;
 
