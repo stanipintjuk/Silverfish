@@ -10,14 +10,14 @@ import org.greenrobot.greendao.annotation.Generated;
         @Index(value = "packageName", unique = true)
 })
 public class ShortcutTable {
-    @Id
-    private Integer id;
+    @Id(autoincrement = true)
+    private Long id;
 
     @NotNull
     private String packageName;
 
-    @Generated(hash = 1339096776)
-    public ShortcutTable(Integer id, @NotNull String packageName) {
+    @Generated(hash = 368591881)
+    public ShortcutTable(Long id, @NotNull String packageName) {
         this.id = id;
         this.packageName = packageName;
     }
@@ -26,11 +26,11 @@ public class ShortcutTable {
     public ShortcutTable() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
