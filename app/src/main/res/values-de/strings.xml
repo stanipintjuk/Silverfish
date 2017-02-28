@@ -1,7 +1,7 @@
 <resources>
     <string name="text_hold_to_change_widget">Gedrückt halten um das Widget zu wechseln</string>
-    <string name="text_empty_category_notice">Dieser Tab ist zur Zeit leer. Sie können Tabs verschieben indem Sie die Icons gedrückt halten.</string>
-    <string name="text_cannot_name_empty"> Der Tab nahme darf nicht leer sein.</string>
+    <string name="text_empty_category_notice">Dieser Tab ist derzeit leer. Sie können Tabs verschieben indem Sie die Icons gedrückt halten.</string>
+    <string name="text_cannot_name_empty"> Der Tabname darf nicht leer sein.</string>
     <string name="text_cannot_remove_tab">Dieser Tab kann nicht entfernt werden.</string>
     <string name="text_remove">Entfernen</string>
     <string name="text_uninstall">Deinstallieren</string>
@@ -24,12 +24,12 @@
     <string name="text_new_tab_name">Neuen Tab Namen eingeben</string>
     <string name="text_move_tab">Verschieben</string>
     <string name="text_cannot_move_tab">Kann diesen Tab nicht verschieben</string>
-    <string name="text_move_tab_toast">Bitte drücken Sie auf den Tab, welcher ausgetauscht werden soll, oder selbigen und abzubrechen.</string>
+    <string name="text_move_tab_toast">Bitte drücken Sie auf den Tab, welcher ausgetauscht werden soll, oder selbigen um abzubrechen.</string>
     <string name="text_operation_cancelled">Vorgang abgebrochen</string>
-    <string name="text_app_icon">Applikationsbild</string>
+    <string name="text_app_icon">Applikationsicon</string>
     <string name="text_change_colors">Farbe ändern</string>
     <string name="text_font">Schriftart</string>
-    <string name="text_settings_screen">Einstellungsmenu</string>
+    <string name="text_settings_screen">Einstellungsmenü</string>
     <string name="text_wallpaper">Hintergrund</string>
     <string name="text_widget">Widget</string>
 
