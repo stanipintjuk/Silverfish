@@ -7,19 +7,19 @@ import com.launcher.silverfish.dbmodel.TabTable;
  * E-mail: stanislav.pintjuk@gmail.com
  */
 public class TabInfo {
-    private final int id;
+    private final long id;
     private final String tag;
     private String label;
 
     public TabInfo(TabTable tab){
-        this.id = tab.id;
-        this.label = tab.label;
+        this.id = tab.getId();
+        this.label = tab.getLabel();
 
-        // let the tag simply be the id of the tab
-        tag = Integer.toString(id);
+        // Let the tag simply be the id of the tab
+        tag = Long.toString(id);
     }
 
-    public int getId(){
+    public long getId(){
         return id;
     }
 

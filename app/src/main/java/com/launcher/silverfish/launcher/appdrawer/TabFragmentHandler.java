@@ -31,7 +31,9 @@ import android.widget.TabHost;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.launcher.App;
 import com.launcher.silverfish.models.TabInfo;
 import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
@@ -127,10 +129,9 @@ public class TabFragmentHandler {
 
         // Attach it to the UI if an instance already exists, otherwise create a new instance and add it.
         if (fragment == null) {
-
             // send the tab id to each tab
             Bundle args = new Bundle();
-            args.putInt(Constants.TAB_ID, tab.getId());
+            args.putLong(Constants.TAB_ID, tab.getId());
 
             fragment = new AppDrawerTabFragment();
             fragment.setArguments(args);
@@ -166,7 +167,7 @@ public class TabFragmentHandler {
 
         LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
 
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
         List<TabTable> tabTables = sql.getAllTabs();
 
         for (TabTable tabEntry : tabTables) {
@@ -318,7 +319,7 @@ public class TabFragmentHandler {
         if (leftIndex == 0 || rightIndex == 0){
             throw new IllegalArgumentException("First tab is not allowed to be moved.");
         } else {
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
 
             // Get their original names
             String leftName = sql.getTabName(left.getId());
@@ -335,21 +336,21 @@ public class TabFragmentHandler {
             right.rename(leftName);
 
             // And now swap the applications by updating their category
-            Map<String, Integer> leftApps = new HashMap<>();
-            for (String app : sql.getAppsForTab(left.getId())) {
-                int category = rightIndex + 1; // Categories start one over
-                leftApps.put(app, category);
+            Map<String, Long> leftApps = new HashMap<>();
+            for (AppTable app : sql.getAppsForTab(left.getId())) {
+                long category = rightIndex + 1; // Categories start one over
+                leftApps.put(app.getPackageName(), category);
             }
 
-            Map<String, Integer> rightApps = new HashMap<>();
-            for (String app : sql.getAppsForTab(right.getId())) {
-                int category = leftIndex + 1; // Categories start one over
-                rightApps.put(app, category);
+            Map<String, Long> rightApps = new HashMap<>();
+            for (AppTable app : sql.getAppsForTab(right.getId())) {
+                long category = leftIndex + 1; // Categories start one over
+                rightApps.put(app.getPackageName(), category);
             }
 
             // First remove the apps from their original tab, we don't want duplicates!
-            sql.removeAppsFromTab(sql.getAppsForTab(left.getId()), left.getId());
-            sql.removeAppsFromTab(sql.getAppsForTab(right.getId()), right.getId());
+            sql.removeApps(sql.getAppsForTab(left.getId()));
+            sql.removeApps(sql.getAppsForTab(right.getId()));
 
             // Finally, move the applications
             sql.addAppsToTab(leftApps);
@@ -357,15 +358,15 @@ public class TabFragmentHandler {
         }
     }
 
-    public void addTab(String tab_name){
-        if (tab_name == null || tab_name.isEmpty()) {
-            throw new IllegalArgumentException("Tab name cannot be empty");
+    public void addTab(String tabName){
+        if (tabName == null || tabName.isEmpty()) {
+            throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
             // add the tab to database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
-            TabTable tab_entry = sql.addTab(tab_name);
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            TabTable tabEntry = sql.addTab(tabName);
 
-            final TabInfo tab = new TabInfo(tab_entry);
+            final TabInfo tab = new TabInfo(tabEntry);
             arrTabs.add(tab);
 
             // create a button for the tab
@@ -411,10 +412,10 @@ public class TabFragmentHandler {
 
     public void renameTab(TabInfo tab, int tab_index, String new_name) {
         if (new_name == null || new_name.isEmpty()){
-            throw new IllegalArgumentException("Tab name cannot be empty");
+            throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
-            // update name in database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            // update packageName in database
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
             sql.renameTab(tab.getId(), new_name);
 
             // rename the button
@@ -430,7 +431,7 @@ public class TabFragmentHandler {
             throw new IllegalArgumentException("First tab is not allowed to be removed.");
         } else {
             // Remove the tab from the database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
             sql.removeTab(tab.getId());
 
             // Hide the tab button

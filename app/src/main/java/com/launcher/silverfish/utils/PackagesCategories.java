@@ -18,7 +18,7 @@ public final class PackagesCategories {
     //region Helper methods
 
     // Retrieve the default tab ID based on the English name
-    private static int getCategoryId(String englishName) {
+    private static long getCategoryId(String englishName) {
         switch (englishName)
         {
             default: case "Other":       return 1;
@@ -93,19 +93,19 @@ public final class PackagesCategories {
 
     //region Set each package category
 
-    public static HashMap<String, Integer> setCategories(Context ctx,
+    public static HashMap<String, Long> setCategories(Context ctx,
                                                          List<ResolveInfo> activities)
     {
         return setCategories(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
-    public static HashMap<String, Integer> setCategories(List<ResolveInfo> activities,
+    public static HashMap<String, Long> setCategories(List<ResolveInfo> activities,
                                                          HashMap<String, String> categories,
                                                          HashMap<String, String[]> keywords)
     {
-        HashMap<String, Integer> pkg_categoryId = new HashMap<>();
+        HashMap<String, Long> pkg_categoryId = new HashMap<>();
         String pkg;
-        int categoryId;
+        long categoryId;
 
         for (int i = 0; i < activities.size(); i++) {
             ResolveInfo ri = activities.get(i);

@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
 
     <application
+        android:name=".launcher.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,8 +17,7 @@
         <activity
             android:name=".launcher.LauncherActivity"
             android:theme="@style/AppTheme"
-            android:label="Silverfish Launcher"
-            >
+            android:label="Silverfish Launcher">
             <!--android:theme="@android:style/Theme.Wallpaper.NoTitleBar"-->
 
             <intent-filter>

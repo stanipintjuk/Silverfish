@@ -22,7 +22,7 @@ import android.graphics.drawable.Drawable;
 
 public class AppDetail {
     public CharSequence label;
-    public CharSequence name;
+    public CharSequence packageName;
     public Drawable icon;
     public long id;
 }
