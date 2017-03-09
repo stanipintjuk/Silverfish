@@ -119,14 +119,16 @@ public class HomeScreenFragment extends Fragment  {
             public void OnShortcutAdd(String appName) {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                long appId = sqlHelper.addShortcut(appName);
+                if (sqlHelper.canAddShortcut(appName)) {
+                    long appId = sqlHelper.addShortcut(appName);
 
-                // Create shortcut and add it
-                ShortcutTable shortcut = new ShortcutTable();
-                shortcut.setPackageName(appName);
-                shortcut.setId(appId);
-                if (addAppToView(shortcut)) {
-                    updateShortcuts();
+                    // Create shortcut and add it
+                    ShortcutTable shortcut = new ShortcutTable();
+                    shortcut.setPackageName(appName);
+                    shortcut.setId(appId);
+                    if (addAppToView(shortcut)) {
+                        updateShortcuts();
+                    }
                 }
             }
         });

@@ -42,4 +42,5 @@
 
     <string name="hint_widget_now_visible">The widget is now visible.</string>
     <string name="hint_widget_now_invisible">The widget has been hidden.</string>
+    <string name="add_to_home_screen">Add to home screen</string>
 </resources>

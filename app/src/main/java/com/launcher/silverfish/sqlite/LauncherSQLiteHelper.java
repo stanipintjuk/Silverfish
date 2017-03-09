@@ -19,6 +19,9 @@
 
 package com.launcher.silverfish.sqlite;
 
+import android.database.sqlite.SQLiteConstraintException;
+import android.util.Log;
+
 import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.AppTableDao;
 import com.launcher.silverfish.dbmodel.DaoSession;
@@ -104,6 +107,12 @@ public class LauncherSQLiteHelper {
 
     public void removeApps(List<AppTable> apps) {
         mSession.getAppTableDao().deleteInTx(apps);
+    }
+
+    public boolean canAddShortcut(String packageName) {
+        return mSession.getShortcutTableDao().queryBuilder()
+                .where(ShortcutTableDao.Properties.PackageName.eq(packageName))
+                .unique() == null;
     }
 
     public long addShortcut(String packageName) {

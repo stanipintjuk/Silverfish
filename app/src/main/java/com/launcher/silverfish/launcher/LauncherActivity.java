@@ -26,6 +26,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -163,6 +164,19 @@ public class LauncherActivity extends FragmentActivity
         return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
+    public boolean addShortcut(String appName) {
+        if (getFragShortcutAddListenerRefreshListener() != null) {
+            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void moveToScreen(int screen) {
+        mViewPager.setCurrentItem(screen, true);
+    }
+
     //endregion
 
     //region Listeners
@@ -212,10 +226,7 @@ public class LauncherActivity extends FragmentActivity
     private void dropItem(DragEvent dragEvent) {
         if (mViewPager.getCurrentItem() == 1) {
             String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
-
-            if(getFragShortcutAddListenerRefreshListener() != null) {
-                getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
-            }
+            addShortcut(appName);
         }
     }
 

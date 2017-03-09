@@ -19,7 +19,7 @@ public class App extends Application {
 
         mSettings = new Settings(this);
 
-        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "settings-db");
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "settings-db", null);
         Database db = helper.getWritableDb();
         mDaoSession = new DaoMaster(db).newSession();
     }

@@ -22,11 +22,13 @@ package com.launcher.silverfish.launcher.appdrawer;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.LinkAddress;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +41,7 @@ import android.widget.Toast;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.launcher.LauncherActivity;
 import com.launcher.silverfish.models.TabInfo;
 
 public class TabbedAppDrawerFragment extends Fragment {
@@ -255,6 +258,8 @@ public class TabbedAppDrawerFragment extends Fragment {
         });
     }
 
+    private float dragOffsetX, dragOffsetY;
+
     private void setOnDragListener() {
 
         rootView.setOnDragListener(new View.OnDragListener() {
@@ -263,11 +268,14 @@ public class TabbedAppDrawerFragment extends Fragment {
 
                 switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED: {
-
                         // Care only about DRAG_APP_MOVE drags.
                         ClipDescription cd = dragEvent.getClipDescription();
                         if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
                             return false;
+
+                        // Starting movement, drag offset is now reset to 0
+                        dragOffsetX = 0;
+                        dragOffsetY = 0;
 
                         // Show the uninstall indicator
                         showUninstallIndicator();
@@ -280,6 +288,11 @@ public class TabbedAppDrawerFragment extends Fragment {
                     }
 
                     case DragEvent.ACTION_DRAG_LOCATION: {
+                        // getX() and getY() now return relative offsets,
+                        // so accumulate them to get the total movement
+                        dragOffsetX += dragEvent.getX();
+                        dragOffsetY += dragEvent.getY();
+
                         // If drag is on the way out of this page then stop receiving drag events
                         int threshold = Constants.SCREEN_CORNER_THRESHOLD;
                         // Get display size
@@ -300,28 +313,32 @@ public class TabbedAppDrawerFragment extends Fragment {
                     }
 
                     case DragEvent.ACTION_DROP: {
+                        String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
 
                         // If app is dropped on the uninstall indicator uninstall the app
                         if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
-                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            launchUninstallIntent(app_name);
-
+                            launchUninstallIntent(appName);
                         } else {
-                            // retrieve tha drop information  and remove it from the original tab
-                            int app_index = Integer.parseInt(
-                                    dragEvent.getClipData().getItemAt(1).
-                                            getText().toString());
+                            // If the user didn't move the application from its original
+                            // place (too much), then they might want to show a menu with more options
+                            float distSq = (dragOffsetX * dragOffsetX) + (dragOffsetY * dragOffsetY);
+                            if (distSq < Constants.NO_DRAG_THRESHOLD_SQ) {
+                                showExtraOptionsMenu(appName);
+                            } else {
+                                // Retrieve tha drop information  and remove it from the original tab
+                                int appIndex = Integer.parseInt(
+                                        dragEvent.getClipData().getItemAt(1).
+                                                getText().toString());
 
-                            String tab_tag = dragEvent.getClipData().getItemAt(2)
-                                    .getText().toString();
+                                String tabTag = dragEvent.getClipData().getItemAt(2)
+                                        .getText().toString();
 
-                            removeAppFromTab(app_index, tab_tag);
+                                removeAppFromTab(appIndex, tabTag);
 
-                            // add it to the new tab
-                            String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            dropAppInTab(app_name);
-
-
+                                // add it to the new tab
+                                String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                                dropAppInTab(app_name);
+                            }
                         }
                         break;
                     }
@@ -391,6 +408,35 @@ public class TabbedAppDrawerFragment extends Fragment {
 
         // Add app and refresh the tab's layout
         fragment.addApp(app_name);
+    }
+
+    //endregion
+
+    //region Extra options per app
+
+    private void showExtraOptionsMenu(final String appName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set up extra menu options
+        CharSequence[] options = new CharSequence[]{
+                getString(R.string.add_to_home_screen)
+        };
+
+        // Add click listener
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        LauncherActivity activity = (LauncherActivity)getActivity();
+                        activity.addShortcut(appName);
+                        activity.moveToScreen(1);
+                        break;
+                }
+            }
+        });
+
+        builder.show();
     }
 
     //endregion
