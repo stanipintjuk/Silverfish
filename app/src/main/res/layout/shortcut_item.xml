@@ -22,7 +22,7 @@
                 android:shadowDy="1"
                 android:shadowRadius="5"
                 android:id="@+id/item_app_label"
-                android:layout_width="70dp"
+                android:layout_width="90dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textAlignment="center"
