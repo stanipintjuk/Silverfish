@@ -9,13 +9,16 @@ android {
         applicationId "com.launcher.silverfish"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName "0.4.1"
+        versionCode 6
+        versionName "0.5"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            lintOptions {
+                disable 'MissingTranslation'
+            }
         }
     }
 }
