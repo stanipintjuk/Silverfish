@@ -3,19 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
         <LinearLayout
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <ImageView
                 android:id="@+id/item_app_icon"
                 android:layout_width="@dimen/app_icon_size"
                 android:layout_height="@dimen/app_icon_size"
                 android:layout_gravity="center"
-            />
+                android:contentDescription="@string/text_app_icon" />
 
             <TextView
                 android:shadowColor="@color/shadowColor"
@@ -28,9 +27,7 @@
                 android:layout_gravity="center"
                 android:textAlignment="center"
                 android:textColor="@color/appLabelColor"
-                android:singleLine="true"
-            />
-
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
-
 </FrameLayout>

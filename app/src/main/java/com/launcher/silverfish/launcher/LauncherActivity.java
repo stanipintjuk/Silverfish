@@ -17,21 +17,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher;
 
 import android.content.ClipDescription;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
+import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
+import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
@@ -41,7 +47,8 @@ import java.util.List;
 /**
  * This is the main activity of the launcher
  */
-public class LauncherActivity extends FragmentActivity {
+public class LauncherActivity extends FragmentActivity
+        implements SettingsScreenFragment.SettingChanged {
 
     //region Fields
 
@@ -50,6 +57,9 @@ public class LauncherActivity extends FragmentActivity {
 
     // Used for telling home screen when a shortcut is added.
     private ShortcutAddListener shortcutAddListener;
+
+    // Used when the intent is created to specify an starting page index
+    public static final String START_PAGE = "start_page";
 
     //endregion
 
@@ -61,12 +71,9 @@ public class LauncherActivity extends FragmentActivity {
 
         // Check if the app is started for the first time. If it is then we have to
         // populate the database with some default values.
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
-        if(!previouslyStarted) {
-            SharedPreferences.Editor edit = prefs.edit();
-            edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-            edit.apply();
+        Settings settings = new Settings(this);
+        if (!settings.wasPreviouslyStarted()) {
+            settings.setPreviouslyStarted(true);
             createDefaultTabs();
             autoSortApplications();
         }
@@ -77,10 +84,9 @@ public class LauncherActivity extends FragmentActivity {
                         getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
 
         setDragListener();
-
     }
 
     //endregion
@@ -88,7 +94,7 @@ public class LauncherActivity extends FragmentActivity {
     //region First time setup
 
     private void createDefaultTabs() {
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
 
         // Load default names for the tab
         String[] defaultTabNames = new String[] {
@@ -112,7 +118,7 @@ public class LauncherActivity extends FragmentActivity {
     private void autoSortApplications() {
 
         // Set up both SQL helper and package manager
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(this.getBaseContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
         PackageManager mPacMan = getApplicationContext().getPackageManager();
 
         // Set MAIN and LAUNCHER filters, so we only get activities with that defined on their manifest
@@ -125,10 +131,50 @@ public class LauncherActivity extends FragmentActivity {
 
         // Store here the packages and their categories IDs
         // This will allow us to add all the apps at once instead opening the database over and over
-        HashMap<String, Integer> pkg_categoryId = PackagesCategories.setCategories(getApplicationContext(), availableActivities);
+        HashMap<String, Long> pkg_categoryId =
+                PackagesCategories.setCategories(getApplicationContext(), availableActivities);
 
         // Then add all the apps to their corresponding tabs at once
         sql.addAppsToTab(pkg_categoryId);
+    }
+
+    //endregion
+
+    //region Fragment communication
+
+    @Override
+    public void onWidgetVisibilityChanged(boolean visible) {
+        getHomeScreenFragment().setWidgetVisibility(visible);
+    }
+
+    @Override
+    public void onWidgetChangeRequested() {
+        getHomeScreenFragment().popupSelectWidget();
+    }
+
+    @Override
+    public void onColorChanged(int drawerBg, int widgetBg, int fontFg) {
+        // There is no need to notify the app drawer fragment that the colors changed.
+        // This tab is at #0, and the settings tab is #2. Only 2 tabs (#1 and #2) are
+        // kept in memory, so as soon as #0 gets created, its colors will get updated.
+        getHomeScreenFragment().setWidgetColors(widgetBg, fontFg);
+    }
+
+    HomeScreenFragment getHomeScreenFragment() {
+        return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
+    }
+
+    public boolean addShortcut(String appName) {
+        if (getFragShortcutAddListenerRefreshListener() != null) {
+            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void moveToScreen(int screen) {
+        mViewPager.setCurrentItem(screen, true);
     }
 
     //endregion
@@ -180,10 +226,7 @@ public class LauncherActivity extends FragmentActivity {
     private void dropItem(DragEvent dragEvent) {
         if (mViewPager.getCurrentItem() == 1) {
             String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
-
-            if(getFragShortcutAddListenerRefreshListener() != null) {
-                getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
-            }
+            addShortcut(appName);
         }
     }
 

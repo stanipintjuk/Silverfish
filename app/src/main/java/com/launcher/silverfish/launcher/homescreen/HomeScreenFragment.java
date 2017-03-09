@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.homescreen;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
@@ -45,11 +45,19 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.ShortcutTable;
+import com.launcher.silverfish.launcher.App;
+import com.launcher.silverfish.launcher.LauncherActivity;
+import com.launcher.silverfish.layouts.SquareGridLayout;
+import com.launcher.silverfish.models.AppDetail;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class HomeScreenFragment extends Fragment  {
@@ -57,6 +65,7 @@ public class HomeScreenFragment extends Fragment  {
     //region Fields
 
     LauncherSQLiteHelper sqlHelper;
+    private Settings settings;
 
     // Constant variables for communication with AppWidgetManager
     final private int WIDGET_HOST_ID = 1339;
@@ -85,7 +94,8 @@ public class HomeScreenFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        sqlHelper = new LauncherSQLiteHelper(getActivity().getBaseContext());
+        sqlHelper = new LauncherSQLiteHelper((App)getActivity().getApplication());
+        settings = new Settings(getContext());
 
         // Initiate global variables
         mAppWidgetManager = AppWidgetManager.getInstance(getActivity().getBaseContext());
@@ -93,7 +103,7 @@ public class HomeScreenFragment extends Fragment  {
         mAppWidgetHost.startListening();
 
         mPacMan = getActivity().getPackageManager();
-        appsList = new ArrayList<AppDetail>();
+        appsList = new ArrayList<>();
 
         rootView = inflater.inflate(R.layout.activity_home, container, false);
         // Set touch slop and listen for touch events, such as swipe
@@ -109,14 +119,16 @@ public class HomeScreenFragment extends Fragment  {
             public void OnShortcutAdd(String appName) {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                long appId = sqlHelper.addShortcut(appName);
+                if (sqlHelper.canAddShortcut(appName)) {
+                    long appId = sqlHelper.addShortcut(appName);
 
-                // Create shortcut and add it
-                ShortcutDetail shortcut = new ShortcutDetail();
-                shortcut.name = appName;
-                shortcut.id = appId;
-                if (addAppToView(shortcut)) {
-                    updateShortcuts();
+                    // Create shortcut and add it
+                    ShortcutTable shortcut = new ShortcutTable();
+                    shortcut.setPackageName(appName);
+                    shortcut.setId(appId);
+                    if (addAppToView(shortcut)) {
+                        updateShortcuts();
+                    }
                 }
             }
         });
@@ -124,7 +136,10 @@ public class HomeScreenFragment extends Fragment  {
         addWidgetOnClickListener();
         setOnDragListener();
 
+        setWidgetColors(settings.getWidgetBgColor(), settings.getFontFgColor());
+        setWidgetVisibility(settings.isWidgetVisible());
         loadWidget();
+
         loadApps();
         updateShortcuts();
 
@@ -142,29 +157,29 @@ public class HomeScreenFragment extends Fragment  {
     //region Manage apps and shortcuts
 
     private void loadApps() {
-
-        LinkedList<ShortcutDetail> shortcuts = sqlHelper.getAllShortcuts();
-        for (ShortcutDetail shortcut : shortcuts) {
+        List<ShortcutTable> shortcuts = sqlHelper.getAllShortcuts();
+        for (ShortcutTable shortcut : shortcuts) {
             if (!addAppToView(shortcut)) {
                 // If the shortcut could not be added then the user has probably uninstalled it,
                 // so we should remove it from the db
-                Log.d("HomeFragment", "Removing shortcut "+shortcut.name+" from db");
-                sqlHelper.removeShorcut(shortcut.id);
+                Log.d("HomeFragment", "Removing shortcut "+shortcut.getPackageName()+" from db");
+                sqlHelper.removeShortcut(shortcut.getId());
             }
         }
     }
 
-    private boolean addAppToView(ShortcutDetail shortcut) {
+    private boolean addAppToView(ShortcutTable shortcut) {
         try {
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(shortcut.name,PackageManager.GET_META_DATA);
+            ApplicationInfo appInfo = mPacMan.getApplicationInfo(
+                    shortcut.getPackageName(), PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
 
             // load the icon later in an async task
             appDetail.icon = null;
 
-            appDetail.name = shortcut.name;
-            appDetail.id = shortcut.id;
+            appDetail.packageName = shortcut.getPackageName();
+            appDetail.id = shortcut.getId();
 
             appsList.add(appDetail);
             return true;
@@ -175,7 +190,7 @@ public class HomeScreenFragment extends Fragment  {
     }
 
     private void removeApp(int app_index, long app_id) {
-        sqlHelper.removeShorcut(app_id);
+        sqlHelper.removeShortcut(app_id);
         appsList.remove(app_index);
     }
 
@@ -200,7 +215,7 @@ public class HomeScreenFragment extends Fragment  {
 
             // load the app icon in an async task
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
-            Utils.loadAppIconAsync(mPacMan, app.name.toString(), im);
+            Utils.loadAppIconAsync(mPacMan, app.packageName.toString(), im);
 
             TextView tv = (TextView)convertView.findViewById(R.id.item_app_label);
             tv.setText(app.label);
@@ -221,7 +236,7 @@ public class HomeScreenFragment extends Fragment  {
                         case MotionEvent.ACTION_UP:
                             // We only want to launch the activity if the touch was not consumed yet!
                             if (!touchConsumed) {
-                                Intent i = mPacMan.getLaunchIntentForPackage(app.name.toString());
+                                Intent i = mPacMan.getLaunchIntentForPackage(app.packageName.toString());
                                 startActivity(i);
                             }
                             break;
@@ -292,7 +307,7 @@ public class HomeScreenFragment extends Fragment  {
                     case DragEvent.ACTION_DROP:
 
                         // If outside of bound, remove the app
-                        if (Utils.onBottomScreenEdge(getActivity(), dragEvent.getY())) {
+                        if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
                             String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
                             String appIndex = dragEvent.getClipData().getItemAt(1).getText().toString();
                             removeApp(Integer.parseInt(appIndex), Long.parseLong(appId));
@@ -318,7 +333,7 @@ public class HomeScreenFragment extends Fragment  {
         widget_area.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });
@@ -330,8 +345,7 @@ public class HomeScreenFragment extends Fragment  {
 
     //region Widget selection
 
-    private void selectWidget() {
-
+    public void popupSelectWidget() {
         // Allocate widget id and start widget selection activity
         int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
         Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
@@ -361,7 +375,7 @@ public class HomeScreenFragment extends Fragment  {
 
         // And place the widget in widget area and save.
         placeWidget(hostView);
-        sqlHelper.updateWidget(appWidgetInfo.provider.getPackageName(), appWidgetInfo.provider.getClassName());
+        settings.setWidget(appWidgetInfo.provider.getPackageName(), appWidgetInfo.provider.getClassName());
     }
 
     //endregion
@@ -369,7 +383,7 @@ public class HomeScreenFragment extends Fragment  {
     //region Widget loading
 
     private void loadWidget() {
-        ComponentName cn = sqlHelper.getWidgetContentName();
+        ComponentName cn = settings.getWidget();
 
         Log.d("Widget creation", "Loaded from db: " + cn.getClassName() + " - " + cn.getPackageName());
         // Check that there actually is a widget in the database
@@ -473,7 +487,7 @@ public class HomeScreenFragment extends Fragment  {
         hostView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                selectWidget();
+                popupSelectWidget();
                 return true;
             }
         });
@@ -536,7 +550,7 @@ public class HomeScreenFragment extends Fragment  {
         }
     }
 
-    View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
+    final View.OnTouchListener onRootTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent event) {
             switch(MotionEventCompat.getActionMasked(event)) {
@@ -556,6 +570,21 @@ public class HomeScreenFragment extends Fragment  {
     //endregion
 
     //region UI
+
+    public void setWidgetVisibility(boolean visible) {
+        final FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        widgetArea.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    public void setWidgetColors(int background, int foreground) {
+        final FrameLayout widgetArea = (FrameLayout)rootView.findViewById(R.id.widget_area);
+        final TextView noWidgetNotice = (TextView)rootView.findViewById(R.id.no_widget_notice);
+
+        widgetArea.setBackgroundColor(background);
+        // The no-widget notice will be null if a widget is set
+        if (noWidgetNotice != null)
+            noWidgetNotice.setTextColor(foreground);
+    }
 
     void updateTouchDown(MotionEvent event) {
         lastX = event.getX();

@@ -1,5 +1,4 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -22,11 +21,11 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/text_hold_to_change_widget"
-            android:id="@+id/textView"
+            android:id="@+id/no_widget_notice"
             android:layout_gravity="center" />
     </FrameLayout>
 
-    <com.launcher.silverfish.SquareGridLayout
+    <com.launcher.silverfish.layouts.SquareGridLayout
         android:layout_weight="3"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:util="http://schemas.android.com/apk/res/com.launcher.silverfish"
@@ -35,24 +34,31 @@
         android:layout_height="fill_parent"
         android:id="@+id/shortcut_area">
 
-    </com.launcher.silverfish.SquareGridLayout>
+    </com.launcher.silverfish.layouts.SquareGridLayout>
     </LinearLayout>
 
     <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/remove_indicator"
-        android:visibility="invisible">
+        android:visibility="invisible"
+        android:layout_gravity="bottom|center_horizontal">
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/app_icon_size"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/text_remove"
             android:textColor="#000000"
             android:textAlignment="center"
             android:background="@drawable/red_gradient"
-            android:layout_gravity="center_horizontal|bottom" />
+            android:layout_gravity="center_horizontal|bottom"
+            android:paddingEnd="@dimen/app_icon_size"
+            android:paddingStart="@dimen/app_icon_size"
+            android:gravity="bottom|center_horizontal"
+            android:shadowColor="@color/white"
+            android:shadowRadius="4"
+            android:textStyle="bold" />
     </FrameLayout>
 
 </FrameLayout>

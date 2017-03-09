@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.homescreen;
 
 import android.appwidget.AppWidgetHostView;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -29,7 +28,6 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
 
     private boolean mHasPerformedLongPress;
     private CheckForLongPress mPendingCheckForLongPress;
-    private LayoutInflater mInflater;
 
     //endregion
 
@@ -37,8 +35,6 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
 
     public LauncherAppWidgetHostView(Context context) {
         super(context);
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         // Listen for touch events at this level for cancelling longClick if necessary
         setOnTouchListener(onTouchListener);
     }
@@ -47,7 +43,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
 
     //region Events
 
-    OnTouchListener onTouchListener = new OnTouchListener() {
+    final OnTouchListener onTouchListener = new OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             switch (motionEvent.getAction()) {

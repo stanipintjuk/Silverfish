@@ -7,23 +7,23 @@ import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Generated;
 
 @Entity(indexes = {
-        @Index(value = "label")
+        @Index(value = "packageName", unique = true)
 })
-public class TabTable {
+public class ShortcutTable {
     @Id(autoincrement = true)
     private Long id;
 
     @NotNull
-    private String label;
+    private String packageName;
 
-    @Generated(hash = 1581068435)
-    public TabTable(Long id, @NotNull String label) {
+    @Generated(hash = 368591881)
+    public ShortcutTable(Long id, @NotNull String packageName) {
         this.id = id;
-        this.label = label;
+        this.packageName = packageName;
     }
 
-    @Generated(hash = 1198679566)
-    public TabTable() {
+    @Generated(hash = 2116092840)
+    public ShortcutTable() {
     }
 
     public Long getId() {
@@ -34,11 +34,11 @@ public class TabTable {
         this.id = id;
     }
 
-    public String getLabel() {
-        return this.label;
+    public String getPackageName() {
+        return this.packageName;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 }

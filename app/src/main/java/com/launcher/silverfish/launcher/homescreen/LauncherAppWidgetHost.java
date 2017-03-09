@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016 Stanislav Pintjuk
  * E-mail: stanislav.pintjuk@gmail.com
@@ -18,22 +17,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.homescreen;
 
+import android.appwidget.AppWidgetHost;
+import android.appwidget.AppWidgetHostView;
+import android.appwidget.AppWidgetProviderInfo;
 import android.content.Context;
-import android.view.View;
-import android.widget.TabHost;
 
-public class DummyTabContent implements TabHost.TabContentFactory {
-    private Context mContext;
+/**
+ * Overrides the onCreateView to return our custom AppWidgetHostView.
+ */
+public class LauncherAppWidgetHost extends AppWidgetHost {
 
-    public DummyTabContent(Context context) {
-        mContext = context;
+    public LauncherAppWidgetHost(Context context, int hostId) {
+        super(context, hostId);
     }
 
     @Override
-    public View createTabContent(String tag) {
-        View v = new View(mContext);
-        return v;
+    protected AppWidgetHostView onCreateView(Context context, int appWidgetId, AppWidgetProviderInfo appWidget) {
+        // pass back our custom AppWidgetHostView
+        return new LauncherAppWidgetHostView(context);
     }
 }

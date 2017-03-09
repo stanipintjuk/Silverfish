@@ -18,16 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.common;
 
 /**
  * Class with static variables used across the application.
  */
 public class Constants {
-    public static String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
-    public static String DRAG_APP_MOVE = "app_move";
+    public final static String DRAG_SHORTCUT_REMOVAL = "shortcut_removal";
+    public final static String DRAG_APP_MOVE = "app_move";
 
-    public static String TAB_ID = "tab_id";
+    public final static String TAB_ID = "tab_id";
 
-    public static int SCREEN_CORNER_THRESHOLD = 40;
+    public final static int SCREEN_CORNER_THRESHOLD = 40;
+    public final static float NO_DRAG_THRESHOLD_SQ = 400f; // Squared distance (20² px)
 }

@@ -26,4 +26,18 @@
     <string name="text_move_tab_toast">Toque la otra pestaña con la que se intercambiará, o la misma para cancelar</string>
     <string name="text_operation_cancelled">Operación cancelada</string>
     <string name="text_cannot_move_tab">No se puede mover esta pestaña</string>
+    <string name="text_app_icon">Icono de aplicación</string>
+    <string name="text_change_colors">Cambiar colores</string>
+    <string name="text_font">Fuente</string>
+    <string name="text_settings_screen">Pantalla de ajustes</string>
+    <string name="text_wallpaper">Fondo de pantalla</string>
+    <string name="text_widget">Widget</string>
+
+    <string name="setting_change_wallpaper">Cambiar fondo de pantalla</string>
+    <string name="setting_change_widget">Cambiar widget</string>
+    <string name="setting_select_wallpaper">Elegir fondo de pantalla</string>
+    <string name="setting_toggle_visibility">Cambiar visibilidad</string>
+
+    <string name="hint_widget_now_invisible">El widget está ahora oculto.</string>
+    <string name="hint_widget_now_visible">El widget está ahora visible.</string>
 </resources>

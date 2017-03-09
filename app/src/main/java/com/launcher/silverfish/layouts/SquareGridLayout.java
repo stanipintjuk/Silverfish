@@ -1,10 +1,12 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.layouts;
 
-import android.view.ViewGroup;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
+
+import com.launcher.silverfish.R;
 
 /**
  * A layout that arranges views into a grid of same-sized squares.

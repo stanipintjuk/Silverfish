@@ -38,16 +38,13 @@ I mostly wrote it to scratch my own itch. As my itch gets worse more functionali
     - square - ✓
     - triangular??
 * Create a settings activity to modify stuff like
-    - Colors
+    - Colors ✓
     - Position of homescreen and appdrawer
-    - Hide or remove empty fragment
     - Change shortcut layout
     - Change the tab icons.
 
-# Changes since last version (v0.3 Alpha)
-* Added the ability to move tabs
-* Added the ability to swipe down on homescreen to show the notification panel
-* Added bulgarian translation
+# Changelog
+The full changelog can be seen under the [releases](https://github.com/stanipintjuk/Silverfish/releases) section.
 
 #Thanks to...
 Thank you @Teyro, @Pierre-lbt, @ImAnnoying, @AlbertWDev and @XyLoNaMiyX for your contributions! :)

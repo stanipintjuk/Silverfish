@@ -2,7 +2,6 @@ package com.launcher.silverfish.utils;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
-import android.util.Log;
 
 import com.launcher.silverfish.R;
 
@@ -19,7 +18,7 @@ public final class PackagesCategories {
     //region Helper methods
 
     // Retrieve the default tab ID based on the English name
-    private static int getCategoryId(String englishName) {
+    private static long getCategoryId(String englishName) {
         switch (englishName)
         {
             default: case "Other":       return 1;
@@ -76,7 +75,7 @@ public final class PackagesCategories {
 
     //region Get Keywords
 
-    public static HashMap<String, String[]> getKeywords(Context ctx)
+    public static HashMap<String, String[]> getKeywords()
     {
         HashMap<String, String[]> keywordsDict = new HashMap<>();
 
@@ -87,7 +86,6 @@ public final class PackagesCategories {
         keywordsDict.put("Accessories", new String[]{"editor", "calc", "calendar", "organize", "clock", "time", "viewer", "file", "manager", "memo", "note"});
         keywordsDict.put("Settings", new String[]{"settings", "config", "keyboard", "launcher", "sync", "backup"});
 
-
         return keywordsDict;
     }
 
@@ -95,18 +93,19 @@ public final class PackagesCategories {
 
     //region Set each package category
 
-    public static HashMap<String, Integer> setCategories(Context ctx, List<ResolveInfo> activities)
+    public static HashMap<String, Long> setCategories(Context ctx,
+                                                         List<ResolveInfo> activities)
     {
-        return setCategories(ctx, activities, getPredefinedCategories(ctx), getKeywords(ctx));
+        return setCategories(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
-    public static HashMap<String, Integer> setCategories(Context ctx, List<ResolveInfo> activities,
+    public static HashMap<String, Long> setCategories(List<ResolveInfo> activities,
                                                          HashMap<String, String> categories,
                                                          HashMap<String, String[]> keywords)
     {
-        HashMap<String, Integer> pkg_categoryId = new HashMap<>();
-        String pkg, category = "";
-        int categoryId;
+        HashMap<String, Long> pkg_categoryId = new HashMap<>();
+        String pkg;
+        long categoryId;
 
         for (int i = 0; i < activities.size(); i++) {
             ResolveInfo ri = activities.get(i);
@@ -114,8 +113,7 @@ public final class PackagesCategories {
 
 
             if (categories.containsKey(pkg)) {
-                category = categories.get(pkg);
-                categoryId = getCategoryId(category);
+                categoryId = getCategoryId(categories.get(pkg));
 
                 // Only add if not default
                 if (categoryId > 1) {
@@ -125,12 +123,8 @@ public final class PackagesCategories {
             // Intelligent fallback: Try to guess the category
             else {
                 pkg = pkg.toLowerCase();
-                for (String key : keywords.keySet())
-                {
-                    if (containsKeyword(pkg, keywords.get(key)))
-                    {
-                        if(pkg.contains("contacts")) Log.d("PACKAGES", "==== CONTACTS APP ====");
-                        category = key;
+                for (String key : keywords.keySet()) {
+                    if (containsKeyword(pkg, keywords.get(key))) {
                         pkg_categoryId.put(pkg, getCategoryId(key));
                     }
                 }

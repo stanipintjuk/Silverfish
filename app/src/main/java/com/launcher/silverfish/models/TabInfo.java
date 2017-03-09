@@ -1,4 +1,4 @@
-package com.launcher.silverfish;
+package com.launcher.silverfish.models;
 
 import com.launcher.silverfish.dbmodel.TabTable;
 
@@ -7,19 +7,19 @@ import com.launcher.silverfish.dbmodel.TabTable;
  * E-mail: stanislav.pintjuk@gmail.com
  */
 public class TabInfo {
-    private int id;
-    private String tag;
+    private final long id;
+    private final String tag;
     private String label;
 
     public TabInfo(TabTable tab){
-        this.id = tab.id;
-        this.label = tab.label;
+        this.id = tab.getId();
+        this.label = tab.getLabel();
 
-        // let the tag simply be the id of the tab
-        tag = Integer.toString(id);
+        // Let the tag simply be the id of the tab
+        tag = Long.toString(id);
     }
 
-    public int getId(){
+    public long getId(){
         return id;
     }
 

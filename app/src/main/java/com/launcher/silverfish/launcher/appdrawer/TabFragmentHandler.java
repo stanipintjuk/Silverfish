@@ -17,13 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher.appdrawer;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
@@ -32,7 +29,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.Constants;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.TabTable;
+import com.launcher.silverfish.launcher.App;
+import com.launcher.silverfish.models.TabInfo;
+import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
@@ -48,23 +51,26 @@ public class TabFragmentHandler {
 
     //region Fields
 
-    private TabHost tHost;
-    private FragmentManager mFragmentManager;
-    private View rootView;
-    private Activity mActivity;
+    private final Settings settings;
+
+    private final TabHost tHost;
+    private final FragmentManager mFragmentManager;
+    private final View rootView;
+    private final Activity mActivity;
 
     private List<TabInfo> arrTabs;
     private List<Button> arrButton;
 
-    private TabButtonClickListener tabButtonClickListener;
+    private AppDrawerTabFragment.TabButtonClickListener tabButtonClickListener;
 
     // Store the last open tab in RAM until end of lifecycle
-    // to not waste precious I/O every time a tab is changed.
+    // not to waste precious I/O every time a tab is changed.
     private int currentOpenTab = -1;
 
     //endregion
 
-    public TabFragmentHandler(FragmentManager fm, View view, Activity activity){
+    public TabFragmentHandler(FragmentManager fm, View view, Activity activity) {
+        settings = new Settings(activity);
 
         mFragmentManager = fm;
         rootView = view;
@@ -123,10 +129,9 @@ public class TabFragmentHandler {
 
         // Attach it to the UI if an instance already exists, otherwise create a new instance and add it.
         if (fragment == null) {
-
             // send the tab id to each tab
             Bundle args = new Bundle();
-            args.putInt(Constants.TAB_ID, tab.getId());
+            args.putLong(Constants.TAB_ID, tab.getId());
 
             fragment = new AppDrawerTabFragment();
             fragment.setArguments(args);
@@ -157,12 +162,12 @@ public class TabFragmentHandler {
      * Loads all tabs from the database.
      */
     public void loadTabs(){
-        arrButton = new ArrayList<Button>();
-        arrTabs = new ArrayList<TabInfo>();
+        arrButton = new ArrayList<>();
+        arrTabs = new ArrayList<>();
 
         LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
 
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
         List<TabTable> tabTables = sql.getAllTabs();
 
         for (TabTable tabEntry : tabTables) {
@@ -175,11 +180,11 @@ public class TabFragmentHandler {
             arrButton.add(btn);
 
             // Set the style of the button
-            btn.setBackgroundResource(R.drawable.tab_style);
+            btn.setBackground(settings.getTabButtonStyle());
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                                               ViewGroup.LayoutParams.MATCH_PARENT,
                                                               1));
-            btn.setTextColor(Color.WHITE);
+            btn.setTextColor(settings.getFontFgColor());
 
             // Add the button to the tab widget.
             tabWidget.addView(btn);
@@ -255,37 +260,26 @@ public class TabFragmentHandler {
     }
 
     private int getLastTabId() {
-
         // If currentOpenTab is already loaded, do not try to load it from preferences again.
-        if (currentOpenTab != -1) {
+        if (currentOpenTab != -1)
             return currentOpenTab;
-        }
-
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mActivity.getBaseContext());
-
-        return prefs.getInt(mActivity.getString(R.string.pref_last_open_tab), 0);
+        else
+            return settings.getLastOpenTab();
     }
 
     /**
      * Saves the last opened tab's id in the apps preferences
-     * @param tabId
+     * @param tabId The id of the tab to be saved
      */
     private void setLastTabId(int tabId) {
-        SharedPreferences prefs = PreferenceManager
-                .getDefaultSharedPreferences(mActivity.getBaseContext());
-
-        SharedPreferences.Editor edit = prefs.edit();
-
-        edit.putInt(mActivity.getString(R.string.pref_last_open_tab), tabId);
-        edit.apply();
+        settings.setLastOpenTab(tabId);
     }
 
     //endregion
 
     //region Click listener
 
-    public void setOnTabButtonClickListener(TabButtonClickListener clickListener){
+    public void setOnTabButtonClickListener(AppDrawerTabFragment.TabButtonClickListener clickListener){
         tabButtonClickListener = clickListener;
     }
 
@@ -310,11 +304,8 @@ public class TabFragmentHandler {
 
                 @Override
                 public boolean onLongClick(View view) {
-                    if (tabButtonClickListener != null) {
-                        return tabButtonClickListener.onLongClick(tab, position);
-                    } else {
-                        return false;
-                    }
+                    return tabButtonClickListener != null &&
+                            tabButtonClickListener.onLongClick(tab, position);
                 }
             });
         }
@@ -328,7 +319,7 @@ public class TabFragmentHandler {
         if (leftIndex == 0 || rightIndex == 0){
             throw new IllegalArgumentException("First tab is not allowed to be moved.");
         } else {
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
 
             // Get their original names
             String leftName = sql.getTabName(left.getId());
@@ -345,21 +336,21 @@ public class TabFragmentHandler {
             right.rename(leftName);
 
             // And now swap the applications by updating their category
-            Map<String, Integer> leftApps = new HashMap<String, Integer>();
-            for (String app : sql.getAppsForTab(left.getId())) {
-                int category = rightIndex + 1; // Categories start one over
-                leftApps.put(app, category);
+            Map<String, Long> leftApps = new HashMap<>();
+            for (AppTable app : sql.getAppsForTab(left.getId())) {
+                long category = rightIndex + 1; // Categories start one over
+                leftApps.put(app.getPackageName(), category);
             }
 
-            Map<String, Integer> rightApps = new HashMap<String, Integer>();
-            for (String app : sql.getAppsForTab(right.getId())) {
-                int category = leftIndex + 1; // Categories start one over
-                rightApps.put(app, category);
+            Map<String, Long> rightApps = new HashMap<>();
+            for (AppTable app : sql.getAppsForTab(right.getId())) {
+                long category = leftIndex + 1; // Categories start one over
+                rightApps.put(app.getPackageName(), category);
             }
 
             // First remove the apps from their original tab, we don't want duplicates!
-            sql.removeAppsFromTab(sql.getAppsForTab(left.getId()), left.getId());
-            sql.removeAppsFromTab(sql.getAppsForTab(right.getId()), right.getId());
+            sql.removeApps(sql.getAppsForTab(left.getId()));
+            sql.removeApps(sql.getAppsForTab(right.getId()));
 
             // Finally, move the applications
             sql.addAppsToTab(leftApps);
@@ -367,15 +358,15 @@ public class TabFragmentHandler {
         }
     }
 
-    public void addTab(String tab_name){
-        if (tab_name == null || tab_name.isEmpty()) {
-            throw new IllegalArgumentException("Tab name cannot be empty");
+    public void addTab(String tabName){
+        if (tabName == null || tabName.isEmpty()) {
+            throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
             // add the tab to database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
-            TabTable tab_entry = sql.addTab(tab_name);
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            TabTable tabEntry = sql.addTab(tabName);
 
-            final TabInfo tab = new TabInfo(tab_entry);
+            final TabInfo tab = new TabInfo(tabEntry);
             arrTabs.add(tab);
 
             // create a button for the tab
@@ -386,11 +377,11 @@ public class TabFragmentHandler {
             arrButton.add(btn);
 
             // Set the style of the button
-            btn.setBackgroundResource(R.drawable.tab_style);
+            btn.setBackground(settings.getTabButtonStyle());
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     1));
-            btn.setTextColor(Color.WHITE);
+            btn.setTextColor(settings.getFontFgColor());
 
             // Add the button to the tab widget.
             tabWidget.addView(btn);
@@ -421,10 +412,10 @@ public class TabFragmentHandler {
 
     public void renameTab(TabInfo tab, int tab_index, String new_name) {
         if (new_name == null || new_name.isEmpty()){
-            throw new IllegalArgumentException("Tab name cannot be empty");
+            throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
-            // update name in database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            // update packageName in database
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
             sql.renameTab(tab.getId(), new_name);
 
             // rename the button
@@ -440,7 +431,7 @@ public class TabFragmentHandler {
             throw new IllegalArgumentException("First tab is not allowed to be removed.");
         } else {
             // Remove the tab from the database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper(mActivity.getApplicationContext());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
             sql.removeTab(tab.getId());
 
             // Hide the tab button
@@ -450,6 +441,7 @@ public class TabFragmentHandler {
             // Remove the tab fragment
             FragmentTransaction ft = mFragmentManager.beginTransaction();
             ft.remove(mFragmentManager.findFragmentByTag(tab.getTag()));
+            ft.commit();
 
             // Go to the first tab
             setTab(0);
@@ -492,7 +484,7 @@ public class TabFragmentHandler {
 
     /**
      * Returns the current open tab
-     * @return
+     * @return currently open tab
      */
     public TabInfo getCurrentTab(){
         return arrTabs.get(currentOpenTab);

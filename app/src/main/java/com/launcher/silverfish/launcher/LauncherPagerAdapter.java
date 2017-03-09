@@ -17,19 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.launcher.silverfish;
+package com.launcher.silverfish.launcher;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.launcher.appdrawer.TabbedAppDrawerFragment;
+import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
+import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
+
 public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 
     //region Fields
 
     // Store a context so we can use getString in later methods
-    private Context _context;
+    final private Context _context;
 
     //endregion
 
@@ -54,6 +59,9 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
             case 1: // Second page is the 'home screen'
                 return new HomeScreenFragment();
 
+            case 2: // Third page is the 'settings activity'
+                return new SettingsScreenFragment();
+
             default: // Any other page (such as last) is an empty fragment
                 return new Fragment();
         }
@@ -61,7 +69,7 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -71,6 +79,8 @@ public class LauncherPagerAdapter extends FragmentStatePagerAdapter {
                 return _context.getString(R.string.text_app_drawer);
             case 1:
                 return _context.getString(R.string.text_home_screen);
+            case 2:
+                return _context.getString(R.string.text_settings_screen);
             default:
                 return _context.getString(R.string.text_empty);
         }
