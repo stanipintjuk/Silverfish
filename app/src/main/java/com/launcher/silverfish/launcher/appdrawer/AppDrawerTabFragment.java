@@ -120,7 +120,7 @@ public class AppDrawerTabFragment extends Fragment {
 
             // And add it to the list.
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
-            appDetail.icon = mPacMan.getApplicationIcon(appInfo);
+            appDetail.icon = null; // Loaded later by AppArrayAdapter
             appDetail.packageName = packageName;
             appsList.add(appDetail);
 
