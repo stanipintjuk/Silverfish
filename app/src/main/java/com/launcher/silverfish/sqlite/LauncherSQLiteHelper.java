@@ -19,9 +19,6 @@
 
 package com.launcher.silverfish.sqlite;
 
-import android.database.sqlite.SQLiteConstraintException;
-import android.util.Log;
-
 import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.AppTableDao;
 import com.launcher.silverfish.dbmodel.DaoSession;
@@ -42,6 +39,10 @@ public class LauncherSQLiteHelper {
 
     public LauncherSQLiteHelper(App app) {
         mSession = app.getDaoSession();
+    }
+
+    public boolean hasTabs() {
+        return mSession.getTabTableDao().count() > 0;
     }
 
     public TabTable addTab(String tabName) {

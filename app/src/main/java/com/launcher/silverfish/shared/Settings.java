@@ -20,14 +20,12 @@ public class Settings {
     private static final String KEY_WIDGET_VISIBLE = "widget_visible";
     private static final String KEY_WIDGET_PACKAGE_NAME = "widget_package_name";
     private static final String KEY_WIDGET_CLASS_NAME = "widget_class_name";
-    private static final String KEY_PREVIOUSLY_STARTED = "pref_previously_started";
     private static final String KEY_LAST_OPEN_TAB = "pref_last_open_tab";
     private static final String KEY_DRAWER_BG_COLOR = "app_drawer_background_color";
     private static final String KEY_WIDGET_BG_COLOR = "widget_background_color";
     private static final String KEY_FONT_FG_COLOR = "font_foreground_color";
 
     private static final Boolean DEFAULT_WIDGET_VISIBLE = true;
-    private static final Boolean DEFAULT_PREVIOUSLY_STARTED = false;
     private static final int DEFAULT_LAST_OPEN_TAB = 0;
     private static final int DEFAULT_DRAWER_BG_COLOR = 0x99000000; // "Dark tint"
     private static final int DEFAULT_WIDGET_BG_COLOR = 0x99000000; // "Dark tint"
@@ -51,10 +49,6 @@ public class Settings {
 
     public boolean isWidgetVisible() {
         return mPrefs.getBoolean(KEY_WIDGET_VISIBLE, DEFAULT_WIDGET_VISIBLE);
-    }
-
-    public boolean wasPreviouslyStarted() {
-        return mPrefs.getBoolean(KEY_PREVIOUSLY_STARTED, DEFAULT_PREVIOUSLY_STARTED);
     }
 
     public int getLastOpenTab() {
@@ -123,10 +117,6 @@ public class Settings {
 
     public void setWidgetVisible(final boolean visible) {
         mPrefs.edit().putBoolean(KEY_WIDGET_VISIBLE, visible).apply();
-    }
-
-    public void setPreviouslyStarted(final boolean firstTime) {
-        mPrefs.edit().putBoolean(KEY_PREVIOUSLY_STARTED, firstTime).apply();
     }
 
     public void setLastOpenTab(final int tab) {

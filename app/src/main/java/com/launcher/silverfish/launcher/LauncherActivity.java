@@ -69,14 +69,9 @@ public class LauncherActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pager);
 
-        // Check if the app is started for the first time. If it is then we have to
-        // populate the database with some default values.
-        Settings settings = new Settings(this);
-        if (!settings.wasPreviouslyStarted()) {
-            settings.setPreviouslyStarted(true);
-            createDefaultTabs();
+        // Try creating the default tabs. This will have no effect if they already exist.
+        if (createDefaultTabs())
             autoSortApplications();
-        }
 
         // Create the pager
         mCollectionPagerAdapter =
@@ -93,18 +88,20 @@ public class LauncherActivity extends FragmentActivity
 
     //region First time setup
 
-    private void createDefaultTabs() {
+    private boolean createDefaultTabs() {
         LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
+        if (sql.hasTabs())
+            return false;
 
         // Load default names for the tab
         String[] defaultTabNames = new String[] {
-            getString(R.string.tab_other),
-            getString(R.string.tab_phone),
-            getString(R.string.tab_games),
-            getString(R.string.tab_internet),
-            getString(R.string.tab_media),
-            getString(R.string.tab_accessories),
-            getString(R.string.tab_settings),
+                getString(R.string.tab_other),
+                getString(R.string.tab_phone),
+                getString(R.string.tab_games),
+                getString(R.string.tab_internet),
+                getString(R.string.tab_media),
+                getString(R.string.tab_accessories),
+                getString(R.string.tab_settings),
         };
 
         // Create and add the tables to the SQL database
@@ -112,6 +109,8 @@ public class LauncherActivity extends FragmentActivity
             String tab_name = defaultTabNames[i];
             sql.addTab(tab_name);
         }
+
+        return true;
     }
 
     // Auto sorts the applications in their corresponding tabs
