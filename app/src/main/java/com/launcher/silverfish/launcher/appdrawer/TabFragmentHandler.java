@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -66,6 +67,8 @@ public class TabFragmentHandler {
     // Store the last open tab in RAM until end of lifecycle
     // not to waste precious I/O every time a tab is changed.
     private int currentOpenTab = -1;
+
+    private static final int TAB_TEXT_SIZE = 14; // sp
 
     //endregion
 
@@ -177,6 +180,7 @@ public class TabFragmentHandler {
             // Create a button for each tab
             Button btn = new Button(mActivity.getApplicationContext());
             btn.setText(tab.getLabel());
+            btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, TAB_TEXT_SIZE);
             arrButton.add(btn);
 
             // Set the style of the button

@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="4dp"
+    android:paddingTop="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,6 +24,7 @@
             android:layout_gravity="center"
             android:textColor="@color/appLabelColor"
             android:maxLines="1"
+            android:textSize="12sp"
             android:ellipsize="end" />
     </LinearLayout>
 </FrameLayout>
