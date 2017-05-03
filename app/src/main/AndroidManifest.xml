@@ -28,6 +28,14 @@
             </intent-filter>
         </activity>
 
+        <receiver
+            android:name=".launcher.LauncherReceiver"
+            android:permission="com.android.launcher.permission.INSTALL_SHORTCUT">
+            <intent-filter>
+                <action android:name="com.android.launcher.action.INSTALL_SHORTCUT" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
