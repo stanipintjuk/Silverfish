@@ -44,6 +44,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
@@ -237,7 +238,14 @@ public class HomeScreenFragment extends Fragment  {
                             // We only want to launch the activity if the touch was not consumed yet!
                             if (!touchConsumed) {
                                 Intent i = mPacMan.getLaunchIntentForPackage(app.packageName.toString());
-                                startActivity(i);
+                                if (i != null) {
+                                    // Sanity check (application may have been uninstalled)
+                                    // TODO Remove it from the database
+                                    startActivity(i);
+                                } else {
+                                    Toast.makeText(getContext(),
+                                            R.string.application_not_installed, Toast.LENGTH_SHORT).show();
+                                }
                             }
                             break;
                     }
