@@ -1,4 +1,4 @@
-#Silverfish Launcher v0.4
+# Silverfish Launcher v0.4
 This is a simple and lightweight launcher for Android (... and heavily inspired by SmartLauncher)
 
 
@@ -24,10 +24,10 @@ The app drawer is devided into multiple tabs for different application types, li
 
 You can add, remove or rename a tab by long clicking it.
 
-#Notes
+# Notes
 I mostly wrote it to scratch my own itch. As my itch gets worse more functionality will be implemented. If you have an itch that you want to scratch then your commits are welcome :)
 
-#Todo 
+# Todo 
 * Make the launcher functional and stable - ✓
 * Functionality to add, remove and rename tabs in app drawer.✓
 * Icon support for tabs in app drawer.
@@ -46,6 +46,6 @@ I mostly wrote it to scratch my own itch. As my itch gets worse more functionali
 # Changelog
 The full changelog can be seen under the [releases](https://github.com/stanipintjuk/Silverfish/releases) section.
 
-#Thanks to...
+# Thanks to...
 Thank you @Teyro, @Pierre-lbt, @ImAnnoying, @AlbertWDev and @XyLoNaMiyX for your contributions! :)
 
