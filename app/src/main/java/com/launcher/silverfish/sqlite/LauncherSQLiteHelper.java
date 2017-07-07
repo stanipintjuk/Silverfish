@@ -28,6 +28,7 @@ import com.launcher.silverfish.dbmodel.TabTable;
 import com.launcher.silverfish.dbmodel.TabTableDao;
 import com.launcher.silverfish.launcher.App;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.LinkedList;
@@ -120,13 +121,24 @@ public class LauncherSQLiteHelper {
         return mSession.getShortcutTableDao().insert(new ShortcutTable(null, packageName));
     }
 
-    public void removeShortcut(long id) {
-        ShortcutTable app = mSession.getShortcutTableDao().queryBuilder()
-                .where(ShortcutTableDao.Properties.Id.eq(id))
-                .unique();
+    public long getShortcutId(String packageName) {
+        try {
+            return mSession.getShortcutTableDao().queryBuilder()
+                    .where(ShortcutTableDao.Properties.PackageName.eq(packageName))
+                    .uniqueOrThrow().getId();
+        } catch (DaoException ignored) {
+            return -1;
+        }
+    }
 
-        if (app != null)
-            mSession.getShortcutTableDao().delete(app);
+    public void removeShortcut(long id) {
+        try {
+            mSession.getShortcutTableDao().delete(
+                    mSession.getShortcutTableDao().queryBuilder()
+                            .where(ShortcutTableDao.Properties.Id.eq(id))
+                            .uniqueOrThrow()
+            );
+        } catch (DaoException ignored) { }
     }
 
     public List<ShortcutTable> getAllShortcuts() {

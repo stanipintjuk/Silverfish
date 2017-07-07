@@ -13,6 +13,9 @@ public class App extends Application {
     private Settings mSettings;
     private DaoSession mDaoSession;
 
+    // HomeScreenFragment will set this so that PackageModifiedReceiver can notify it
+    public ShortcutListener shortcutListener;
+
     @Override
     public void onCreate() {
         super.onCreate();

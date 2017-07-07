@@ -52,6 +52,7 @@ import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.dbmodel.ShortcutTable;
 import com.launcher.silverfish.launcher.App;
 import com.launcher.silverfish.launcher.LauncherActivity;
+import com.launcher.silverfish.launcher.ShortcutListener;
 import com.launcher.silverfish.layouts.SquareGridLayout;
 import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.shared.Settings;
@@ -144,6 +145,9 @@ public class HomeScreenFragment extends Fragment  {
         loadApps();
         updateShortcuts();
 
+        // Listen for application uninstall events to remove the shortcuts if needed
+        ((App)getContext().getApplicationContext()).shortcutListener = shortcutListener;
+
         return rootView;
     }
 
@@ -151,6 +155,7 @@ public class HomeScreenFragment extends Fragment  {
     public void onDestroy() {
         super.onDestroy();
         mAppWidgetHost.stopListening();
+        ((App)getContext().getApplicationContext()).shortcutListener = null;
     }
 
     //endregion
@@ -189,6 +194,19 @@ public class HomeScreenFragment extends Fragment  {
             return false;
         }
     }
+
+    private ShortcutListener shortcutListener = new ShortcutListener() {
+        @Override
+        public void onShortcutRemoved(long appId) {
+            for (int i = 0; i < appsList.size(); ++i) {
+                if (appsList.get(i).id == appId) {
+                    appsList.remove(i);
+                    updateShortcuts();
+                    break;
+                }
+            }
+        }
+    };
 
     private void removeApp(int app_index, long app_id) {
         sqlHelper.removeShortcut(app_id);
