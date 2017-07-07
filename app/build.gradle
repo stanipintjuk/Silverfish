@@ -9,8 +9,8 @@ android {
         applicationId "com.launcher.silverfish"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 7
-        versionName "0.5.1"
+        versionCode 8
+        versionName "0.5.2"
     }
     buildTypes {
         release {
@@ -20,15 +20,6 @@ android {
                 disable 'MissingTranslation'
             }
         }
-    }
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
     }
 }
 
