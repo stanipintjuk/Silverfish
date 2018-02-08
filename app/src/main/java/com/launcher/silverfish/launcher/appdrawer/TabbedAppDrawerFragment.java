@@ -43,6 +43,7 @@ import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.launcher.LauncherActivity;
 import com.launcher.silverfish.models.TabInfo;
+import static java.lang.String.format;
 
 public class TabbedAppDrawerFragment extends Fragment {
 
@@ -176,7 +177,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         String tabName = tab.getLabel();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle(String.format(getString(R.string.text_renaming_tab), tabName));
+        builder.setTitle(format(getString(R.string.text_renaming_tab), tabName));
 
         // Set up the input
         final EditText input = new EditText(getContext());
@@ -258,7 +259,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         });
     }
 
-    private float dragOffsetX, dragOffsetY;
+    private float dragBeginX, dragOffsetX=0f, dragBeginY, dragOffsetY=0f;
 
     private void setOnDragListener() {
 
@@ -273,9 +274,8 @@ public class TabbedAppDrawerFragment extends Fragment {
                         if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
                             return false;
 
-                        // Starting movement, drag offset is now reset to 0
-                        dragOffsetX = 0;
-                        dragOffsetY = 0;
+                        dragBeginX = dragEvent.getX();  // Starting position (x)
+                        dragBeginY = dragEvent.getY();  // Starting position (y)
 
                         // Show the uninstall indicator
                         showUninstallIndicator();
@@ -288,23 +288,10 @@ public class TabbedAppDrawerFragment extends Fragment {
                     }
 
                     case DragEvent.ACTION_DRAG_LOCATION: {
-                        // getX() and getY() now return relative offsets,
-                        // so accumulate them to get the total movement
-                        dragOffsetX += dragEvent.getX();
-                        dragOffsetY += dragEvent.getY();
-
-                        // If drag is on the way out of this page then stop receiving drag events
-                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-                        // Get display size
-                        int screen_width = Utils.getScreenDimensions(getActivity()).x;
-                        if (dragEvent.getX() > screen_width - threshold) {
-                            return false;
-
-                        } else {
-
+                        // Do nothing if inside 'Move to Home Page' zone
+                        if (!Utils.isBeyondRightHandThreshold(getActivity(),dragEvent)) {
                             // Check if the drag is hovering over a tab button
                             int i = tabHandler.getHoveringTab(dragEvent.getX(), dragEvent.getY());
-
                             // If so, change to that tab
                             if (i > -1)
                                 tabHandler.setTab(i);
@@ -313,15 +300,22 @@ public class TabbedAppDrawerFragment extends Fragment {
                     }
 
                     case DragEvent.ACTION_DROP: {
+
+                        dragOffsetX = dragBeginX-dragEvent.getX();  // Total x movement
+                        dragOffsetY = dragBeginY-dragEvent.getY();  // Total y movement
+
                         String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
 
-                        // If app is dropped on the uninstall indicator uninstall the app
+
                         if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
+                            // Uninstall app if icon dropped on the uninstall indicator.
                             launchUninstallIntent(appName);
+                        } else if (Utils.isBeyondRightHandThreshold(getActivity(),dragEvent)) {
+                            // Add app to Home page if icon dragged to far right
+                            moveToHomeScreen((LauncherActivity)getActivity(), appName);
                         } else {
-                            // If the user didn't move the application from its original
-                            // place (too much), then they might want to show a menu with more options
-                            float distSq = (dragOffsetX * dragOffsetX) + (dragOffsetY * dragOffsetY);
+                            // Pop-up menu if icon dragged minimally
+                            float distSq = Math.max(dragOffsetX*dragOffsetX, dragOffsetY*dragOffsetY);
                             if (distSq < Constants.NO_DRAG_THRESHOLD_SQ) {
                                 showExtraOptionsMenu(appName);
                             } else {
@@ -428,15 +422,18 @@ public class TabbedAppDrawerFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 switch (i){
                     case 0:
-                        LauncherActivity activity = (LauncherActivity)getActivity();
-                        activity.addShortcut(appName);
-                        activity.moveToScreen(1);
+                        moveToHomeScreen((LauncherActivity)getActivity(), appName);
                         break;
                 }
             }
         });
 
         builder.show();
+    }
+
+    private void moveToHomeScreen(LauncherActivity activity, String appName) {
+        activity.addShortcut(appName);
+        activity.moveToScreen(1);
     }
 
     //endregion
