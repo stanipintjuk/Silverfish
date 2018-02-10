@@ -29,6 +29,6 @@ public class Constants {
 
     public final static String TAB_ID = "tab_id";
 
-    public final static float DRAG_THRESHOLD_PERCENT_X = .95f;  // % of screen width
-    public final static float MIN_DRAG_ADJ = .75f;              // Apply to icon dimension
+    public final static float DRAG_THRESHOLD_PERCENT_X = .95f;  // Percent of screen width
+    public final static float MIN_DRAG_ADJ = .75f;              // Percent of icon dimension
 }
