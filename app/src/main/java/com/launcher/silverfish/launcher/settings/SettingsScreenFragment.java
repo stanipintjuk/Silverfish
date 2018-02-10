@@ -8,12 +8,16 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.common.LG;
 import com.launcher.silverfish.shared.Settings;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
+
+import static com.launcher.silverfish.common.LG.lg;
 
 public class SettingsScreenFragment extends Fragment  {
 
@@ -38,14 +42,16 @@ public class SettingsScreenFragment extends Fragment  {
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+        lg("Method begins...");
         super.onCreate(savedInstanceState);
+
         settings = new Settings(getContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        lg("Method begins...");
         View rootView = inflater.inflate(R.layout.activity_settings, container, false);
 
         // Toggle widget visibility button
@@ -101,6 +107,16 @@ public class SettingsScreenFragment extends Fragment  {
                         changeFontColor();
                     }
                 });
+
+        // Enable debug logging
+        Button toggle_logging = (Button)rootView.findViewById(R.id.toggle_logging);
+        syncLogging(toggle_logging);    // Set (dynamic) button text
+        toggle_logging.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleLogging((Button)view);
+            }
+        });
 
         return rootView;
     }
@@ -176,6 +192,15 @@ public class SettingsScreenFragment extends Fragment  {
                     }
                 }).show();
     }
+
+    private void toggleLogging(Button btn) {
+        LG.setDebug(!LG.isDebug());         // Toggle on/off
+        syncLogging(btn);                   // Synchronise button text
+    }
+    private void syncLogging(Button btn) {
+        btn.setText(LG.isDebug() ? R.string.text_debug_off : R.string.text_debug_on);
+    }
+
 
     //endregion
 
