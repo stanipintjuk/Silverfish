@@ -20,6 +20,8 @@
 package com.launcher.silverfish.common;
 
 import android.app.Activity;
+import android.content.ClipDescription;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -29,7 +31,13 @@ import android.view.Display;
 import android.view.DragEvent;
 import android.widget.ImageView;
 
+import com.launcher.silverfish.R;
+import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
+
 import java.lang.ref.WeakReference;
+
+import static com.launcher.silverfish.common.LG.lg;
+import static java.lang.String.format;
 
 /**
  * Created by Stanislav Pintjuk on 8/3/16.
@@ -38,11 +46,51 @@ import java.lang.ref.WeakReference;
 public class Utils {
 
     /**
-     * Is supplied drag event within the 'move to home page' zone?
+     * Return ADJUSTED icon dimension (e.g. Twice the 'dp' value specified in the XML) <br>
+     * Returned value is also a function of hardware device characteristics <br>
+     * Used (for example) to determine a minimal drag threshold for submenu display...
+     * @see HomeScreenFragment#setOnDragListener()
      */
-    public static boolean isBeyondRightHandThreshold(Activity a, DragEvent dragEvent) {
-        int xThreshold = Utils.getScreenDimensions(a).x - Constants.SCREEN_CORNER_THRESHOLD;
-        return (dragEvent.getX() > xThreshold);
+    public static int getIconDimPixels(Context ctx) {
+        return (int) ctx.getResources().getDimension(R.dimen.app_icon_size);
+    }
+
+    /**
+     * Extract and analyze clip label from supplied DragEvent <br>
+     * Despite documentation to the contrary, DragEvent.getClipDescription() will
+     * return null in the case of DragEvent.ACTION_DRAG_ENDED!
+     */
+    public static String getClipLabel(DragEvent dragEvent, String loggingTag) {
+        int dragAction = dragEvent.getAction();
+        String label = "?";             // Useful for error diagnosis
+        ClipDescription cd = dragEvent.getClipDescription();
+        if (cd==null) {
+            if (dragAction==DragEvent.ACTION_DRAG_ENDED) return "ACTION_DRAG_ENDED";
+            lg(loggingTag, format("Null clip description for DragEvent action %s", dragAction));
+        } else {
+            label = cd.getLabel().toString();
+        }
+        return label;
+    }
+
+    /**
+     * Is supplied drag event within the right hand 'move to next page' zone?
+     */
+    public static boolean isBeyondRightHandThreshold(Activity a, DragEvent dragEvent, boolean log) {
+        int xThreshold = (int)(Utils.getScreenDimensions(a).x * Constants.DRAG_THRESHOLD_PERCENT_X);
+        boolean result = dragEvent.getX() > xThreshold;
+        if (log) lg("Result = " + result);
+        return result;
+    }
+
+    /**
+     * Not in use
+     */
+    public static boolean isWithinLeftHandThreshold(Activity a, DragEvent dragEvent, boolean log) {
+        int xThreshold = (int)(Utils.getScreenDimensions(a).x * (1f - Constants.DRAG_THRESHOLD_PERCENT_X));
+        boolean result = dragEvent.getX() < xThreshold;
+        if (log) lg("Result = " + result);
+        return result;
     }
 
     public static Point getScreenDimensions(Activity activity) {
@@ -101,13 +149,14 @@ public class Utils {
             ImageView iv = iv_wr.get();
             if (exception == null && app_icon != null && iv != null) {
                 iv.setImageDrawable(app_icon);
-                //Log.d("Utils.loadAppIconTask", "Loaded icon for '"+appInfo_wr.get()+"' OK");
+                lg("Loaded icon for '"+appInfo_wr.get()+"' OK");
             } else {
-                Log.d("Utils.loadAppIconTask", "ERROR Could not load app icon.");
+                lg("ERROR Could not load app icon.");
             }
         }
     }
 
+    /** Asynchronously render icon for provided package name */
     public static void loadAppIconAsync(PackageManager pm, String appInfo, ImageView iv ){
         new loadAppIconTask(pm, appInfo, iv).execute(null,null,null);
     }
