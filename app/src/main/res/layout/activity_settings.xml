@@ -139,4 +139,39 @@
             android:textColor="@color/white"
             android:layout_weight="1"/>
     </LinearLayout>
+
+    <!-- Developer Options -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_margin="4dp"
+        android:text="@string/text_developer"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:gravity="start"
+        android:textColor="@color/white"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/toggle_logging"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_margin="4dp"
+            android:text="@string/text_debug_on"
+            android:background="@drawable/tintbackground"
+            android:textAppearance="?android:textAppearanceSmall"
+            style="?buttonBarButtonStyle"
+            android:gravity="center_vertical"
+            android:textColor="@color/white"
+            android:layout_weight="1"/>
+
+
+    </LinearLayout>
 </LinearLayout>
