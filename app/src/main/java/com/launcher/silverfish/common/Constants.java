@@ -29,6 +29,6 @@ public class Constants {
 
     public final static String TAB_ID = "tab_id";
 
-    public final static int SCREEN_CORNER_THRESHOLD = 40;
-    public final static float NO_DRAG_THRESHOLD_SQ = 400f; // Squared distance (20² px)
+    public final static float DRAG_THRESHOLD_PERCENT_X = .95f;  // % of screen width
+    public final static float MIN_DRAG_ADJ = .75f;              // Apply to icon dimension
 }
