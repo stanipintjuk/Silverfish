@@ -19,6 +19,7 @@
 
 package com.launcher.silverfish.launcher.homescreen;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
@@ -26,13 +27,17 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -61,6 +66,10 @@ import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.launcher.silverfish.common.Constants.MIN_DRAG_ADJ;
+import static com.launcher.silverfish.common.LG.lg;
+import static java.lang.String.format;
 
 public class HomeScreenFragment extends Fragment  {
 
@@ -95,6 +104,7 @@ public class HomeScreenFragment extends Fragment  {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        lg("Method begins...");
 
         sqlHelper = new LauncherSQLiteHelper((App)getActivity().getApplication());
         settings = new Settings(getContext());
@@ -128,9 +138,11 @@ public class HomeScreenFragment extends Fragment  {
                     ShortcutTable shortcut = new ShortcutTable();
                     shortcut.setPackageName(appName);
                     shortcut.setId(appId);
-                    if (addAppToView(shortcut)) {
+                    if (addAppToView(shortcut, true)) {
                         updateShortcuts();
                     }
+                } else {
+                    lg(format("Cannot add shortcut '%s'. (Probably it's there already!)", appName));
                 }
             }
         });
@@ -165,16 +177,16 @@ public class HomeScreenFragment extends Fragment  {
     private void loadApps() {
         List<ShortcutTable> shortcuts = sqlHelper.getAllShortcuts();
         for (ShortcutTable shortcut : shortcuts) {
-            if (!addAppToView(shortcut)) {
+            if (!addAppToView(shortcut, false)) {
                 // If the shortcut could not be added then the user has probably uninstalled it,
                 // so we should remove it from the db
-                Log.d("HomeFragment", "Removing shortcut "+shortcut.getPackageName()+" from db");
+                lg("Removing shortcut "+shortcut.getPackageName()+" from db");
                 sqlHelper.removeShortcut(shortcut.getId());
             }
         }
     }
 
-    private boolean addAppToView(ShortcutTable shortcut) {
+    private boolean addAppToView(ShortcutTable shortcut, boolean log) {
         try {
             ApplicationInfo appInfo = mPacMan.getApplicationInfo(
                     shortcut.getPackageName(), PackageManager.GET_META_DATA);
@@ -188,6 +200,9 @@ public class HomeScreenFragment extends Fragment  {
             appDetail.id = shortcut.getId();
 
             appsList.add(appDetail);
+
+            if (log) lg(format("Package '%s' added to 'ArrayList<AppDetail> appsList'", appDetail.packageName));
+
             return true;
 
         } catch (PackageManager.NameNotFoundException e) {
@@ -208,7 +223,8 @@ public class HomeScreenFragment extends Fragment  {
         }
     };
 
-    private void removeApp(int app_index, long app_id) {
+    private void removeAppShortcut(int app_index, long app_id) {
+        lg(format("Removing shortcut to app %d/%d from Home screen", app_index, app_id));
         sqlHelper.removeShortcut(app_id);
         appsList.remove(app_index);
     }
@@ -275,14 +291,17 @@ public class HomeScreenFragment extends Fragment  {
             // start a drag when an app has been long clicked
             final long appId = app.id;
             final int appIndex = i;
+            final String appName = app.packageName.toString();
+            final String appLabel = app.label.toString();
             convertView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
                     String[] mime_types = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                     ClipData data = new ClipData(Constants.DRAG_SHORTCUT_REMOVAL,
-                            mime_types, new ClipData.Item(Long.toString(appId)));
-
-                    data.addItem(new ClipData.Item(Integer.toString(appIndex)));
+                            mime_types, new ClipData.Item(Long.toString(appId)));   // [0]
+                    data.addItem(new ClipData.Item(Integer.toString(appIndex)));    // [1]
+                    data.addItem(new ClipData.Item(appName));                       // [2]
+                    data.addItem(new ClipData.Item(appLabel));                      // [3]
 
                     View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(
                             view.findViewById(R.id.item_app_icon));
@@ -313,34 +332,71 @@ public class HomeScreenFragment extends Fragment  {
     //region Listeners
 
     private void setOnDragListener() {
+
         rootView.setOnDragListener(new View.OnDragListener() {
+
+            private float dragBeginX, dragOffsetX=0f, dragBeginY, dragOffsetY=0f;
+
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
+                String cdLabel = Utils.getClipLabel(dragEvent, "HomeScreenFragment");
+
                 switch (dragEvent.getAction()) {
+
                     case DragEvent.ACTION_DRAG_STARTED:
-                        // Check that it is a shortcut removal gesture
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_SHORTCUT_REMOVAL)) {
+                        lg(format("ACTION_DRAG_STARTED label='%s'", cdLabel));
+
+                        dragBeginX = dragEvent.getX();  // Starting position (x)
+                        dragBeginY = dragEvent.getY();  // Starting position (y)
+
+                        // Check ClipDescription label for expected value
+                        if (!cdLabel.equals(Constants.DRAG_SHORTCUT_REMOVAL)) {
+                            lg(format("Terminating DRAG '%s': (not '%s')", cdLabel, Constants.DRAG_SHORTCUT_REMOVAL));
                             return false;
                         }
+
+                        // Show removal indicator here for consistency with TabbedAppDrawerFragment?
+
                         break;
+
                     case DragEvent.ACTION_DRAG_ENTERED:
                         // Don't do anything
                         break;
+
                     case DragEvent.ACTION_DRAG_LOCATION:
                         //Don't do anything
                         break;
+
                     case DragEvent.ACTION_DROP:
 
-                        // If outside of bound, remove the app
+                        dragOffsetX = dragBeginX - dragEvent.getX();    // Total x movement (+/-)
+                        dragOffsetY = dragBeginY - dragEvent.getY();    // Total y movement (+/-)
+                        int absDragPx = (int) Math.max(Math.abs(dragOffsetX), Math.abs(dragOffsetY));
+                        int absIconPx = Utils.getIconDimPixels(getContext());
+
+                        // Retrieve ClipData items set up earlier by this fragment
+                        String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
+                        String appIndex = dragEvent.getClipData().getItemAt(1).getText().toString();
+                        String appName = dragEvent.getClipData().getItemAt(2).getText().toString();
+                        String appLabel = dragEvent.getClipData().getItemAt(3).getText().toString();
+                        lg(format("ACTION_DROP package: '%s' ('%s')", appName, appLabel));
+
+                        // Remove shortcut if hovering over FrameLayout 'remove_indicator'
                         if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
-                            String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
-                            String appIndex = dragEvent.getClipData().getItemAt(1).getText().toString();
-                            removeApp(Integer.parseInt(appIndex), Long.parseLong(appId));
+                            removeAppShortcut(Integer.parseInt(appIndex), Long.parseLong(appId));
                             updateShortcuts();
+                        }
+                        // Display submenu if 'minimal drag'
+                        else if (absDragPx < MIN_DRAG_ADJ * absIconPx) {
+                            lg(format("Icon dragged only %d pixels (somewhat less than its implied dimension of %d pixels)", absDragPx, absIconPx));
+                            showExtraOptionsMenu(appId, appIndex, appName, appLabel);
+                        }
+                        else {
+                            lg("Drag/Drop operation ended normally: No action taken");
                         }
 
                         break;
+
                     case DragEvent.ACTION_DRAG_ENDED:
                         // Hide the remove-indicator
                         FrameLayout rem_ind  = (FrameLayout)rootView.findViewById(R.id.remove_indicator);
@@ -595,6 +651,55 @@ public class HomeScreenFragment extends Fragment  {
 
     //endregion
 
+    //region Extra options per app
+
+    /** Home screen 'pop-up' menu after minimal drag */
+    private void showExtraOptionsMenu(final String appId, final String appIndex, final String appName, String appLabel) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+        // Set up a title e.g. "Silverfish (com.launcher.silverfish)"
+        String title = format("<font color='red'><b>%s</b></font> ", appLabel);
+        title += format("<small><small>(%s)</small></small>", appName);
+        builder.setTitle(Html.fromHtml(title));
+
+        // Set up extra menu options
+        CharSequence[] options = new CharSequence[]{
+                getString(R.string.remove_shortcut),
+                getString(R.string.go_to_app_settings)
+        };
+
+        // Add click listener
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0:
+                        removeAppShortcut(Integer.parseInt(appIndex), Long.parseLong(appId));
+                        updateShortcuts();
+                        break;
+                    case 1:
+                        gotoAppSettings((LauncherActivity)getActivity(), appName);
+                        break;
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    // https://stackoverflow.com/a/32983128/2376004
+    /** Take user directly to android App Settings for selected app */
+    public static  void gotoAppSettings(LauncherActivity activity, String appName) {
+        Intent intent = new Intent();
+        intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", appName, null);
+        intent.setData(uri);
+        activity.startActivity(intent);
+    }
+
+    //endregion
+
+
     //region UI
 
     public void setWidgetVisibility(boolean visible) {
@@ -635,8 +740,11 @@ public class HomeScreenFragment extends Fragment  {
     void expandNotificationPanel() {
         try
         {
+
+            @SuppressLint("WrongConstant")
             //noinspection WrongConstant
             Object service = getActivity().getSystemService("statusbar");
+            @SuppressLint("PrivateApi")
             Class<?> clazz = Class.forName("android.app.StatusBarManager");
             Method expand = Build.VERSION.SDK_INT <= 16 ?
                     clazz.getMethod("expand") :
