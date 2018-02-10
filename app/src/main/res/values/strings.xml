@@ -35,7 +35,7 @@
     <string name="text_wallpaper">Wallpaper</string>
     <string name="text_font">Font</string>
 
-    <string name="text_developer">Developer Options</string>
+    <string name="text_developer">Developer options</string>
     <string name="text_debug_off">Turn logging OFF</string>
     <string name="text_debug_on">Turn logging ON</string>
 
