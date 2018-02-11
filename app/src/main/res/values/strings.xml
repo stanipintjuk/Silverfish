@@ -35,6 +35,10 @@
     <string name="text_wallpaper">Wallpaper</string>
     <string name="text_font">Font</string>
 
+    <string name="text_developer">Developer options</string>
+    <string name="text_debug_off">Turn logging OFF</string>
+    <string name="text_debug_on">Turn logging ON</string>
+
     <string name="setting_toggle_visibility">Toggle visibility</string>
     <string name="setting_change_widget">Change widget</string>
     <string name="setting_select_wallpaper">Select wallpaper</string>
@@ -43,5 +47,7 @@
     <string name="hint_widget_now_visible">The widget is now visible.</string>
     <string name="hint_widget_now_invisible">The widget has been hidden.</string>
     <string name="add_to_home_screen">Add to home screen</string>
+    <string name="remove_shortcut">Remove shortcut</string>
+    <string name="go_to_app_settings">App settings</string>
     <string name="application_not_installed">The application is not installed</string>
 </resources>

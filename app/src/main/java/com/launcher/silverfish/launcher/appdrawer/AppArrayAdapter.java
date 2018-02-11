@@ -24,6 +24,9 @@ import com.launcher.silverfish.shared.Settings;
 
 import java.util.List;
 
+import static com.launcher.silverfish.common.LG.lg;
+import static java.lang.String.format;
+
 /**
  * Created by stani on 2016-12-15.
  */
@@ -65,16 +68,24 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         //final TextView appLabel = (TextView) view.findViewById(R.id.item_app_label);
         viewHolder.appLabel.setText(app.label);
 
-        // Start a drag action when icon is long clicked
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+                // Start a drag action with ClipData when icon is long clicked
+                lg(format("Icon long press for %s ('%s') tab=%s", app.packageName, app.label, mTag));
 
-                // Add data to the clipboard
+                // Add data to the clipboard ...
+                // Current ClipData.Item usage:
+                //     0: package eg: 'com.launcher.silverfish'
+                //     1: ArrayAdapter position eg: 0
+                //     2: Fragment tag eg: "1" to represent tab 'OTHER'
+                //     3: Application label eg: 'Silverfish'                10Feb2018
+                // CAUTION: This package uses hard-coded offsets to reference ClipData items. Fix!
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                 ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(app.packageName.toString()));
                 data.addItem(new ClipData.Item(Integer.toString(position)));
                 data.addItem(new ClipData.Item(mTag));
+                data.addItem(new ClipData.Item(app.label.toString()));
 
                 // The drag shadow is simply the app's  icon
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(

@@ -19,30 +19,26 @@
 
 package com.launcher.silverfish.launcher;
 
-import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.DragEvent;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.launcher.silverfish.R;
-import com.launcher.silverfish.common.Constants;
-import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
 import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
 import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
-import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
 import java.util.HashMap;
 import java.util.List;
+
+import static com.launcher.silverfish.common.LG.lg;
+import static java.lang.String.format;
 
 /**
  * This is the main activity of the launcher
@@ -80,8 +76,11 @@ public class LauncherActivity extends FragmentActivity
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
         mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
-
-        setDragListener();
+        mViewPager.setOffscreenPageLimit(1);            // Documentation! - the default is 1
+        mViewPager.addOnPageChangeListener(pageChangeListener);
+        //setDragListener();    Assuming redundant until proved otherwise ...
+        // ... was in conflict with TabbedAppDrawerFragment.setOnDragListener() ...
+        // ... which handles the 'DRAG_APP_MOVE' processing anyway
     }
 
     //endregion
@@ -164,6 +163,7 @@ public class LauncherActivity extends FragmentActivity
     }
 
     public boolean addShortcut(String appName) {
+        lg(format("User requests home page shortcut for '%s'", appName));
         if (getFragShortcutAddListenerRefreshListener() != null) {
             getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
             return true;
@@ -180,35 +180,21 @@ public class LauncherActivity extends FragmentActivity
 
     //region Listeners
 
-    private void setDragListener() {
-        mViewPager.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()) {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        // Only care about the DRAG_APP_MOVE description.
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
-                            return false;
-                        break;
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        // Don't do anything
-                        break;
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        changePage(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DROP:
-                        dropItem(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        // Don't do anything
-                        break;
-
-                }
-                return true;
-            }
-        });
-    }
+    /** Horizonal page-change event */
+    private ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageSelected(int position) {
+            lg(format("Horizontal scroll to page %d (%s)",
+                    position,
+                    mCollectionPagerAdapter.getPageTitle(position)));
+            int pages = mCollectionPagerAdapter.getCount();
+            // Add code here as required ...
+        }
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+        @Override
+        public void onPageScrollStateChanged(int state) {}
+    };
 
     public ShortcutAddListener getFragShortcutAddListenerRefreshListener() {
         return shortcutAddListener;
@@ -221,28 +207,6 @@ public class LauncherActivity extends FragmentActivity
     //endregion
 
     //region Events
-
-    private void dropItem(DragEvent dragEvent) {
-        if (mViewPager.getCurrentItem() == 1) {
-            String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
-            addShortcut(appName);
-        }
-    }
-
-    private void changePage(DragEvent dragEvent) {
-        // Change page mid drag if drag is within threshold
-        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-
-        // Get display size
-        int width = Utils.getScreenDimensions(this).x;
-
-        // Change page
-        if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold) {
-            mViewPager.setCurrentItem(1);
-        } else if(mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold) {
-            mViewPager.setCurrentItem(0);
-        }
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
