@@ -86,22 +86,28 @@ public class LauncherSQLiteHelper {
                 .unique() != null;
     }
 
-    public void addAppToTab(String packageName, long tabId) {
-        mSession.getAppTableDao().insert(new AppTable(null, packageName, tabId));
+    public void addAppToTab(AppTable appTable, long tabId) {
+        appTable.setId(null);
+        appTable.setTabId(tabId);
+        mSession.getAppTableDao().insert(appTable);
     }
 
-    public void addAppsToTab(Map<String, Long> pkg_categoryId) {
+    public void addAppsToTab(Map<AppTable, Long> pkg_categoryId) {
         List<AppTable> apps = new LinkedList<>();
-        for (Map.Entry<String, Long> entry : pkg_categoryId.entrySet()) {
-            apps.add(new AppTable(null, entry.getKey(), entry.getValue()));
+        for (Map.Entry<AppTable, Long> entry : pkg_categoryId.entrySet()) {
+            AppTable appTable = entry.getKey();
+            long tabId = entry.getValue();
+            appTable.setId(null);
+            appTable.setTabId(tabId);
+            apps.add(appTable);
         }
         mSession.getAppTableDao().insertInTx(apps);
     }
 
-    public void removeAppFromTab(String packageName, long tabId) {
+    public void removeAppFromTab(AppTable appTable, long tabId) {
         QueryBuilder qb = mSession.getAppTableDao().queryBuilder();
         AppTable app = (AppTable)qb.where(qb.and(AppTableDao.Properties.TabId.eq(tabId),
-                AppTableDao.Properties.PackageName.eq(packageName))).unique();
+                AppTableDao.Properties.ActivityName.eq(appTable.getActivityName()))).unique();
 
         if (app != null)
             mSession.getAppTableDao().delete(app);
@@ -111,14 +117,15 @@ public class LauncherSQLiteHelper {
         mSession.getAppTableDao().deleteInTx(apps);
     }
 
-    public boolean canAddShortcut(String packageName) {
+    public boolean canAddShortcut(ShortcutTable shortcutTable) {
         return mSession.getShortcutTableDao().queryBuilder()
-                .where(ShortcutTableDao.Properties.PackageName.eq(packageName))
+                .where(ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()))
                 .unique() == null;
     }
 
-    public long addShortcut(String packageName) {
-        return mSession.getShortcutTableDao().insert(new ShortcutTable(null, packageName));
+    public long addShortcut(ShortcutTable shortcutTable) {
+        shortcutTable.setId(null);
+        return mSession.getShortcutTableDao().insert(shortcutTable);
     }
 
     public long getShortcutId(String packageName) {
