@@ -23,6 +23,8 @@ import android.graphics.drawable.Drawable;
 public class AppDetail {
     public CharSequence label;
     public CharSequence packageName;
+    public CharSequence activityName;
+
     public Drawable icon;
     public long id;
 }

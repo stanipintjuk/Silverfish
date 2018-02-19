@@ -1,13 +1,13 @@
 package com.launcher.silverfish.dbmodel;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.NotNull;
-import org.greenrobot.greendao.annotation.Generated;
 
 @Entity(indexes = {
-        @Index(value = "packageName", unique = true)
+        @Index(value = "activityName", unique = true)
 })
 public class AppTable {
     @Id(autoincrement = true)
@@ -15,18 +15,22 @@ public class AppTable {
 
     @NotNull
     private String packageName;
+    @NotNull
+    private String activityName;
+
 
     @NotNull
     private Long tabId;
 
-    @Generated(hash = 1161766823)
-    public AppTable(Long id, @NotNull String packageName, @NotNull Long tabId) {
+    @Generated
+    public AppTable(Long id, @NotNull String packageName, @NotNull String activityName, @NotNull Long tabId) {
         this.id = id;
         this.packageName = packageName;
+        this.activityName = activityName;
         this.tabId = tabId;
     }
 
-    @Generated(hash = 639376780)
+    @Generated
     public AppTable() {
     }
 
@@ -52,5 +56,13 @@ public class AppTable {
 
     public void setTabId(Long tabId) {
         this.tabId = tabId;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
 }
