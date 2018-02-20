@@ -3,12 +3,11 @@ package com.launcher.silverfish.launcher.appdrawer;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -97,7 +96,9 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = mPackageManager.getLaunchIntentForPackage(app.packageName.toString());
+                Intent i = new Intent();
+                i.setAction(Intent.ACTION_MAIN);
+                i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
                 if (i != null) {
                     // Sanity check (application may have been uninstalled)
                     // TODO Remove it from the database
