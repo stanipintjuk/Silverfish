@@ -123,6 +123,7 @@ public class AppDrawerTabFragment extends Fragment {
             appDetail.icon = null; // Loaded later by AppArrayAdapter
             appDetail.packageName = appTable.getPackageName();
             appDetail.activityName = appTable.getActivityName();
+            Log.d("fzn", appDetail.label + ";" + appDetail.packageName + ";" + appDetail.activityName);
             appsList.add(appDetail);
 
             hideEmptyCategoryNotice();

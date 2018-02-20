@@ -59,7 +59,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         }
 
         // load the app icon in an async task
-        Utils.loadAppIconAsync(mPackageManager, app.packageName.toString(), viewHolder.appIcon);
+        Utils.loadAppIconAsync(mPackageManager, app, viewHolder.appIcon);
 
         //final TextView appLabel = (TextView) view.findViewById(R.id.item_app_label);
         viewHolder.appLabel.setText(app.label);

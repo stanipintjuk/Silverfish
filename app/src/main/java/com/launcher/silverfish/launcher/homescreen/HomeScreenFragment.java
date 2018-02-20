@@ -236,7 +236,7 @@ public class HomeScreenFragment extends Fragment  {
 
             // load the app icon in an async task
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
-            Utils.loadAppIconAsync(mPacMan, app.packageName.toString(), im);
+            Utils.loadAppIconAsync(mPacMan, app, im);
 
             TextView tv = (TextView)convertView.findViewById(R.id.item_app_label);
             tv.setText(app.label);

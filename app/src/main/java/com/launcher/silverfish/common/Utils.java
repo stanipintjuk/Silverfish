@@ -20,13 +20,18 @@
 package com.launcher.silverfish.common;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Display;
 import android.widget.ImageView;
+
+import com.launcher.silverfish.models.AppDetail;
 
 /**
  * Created by Stanislav Pintjuk on 8/3/16.
@@ -52,7 +57,7 @@ public class Utils {
         return (y >= screen_height - thresholdy && x <= screen_width - thresholdx && x >= 0+thresholdx);
     }
 
-    public static void loadAppIconAsync(final PackageManager pm, final String appInfo, final ImageView im ){
+    public static void loadAppIconAsync(final PackageManager packageManager, final AppDetail appDetail, final ImageView im) {
 
         // Create an async task
         AsyncTask<Void,Void,Drawable> loadAppIconTask = new AsyncTask<Void, Void, Drawable>() {
@@ -65,15 +70,10 @@ public class Utils {
             protected Drawable doInBackground(Void... voids) {
                 // load the icon
                 Drawable app_icon = null;
-                try {
-                    app_icon = pm.getApplicationIcon(appInfo);
-
-                } catch (PackageManager.NameNotFoundException e) {
-                    e.printStackTrace();
-                    exception = e;
-                }
-
-                return app_icon;
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(appDetail.packageName.toString(), appDetail.activityName.toString()));
+                ResolveInfo resolveInfo = packageManager.resolveActivity(intent, 0);
+                return resolveInfo.loadIcon(packageManager);
             }
 
             @Override
