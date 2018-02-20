@@ -326,18 +326,19 @@ public class TabbedAppDrawerFragment extends Fragment {
                             } else {
                                 // Retrieve tha drop information  and remove it from the original tab
                                 int appIndex = Integer.parseInt(
-                                        dragEvent.getClipData().getItemAt(1).
+                                        dragEvent.getClipData().getItemAt(2).
                                                 getText().toString());
 
-                                String tabTag = dragEvent.getClipData().getItemAt(2)
+                                String tabTag = dragEvent.getClipData().getItemAt(3)
                                         .getText().toString();
 
                                 removeAppFromTab(appIndex, tabTag);
 
                                 // add it to the new tab
-                                String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
+                                String packageName = dragEvent.getClipData().getItemAt(0).getText().toString();
+                                String activityName = dragEvent.getClipData().getItemAt(1).getText().toString();
                                 //TODO: IMPORTANT. Fix this line.
-                                //dropAppInTab(app_name);
+                                dropAppInTab(new AppTable(null, packageName, activityName, null));
                             }
                         }
                         break;

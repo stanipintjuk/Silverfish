@@ -72,6 +72,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
                 // Add data to the clipboard
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                 ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(app.packageName.toString()));
+                data.addItem(new ClipData.Item(app.activityName.toString()));
                 data.addItem(new ClipData.Item(Integer.toString(position)));
                 data.addItem(new ClipData.Item(mTag));
 

@@ -69,10 +69,9 @@ public class Utils {
             @Override
             protected Drawable doInBackground(Void... voids) {
                 // load the icon
-                Drawable app_icon = null;
                 Intent intent = new Intent();
                 intent.setComponent(new ComponentName(appDetail.packageName.toString(), appDetail.activityName.toString()));
-                ResolveInfo resolveInfo = packageManager.resolveActivity(intent, 0);
+                ResolveInfo resolveInfo = packageManager.resolveActivity(intent, PackageManager.GET_META_DATA);
                 return resolveInfo.loadIcon(packageManager);
             }
 
