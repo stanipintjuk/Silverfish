@@ -119,11 +119,11 @@ public class AppDrawerTabFragment extends Fragment {
             AppDetail appDetail = new AppDetail();
 
             // And add it to the list.
+            // TODO: Possible source of bug! Doesn't take into account activityName when getting label.
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
             appDetail.icon = null; // Loaded later by AppArrayAdapter
             appDetail.packageName = appTable.getPackageName();
             appDetail.activityName = appTable.getActivityName();
-            Log.d("fzn", appDetail.label + ";" + appDetail.packageName + ";" + appDetail.activityName);
             appsList.add(appDetail);
 
             hideEmptyCategoryNotice();
