@@ -104,9 +104,9 @@ public class LauncherSQLiteHelper {
         mSession.getAppTableDao().insertInTx(apps);
     }
 
-    public void removeAppFromTab(AppTable appTable, long tabId) {
+    public void removeAppFromTab(AppTable appTable) {
         QueryBuilder qb = mSession.getAppTableDao().queryBuilder();
-        AppTable app = (AppTable)qb.where(qb.and(AppTableDao.Properties.TabId.eq(tabId),
+        AppTable app = (AppTable) qb.where(qb.and(AppTableDao.Properties.TabId.eq(appTable.getTabId()),
                 AppTableDao.Properties.ActivityName.eq(appTable.getActivityName()))).unique();
 
         if (app != null)
