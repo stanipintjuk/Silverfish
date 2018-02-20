@@ -18,14 +18,14 @@ public class ShortcutTable {
     private String activityName;
 
 
-    @Generated
+    @Generated(hash = 336387105)
     public ShortcutTable(Long id, @NotNull String packageName, @NotNull String activityName) {
         this.id = id;
         this.packageName = packageName;
         this.activityName = activityName;
     }
 
-    @Generated
+    @Generated(hash = 2116092840)
     public ShortcutTable() {
     }
 

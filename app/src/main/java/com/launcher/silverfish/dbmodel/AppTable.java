@@ -22,7 +22,7 @@ public class AppTable {
     @NotNull
     private Long tabId;
 
-    @Generated
+    @Generated(hash = 1498711068)
     public AppTable(Long id, @NotNull String packageName, @NotNull String activityName, @NotNull Long tabId) {
         this.id = id;
         this.packageName = packageName;
@@ -30,7 +30,7 @@ public class AppTable {
         this.tabId = tabId;
     }
 
-    @Generated
+    @Generated(hash = 639376780)
     public AppTable() {
     }
 
