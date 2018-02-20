@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ResolveInfo;
 
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.dbmodel.AppTable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,45 +94,48 @@ public final class PackagesCategories {
 
     //region Set each package category
 
-    public static HashMap<String, Long> setCategories(Context ctx,
-                                                         List<ResolveInfo> activities)
+    public static HashMap<AppTable, Long> setCategories(Context ctx,
+                                                        List<ResolveInfo> activities)
     {
         return setCategories(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
-    public static HashMap<String, Long> setCategories(List<ResolveInfo> activities,
-                                                         HashMap<String, String> categories,
-                                                         HashMap<String, String[]> keywords)
+    public static HashMap<AppTable, Long> setCategories(List<ResolveInfo> activities,
+                                                        HashMap<String, String> categories,
+                                                        HashMap<String, String[]> keywords)
     {
-        HashMap<String, Long> pkg_categoryId = new HashMap<>();
-        String pkg;
+        HashMap<AppTable, Long> app_categoryId = new HashMap<>();
+        AppTable appTable = new AppTable();
         long categoryId;
 
         for (int i = 0; i < activities.size(); i++) {
             ResolveInfo ri = activities.get(i);
-            pkg = ri.activityInfo.packageName;
+            String activityName = ri.activityInfo.name;
+            String packageName = ri.activityInfo.packageName;
+            appTable.setActivityName(activityName);
+            appTable.setPackageName(packageName);
 
 
-            if (categories.containsKey(pkg)) {
-                categoryId = getCategoryId(categories.get(pkg));
+            if (categories.containsKey(packageName)) {
+                categoryId = getCategoryId(categories.get(packageName));
 
                 // Only add if not default
                 if (categoryId > 1) {
-                    pkg_categoryId.put(pkg, categoryId);
+                    app_categoryId.put(appTable, categoryId);
                 }
             }
             // Intelligent fallback: Try to guess the category
             else {
-                pkg = pkg.toLowerCase();
+                String _packageName = packageName.toLowerCase();
                 for (String key : keywords.keySet()) {
-                    if (containsKeyword(pkg, keywords.get(key))) {
-                        pkg_categoryId.put(pkg, getCategoryId(key));
+                    if (containsKeyword(_packageName, keywords.get(key))) {
+                        app_categoryId.put(appTable, getCategoryId(key));
                     }
                 }
             }
         }
 
-        return pkg_categoryId;
+        return app_categoryId;
     }
 
     //endregion

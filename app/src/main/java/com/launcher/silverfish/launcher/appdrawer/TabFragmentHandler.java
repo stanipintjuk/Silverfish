@@ -340,16 +340,16 @@ public class TabFragmentHandler {
             right.rename(leftName);
 
             // And now swap the applications by updating their category
-            Map<String, Long> leftApps = new HashMap<>();
+            Map<AppTable, Long> leftApps = new HashMap<>();
             for (AppTable app : sql.getAppsForTab(left.getId())) {
                 long category = rightIndex + 1; // Categories start one over
-                leftApps.put(app.getPackageName(), category);
+                leftApps.put(app, category);
             }
 
-            Map<String, Long> rightApps = new HashMap<>();
+            Map<AppTable, Long> rightApps = new HashMap<>();
             for (AppTable app : sql.getAppsForTab(right.getId())) {
                 long category = leftIndex + 1; // Categories start one over
-                rightApps.put(app.getPackageName(), category);
+                rightApps.put(app, category);
             }
 
             // First remove the apps from their original tab, we don't want duplicates!

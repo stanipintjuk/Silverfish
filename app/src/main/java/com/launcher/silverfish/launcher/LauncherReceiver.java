@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.launcher.silverfish.dbmodel.ShortcutTable;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 public class LauncherReceiver extends BroadcastReceiver {
@@ -27,9 +28,12 @@ public class LauncherReceiver extends BroadcastReceiver {
             // TODO Save 'target.toUri(0)' instead, to preserve all the information
             final LauncherSQLiteHelper sql =
                     new LauncherSQLiteHelper((App)context.getApplicationContext());
-
-            if (sql.canAddShortcut(target.getPackage()))
-                sql.addShortcut(target.getPackage());
+            // TODO: IMPORTANT! canAddShortcut uses activityName field to search.
+            //       Will cause NullPointerException.
+            // TODO: IMPORTANT! Figure out how to get activityName from here.
+            ShortcutTable shortcutTable = new ShortcutTable(null, target.getPackage(), null);
+            if (sql.canAddShortcut(shortcutTable))
+                sql.addShortcut(shortcutTable);
         }
     }
 }

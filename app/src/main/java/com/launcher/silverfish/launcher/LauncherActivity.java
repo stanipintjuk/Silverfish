@@ -26,7 +26,6 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,10 +33,10 @@ import android.view.View;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
 import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
 import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
-import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
@@ -130,7 +129,7 @@ public class LauncherActivity extends FragmentActivity
 
         // Store here the packages and their categories IDs
         // This will allow us to add all the apps at once instead opening the database over and over
-        HashMap<String, Long> pkg_categoryId =
+        HashMap<AppTable, Long> pkg_categoryId =
                 PackagesCategories.setCategories(getApplicationContext(), availableActivities);
 
         // Then add all the apps to their corresponding tabs at once

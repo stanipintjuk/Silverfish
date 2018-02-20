@@ -22,13 +22,11 @@ package com.launcher.silverfish.launcher.appdrawer;
 import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.LinkAddress;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +39,7 @@ import android.widget.Toast;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.launcher.LauncherActivity;
 import com.launcher.silverfish.models.TabInfo;
 
@@ -337,7 +336,8 @@ public class TabbedAppDrawerFragment extends Fragment {
 
                                 // add it to the new tab
                                 String app_name = dragEvent.getClipData().getItemAt(0).getText().toString();
-                                dropAppInTab(app_name);
+                                //TODO: IMPORTANT. Fix this line.
+                                //dropAppInTab(app_name);
                             }
                         }
                         break;
@@ -400,14 +400,14 @@ public class TabbedAppDrawerFragment extends Fragment {
         fragment.removeApp(appIndex);
     }
 
-    private void dropAppInTab(String app_name) {
+    private void dropAppInTab(AppTable appTable) {
         // Retrieve tab fragment
         android.support.v4.app.FragmentManager fm = getChildFragmentManager();
         TabInfo tab = tabHandler.getCurrentTab();
         AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(tab.getTag());
 
         // Add app and refresh the tab's layout
-        fragment.addApp(app_name);
+        fragment.addApp(appTable);
     }
 
     //endregion

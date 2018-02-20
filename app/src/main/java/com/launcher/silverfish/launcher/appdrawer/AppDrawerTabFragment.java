@@ -100,28 +100,29 @@ public class AppDrawerTabFragment extends Fragment {
 
     //region Adding applications
 
-    public void addApp(String packageName) {
-        boolean success = addAppToList(packageName);
+    public void addApp(AppTable appTable) {
+        boolean success = addAppToList(appTable);
         if (success) {
             sortAppsList();
             arrayAdapter.notifyDataSetChanged();
             // add to database only if it is not the first tab
             if (tabId != 1)
-                sqlHelper.addAppToTab(packageName, tabId);
+                sqlHelper.addAppToTab(appTable, tabId);
         }
     }
 
-    private boolean addAppToList(String packageName) {
+    private boolean addAppToList(AppTable appTable) {
         try {
             // Get the information about the app
             ApplicationInfo appInfo = mPacMan.getApplicationInfo(
-                    packageName, PackageManager.GET_META_DATA);
+                    appTable.getPackageName(), PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
 
             // And add it to the list.
             appDetail.label = mPacMan.getApplicationLabel(appInfo);
             appDetail.icon = null; // Loaded later by AppArrayAdapter
-            appDetail.packageName = packageName;
+            appDetail.packageName = appTable.getPackageName();
+            appDetail.activityName = appTable.getActivityName();
             appsList.add(appDetail);
 
             hideEmptyCategoryNotice();
@@ -137,7 +138,12 @@ public class AppDrawerTabFragment extends Fragment {
 
     public void removeApp(int appIndex) {
         if (tabId != 1)
-            sqlHelper.removeAppFromTab(appsList.get(appIndex).packageName.toString(), tabId);
+            // TODO: Use AppTable directly instead of AppDetail?
+            sqlHelper.removeAppFromTab(
+                    new AppTable(null,
+                            appsList.get(appIndex).packageName.toString(),
+                            appsList.get(appIndex).activityName.toString(), tabId)
+            );
 
         arrayAdapter.remove(appsList.get(appIndex));
 
@@ -175,6 +181,8 @@ public class AppDrawerTabFragment extends Fragment {
                     AppDetail app = new AppDetail();
                     app.label = ri.loadLabel(mPacMan);
                     app.packageName = ri.activityInfo.packageName;
+                    app.activityName = ri.activityInfo.name;
+
 
                     // Load the icon later in an async task.
                     app.icon = null;
@@ -187,12 +195,12 @@ public class AppDrawerTabFragment extends Fragment {
                 List<AppTable> apps = sqlHelper.getAppsForTab(tabId);
                 for (AppTable app : apps) {
 
-                    boolean success = addAppToList(app.getPackageName());
+                    boolean success = addAppToList(app);
                     // If the app could not be added then it was probably uninstalled,
                     // so we have to remove it from the database
                     if (!success) {
                         Log.d("DB", "Removing app "+app.getPackageName()+" from db");
-                        sqlHelper.removeAppFromTab(app.getPackageName(), this.tabId);
+                        sqlHelper.removeAppFromTab(app);
                     }
                 }
 

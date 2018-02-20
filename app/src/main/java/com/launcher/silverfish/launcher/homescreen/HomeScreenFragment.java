@@ -121,8 +121,10 @@ public class HomeScreenFragment extends Fragment  {
             public void OnShortcutAdd(String appName) {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                if (sqlHelper.canAddShortcut(appName)) {
-                    long appId = sqlHelper.addShortcut(appName);
+                // TODO: IMPORTANT. Figure out a way to get the corresponding activityName here.
+                ShortcutTable shortcutTable = new ShortcutTable(null, appName, null);
+                if (sqlHelper.canAddShortcut(shortcutTable)) {
+                    long appId = sqlHelper.addShortcut(shortcutTable);
 
                     // Create shortcut and add it
                     ShortcutTable shortcut = new ShortcutTable();
