@@ -120,7 +120,8 @@ public class LauncherSQLiteHelper {
                 .unique() == null;
         } else {
             return mSession.getShortcutTableDao().queryBuilder()
-                    .where(commonCondition)
+                    .where(commonCondition,
+                            ShortcutTableDao.Properties.IntentUri.isNull())
                     .unique() == null;
         }
     }
