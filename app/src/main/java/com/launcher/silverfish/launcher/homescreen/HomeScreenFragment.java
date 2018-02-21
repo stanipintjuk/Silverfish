@@ -27,7 +27,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -174,10 +174,10 @@ public class HomeScreenFragment extends Fragment  {
 
     private boolean addAppToView(ShortcutTable shortcut) {
         try {
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(
-                    shortcut.getPackageName(), PackageManager.GET_META_DATA);
+            ActivityInfo activityInfo = mPacMan.getActivityInfo(
+                    new ComponentName(shortcut.getPackageName(), shortcut.getActivityName()), PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
-            appDetail.label = mPacMan.getApplicationLabel(appInfo);
+            appDetail.label = activityInfo.loadLabel(mPacMan);
 
             // load the icon later in an async task
             appDetail.icon = null;
