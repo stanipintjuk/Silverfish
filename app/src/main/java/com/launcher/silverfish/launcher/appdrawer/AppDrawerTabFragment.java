@@ -20,8 +20,9 @@
 
 package com.launcher.silverfish.launcher.appdrawer;
 
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -101,26 +102,27 @@ public class AppDrawerTabFragment extends Fragment {
     //region Adding applications
 
     public void addApp(AppTable appTable) {
+        appTable.setTabId(tabId);
         boolean success = addAppToList(appTable);
         if (success) {
             sortAppsList();
             arrayAdapter.notifyDataSetChanged();
             // add to database only if it is not the first tab
             if (tabId != 1)
-                sqlHelper.addAppToTab(appTable, tabId);
+                sqlHelper.addAppToTab(appTable);
         }
     }
 
     private boolean addAppToList(AppTable appTable) {
         try {
             // Get the information about the app
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(
-                    appTable.getPackageName(), PackageManager.GET_META_DATA);
+            ActivityInfo activityInfo = mPacMan.getActivityInfo(
+                    new ComponentName(appTable.getPackageName(), appTable.getActivityName()),
+                    PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
 
             // And add it to the list.
-            // TODO: Possible source of bug! Doesn't take into account activityName when getting label.
-            appDetail.label = mPacMan.getApplicationLabel(appInfo);
+            appDetail.label = activityInfo.loadLabel(mPacMan).toString();
             appDetail.icon = null; // Loaded later by AppArrayAdapter
             appDetail.packageName = appTable.getPackageName();
             appDetail.activityName = appTable.getActivityName();
@@ -176,7 +178,7 @@ public class AppDrawerTabFragment extends Fragment {
                 for (int j = 0; j < availableActivities.size(); j++)    {
                     ResolveInfo ri = availableActivities.get(j);
 
-                    if (sqlHelper.containsApp(ri.activityInfo.packageName))
+                    if (sqlHelper.containsApp(ri.activityInfo.name))
                         continue;
 
                     AppDetail app = new AppDetail();

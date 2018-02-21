@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -94,24 +95,23 @@ public final class PackagesCategories {
 
     //region Set each package category
 
-    public static HashMap<AppTable, Long> setCategories(Context ctx,
-                                                        List<ResolveInfo> activities)
+    public static List<AppTable> setCategoriesForAppTable(Context ctx,
+                                                          List<ResolveInfo> activities)
     {
-        return setCategories(activities, getPredefinedCategories(ctx), getKeywords());
+        return setCategoriesForAppTable(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
-    public static HashMap<AppTable, Long> setCategories(List<ResolveInfo> activities,
-                                                        HashMap<String, String> categories,
-                                                        HashMap<String, String[]> keywords)
+    public static List<AppTable> setCategoriesForAppTable(List<ResolveInfo> activities,
+                                                          HashMap<String, String> categories,
+                                                          HashMap<String, String[]> keywords)
     {
-        HashMap<AppTable, Long> app_categoryId = new HashMap<>();
-        AppTable appTable = new AppTable();
+        List<AppTable> apps = new ArrayList<>();
         long categoryId;
-
-        for (int i = 0; i < activities.size(); i++) {
-            ResolveInfo ri = activities.get(i);
+        for (ResolveInfo ri : activities) {
             String activityName = ri.activityInfo.name;
             String packageName = ri.activityInfo.packageName;
+
+            AppTable appTable = new AppTable();
             appTable.setActivityName(activityName);
             appTable.setPackageName(packageName);
 
@@ -121,7 +121,8 @@ public final class PackagesCategories {
 
                 // Only add if not default
                 if (categoryId > 1) {
-                    app_categoryId.put(appTable, categoryId);
+                    appTable.setTabId(categoryId);
+                    apps.add(appTable);
                 }
             }
             // Intelligent fallback: Try to guess the category
@@ -129,13 +130,15 @@ public final class PackagesCategories {
                 String _packageName = packageName.toLowerCase();
                 for (String key : keywords.keySet()) {
                     if (containsKeyword(_packageName, keywords.get(key))) {
-                        app_categoryId.put(appTable, getCategoryId(key));
+                        appTable.setTabId(getCategoryId(key));
+                        apps.add(appTable);
+                        break;
                     }
                 }
             }
         }
 
-        return app_categoryId;
+        return apps;
     }
 
     //endregion

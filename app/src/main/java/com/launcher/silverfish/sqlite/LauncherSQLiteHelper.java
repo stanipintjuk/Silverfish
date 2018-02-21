@@ -31,11 +31,10 @@ import com.launcher.silverfish.launcher.App;
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class LauncherSQLiteHelper {
+
     private DaoSession mSession;
 
     public LauncherSQLiteHelper(App app) {
@@ -76,31 +75,22 @@ public class LauncherSQLiteHelper {
                 .list();
     }
 
-    public List<AppTable> getAllApps() {
-        return mSession.getAppTableDao().loadAll();
-    }
-
-    public boolean containsApp(String packageName) {
+    /*  Looks like this is unused. Commenting out (YAGNI).
+        public List<AppTable> getAllApps() {
+            return mSession.getAppTableDao().loadAll();
+        }
+    */
+    public boolean containsApp(String activityName) {
         return mSession.getAppTableDao().queryBuilder()
-                .where(AppTableDao.Properties.PackageName.eq(packageName))
+                .where(AppTableDao.Properties.ActivityName.eq(activityName))
                 .unique() != null;
     }
 
-    public void addAppToTab(AppTable appTable, long tabId) {
-        appTable.setId(null);
-        appTable.setTabId(tabId);
+    public void addAppToTab(AppTable appTable) {
         mSession.getAppTableDao().insert(appTable);
     }
 
-    public void addAppsToTab(Map<AppTable, Long> pkg_categoryId) {
-        List<AppTable> apps = new LinkedList<>();
-        for (Map.Entry<AppTable, Long> entry : pkg_categoryId.entrySet()) {
-            AppTable appTable = entry.getKey();
-            long tabId = entry.getValue();
-            appTable.setId(null);
-            appTable.setTabId(tabId);
-            apps.add(appTable);
-        }
+    public void addAppsToTab(List<AppTable> apps) {
         mSession.getAppTableDao().insertInTx(apps);
     }
 

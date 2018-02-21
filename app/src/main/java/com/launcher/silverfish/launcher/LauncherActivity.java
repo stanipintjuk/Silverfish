@@ -40,7 +40,6 @@ import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -125,15 +124,13 @@ public class LauncherActivity extends FragmentActivity
 
         // Get all activities that have those filters
         List<ResolveInfo> availableActivities = mPacMan.queryIntentActivities(i, 0);
-
-
         // Store here the packages and their categories IDs
         // This will allow us to add all the apps at once instead opening the database over and over
-        HashMap<AppTable, Long> pkg_categoryId =
-                PackagesCategories.setCategories(getApplicationContext(), availableActivities);
+        List<AppTable> apps =
+                PackagesCategories.setCategoriesForAppTable(getApplicationContext(), availableActivities);
 
         // Then add all the apps to their corresponding tabs at once
-        sql.addAppsToTab(pkg_categoryId);
+        sql.addAppsToTab(apps);
     }
 
     //endregion
