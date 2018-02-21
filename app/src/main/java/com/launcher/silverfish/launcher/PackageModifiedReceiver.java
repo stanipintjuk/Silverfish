@@ -25,6 +25,8 @@ public class PackageModifiedReceiver extends BroadcastReceiver {
                 if (added) {
                     // TODO Determine its category
                 } else {
+                    // TODO: ShortcutTable entries are no longer uniquely identified by its packageName.
+                    // Also take in to account activityName and intentUri
                     final long id = sql.getShortcutId(pkg);
                     sql.removeShortcut(id);
                     if (app.shortcutListener != null)

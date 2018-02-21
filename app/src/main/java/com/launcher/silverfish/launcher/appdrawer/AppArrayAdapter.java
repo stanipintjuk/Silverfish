@@ -21,6 +21,7 @@ import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.shared.Settings;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -98,8 +99,16 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent();
-                i.setAction(Intent.ACTION_MAIN);
-                i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                if (app.intentUri != null) {
+                    try {
+                        i = Intent.parseUri(app.intentUri.toString(), Intent.URI_INTENT_SCHEME);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    i.setAction(Intent.ACTION_MAIN);
+                    i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                }
                 if (i != null) {
                     // Sanity check (application may have been uninstalled)
                     // TODO Remove it from the database

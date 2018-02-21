@@ -60,6 +60,7 @@ import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,7 +124,7 @@ public class HomeScreenFragment extends Fragment  {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
                 ShortcutTable shortcutTable = new ShortcutTable(null, appTable.getPackageName(),
-                        appTable.getActivityName());
+                        appTable.getActivityName(), null);
                 if (sqlHelper.canAddShortcut(shortcutTable)) {
                     sqlHelper.addShortcut(shortcutTable);
                     if (addAppToView(shortcutTable)) {
@@ -178,7 +179,7 @@ public class HomeScreenFragment extends Fragment  {
                     new ComponentName(shortcut.getPackageName(), shortcut.getActivityName()), PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
             appDetail.label = activityInfo.loadLabel(mPacMan);
-
+            appDetail.intentUri = shortcut.getIntentUri();
             // load the icon later in an async task
             appDetail.icon = null;
 
@@ -254,7 +255,17 @@ public class HomeScreenFragment extends Fragment  {
                         case MotionEvent.ACTION_UP:
                             // We only want to launch the activity if the touch was not consumed yet!
                             if (!touchConsumed) {
-                                Intent i = mPacMan.getLaunchIntentForPackage(app.packageName.toString());
+                                Intent i = new Intent();
+                                if (app.intentUri != null) {
+                                    try {
+                                        i = Intent.parseUri(app.intentUri.toString(), Intent.URI_INTENT_SCHEME);
+                                    } catch (URISyntaxException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    i.setAction(Intent.ACTION_MAIN);
+                                    i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                                }
                                 if (i != null) {
                                     // Sanity check (application may have been uninstalled)
                                     // TODO Remove it from the database

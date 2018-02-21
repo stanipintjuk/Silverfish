@@ -3,12 +3,9 @@ package com.launcher.silverfish.dbmodel;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Index;
 import org.greenrobot.greendao.annotation.NotNull;
 
-@Entity(indexes = {
-        @Index(value = "activityName", unique = true)
-})
+@Entity()
 public class AppTable {
     @Id(autoincrement = true)
     private Long id;

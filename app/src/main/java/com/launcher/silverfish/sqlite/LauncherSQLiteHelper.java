@@ -30,6 +30,7 @@ import com.launcher.silverfish.launcher.App;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.util.List;
 
@@ -108,11 +109,20 @@ public class LauncherSQLiteHelper {
     }
 
     public boolean canAddShortcut(ShortcutTable shortcutTable) {
-        boolean ret = mSession.getShortcutTableDao().queryBuilder()
-                .where(ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()),
-                        ShortcutTableDao.Properties.PackageName.eq(shortcutTable.getPackageName()))
+        WhereCondition commonCondition = mSession.getShortcutTableDao().queryBuilder().and(
+                ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()),
+                ShortcutTableDao.Properties.PackageName.eq(shortcutTable.getPackageName())
+        );
+        if (shortcutTable.getIntentUri() != null) {
+            return mSession.getShortcutTableDao().queryBuilder()
+                    .where(commonCondition,
+                            ShortcutTableDao.Properties.IntentUri.eq(shortcutTable.getIntentUri()))
                 .unique() == null;
-        return ret;
+        } else {
+            return mSession.getShortcutTableDao().queryBuilder()
+                    .where(commonCondition)
+                    .unique() == null;
+        }
     }
 
     public long addShortcut(ShortcutTable shortcutTable) {
