@@ -49,6 +49,7 @@ import android.widget.Toast;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.ShortcutTable;
 import com.launcher.silverfish.launcher.App;
 import com.launcher.silverfish.launcher.LauncherActivity;
@@ -118,19 +119,14 @@ public class HomeScreenFragment extends Fragment  {
         ((LauncherActivity)getActivity())
                 .setFragShortcutAddListenerRefreshListener(new ShortcutAddListener() {
             @Override
-            public void OnShortcutAdd(String appName) {
+            public void OnShortcutAdd(AppTable appTable) {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                // TODO: IMPORTANT. Figure out a way to get the corresponding activityName here.
-                ShortcutTable shortcutTable = new ShortcutTable(null, appName, null);
+                ShortcutTable shortcutTable = new ShortcutTable(null, appTable.getPackageName(),
+                        appTable.getActivityName());
                 if (sqlHelper.canAddShortcut(shortcutTable)) {
-                    long appId = sqlHelper.addShortcut(shortcutTable);
-
-                    // Create shortcut and add it
-                    ShortcutTable shortcut = new ShortcutTable();
-                    shortcut.setPackageName(appName);
-                    shortcut.setId(appId);
-                    if (addAppToView(shortcut)) {
+                    sqlHelper.addShortcut(shortcutTable);
+                    if (addAppToView(shortcutTable)) {
                         updateShortcuts();
                     }
                 }
@@ -187,6 +183,7 @@ public class HomeScreenFragment extends Fragment  {
             appDetail.icon = null;
 
             appDetail.packageName = shortcut.getPackageName();
+            appDetail.activityName = shortcut.getActivityName();
             appDetail.id = shortcut.getId();
 
             appsList.add(appDetail);

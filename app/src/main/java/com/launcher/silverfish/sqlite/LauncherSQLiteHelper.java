@@ -108,9 +108,11 @@ public class LauncherSQLiteHelper {
     }
 
     public boolean canAddShortcut(ShortcutTable shortcutTable) {
-        return mSession.getShortcutTableDao().queryBuilder()
-                .where(ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()))
+        boolean ret = mSession.getShortcutTableDao().queryBuilder()
+                .where(ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()),
+                        ShortcutTableDao.Properties.PackageName.eq(shortcutTable.getPackageName()))
                 .unique() == null;
+        return ret;
     }
 
     public long addShortcut(ShortcutTable shortcutTable) {

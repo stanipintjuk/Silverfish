@@ -159,9 +159,9 @@ public class LauncherActivity extends FragmentActivity
         return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
-    public boolean addShortcut(String appName) {
+    public boolean addShortcut(AppTable appTable) {
         if (getFragShortcutAddListenerRefreshListener() != null) {
-            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
+            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appTable);
             return true;
         }
         else
@@ -220,8 +220,10 @@ public class LauncherActivity extends FragmentActivity
 
     private void dropItem(DragEvent dragEvent) {
         if (mViewPager.getCurrentItem() == 1) {
-            String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
-            addShortcut(appName);
+            AppTable appTable = new AppTable();
+            appTable.setPackageName(dragEvent.getClipData().getItemAt(0).getText().toString());
+            appTable.setActivityName(dragEvent.getClipData().getItemAt(1).getText().toString());
+            addShortcut(appTable);
         }
     }
 
