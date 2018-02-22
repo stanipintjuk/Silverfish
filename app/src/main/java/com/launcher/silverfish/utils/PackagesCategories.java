@@ -21,21 +21,28 @@ public final class PackagesCategories {
 
     // Retrieve the default tab ID based on the English name
     private static long getCategoryId(String englishName) {
-        switch (englishName)
-        {
-            default: case "Other":       return 1;
-                     case "Phone":       return 2;
-                     case "Games":       return 3;
-                     case "Internet":    return 4;
-                     case "Media":       return 5;
-                     case "Accessories": return 6;
-                     case "Settings":    return 7;
+        switch (englishName) {
+            default:
+            case "Other":
+                return 1;
+            case "Phone":
+                return 2;
+            case "Games":
+                return 3;
+            case "Internet":
+                return 4;
+            case "Media":
+                return 5;
+            case "Accessories":
+                return 6;
+            case "Settings":
+                return 7;
         }
     }
 
     private static boolean containsKeyword(String str, String[] keywords) {
         for (String keyword : keywords) {
-            if(str.contains(keyword)) return true;
+            if (str.contains(keyword)) return true;
         }
         return false;
     }
@@ -44,8 +51,7 @@ public final class PackagesCategories {
 
     //region Get Categories
 
-    public static HashMap<String, String> getPredefinedCategories(Context ctx)
-    {
+    public static HashMap<String, String> getPredefinedCategories(Context ctx) {
         HashMap<String, String> predefCategories = new HashMap<>();
 
         InputStream inputStream = ctx.getResources().openRawResource(R.raw.package_category);
@@ -56,7 +62,7 @@ public final class PackagesCategories {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
             while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty()){
+                if (!line.isEmpty()) {
                     lineSplit = line.split("=");
                     predefCategories.put(lineSplit[0], lineSplit[1]);
                 }
@@ -66,8 +72,10 @@ public final class PackagesCategories {
             ex.printStackTrace();
         } finally {
             try {
-                if(inputStream != null) inputStream.close();
-            } catch (IOException e) { e.printStackTrace(); }
+                if (inputStream != null) inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         return predefCategories;
@@ -77,8 +85,7 @@ public final class PackagesCategories {
 
     //region Get Keywords
 
-    public static HashMap<String, String[]> getKeywords()
-    {
+    public static HashMap<String, String[]> getKeywords() {
         HashMap<String, String[]> keywordsDict = new HashMap<>();
 
         keywordsDict.put("Phone", new String[]{"phone", "conv", "call", "sms", "mms", "contacts", "stk"});  // stk stands for "SIM Toolkit"
@@ -96,15 +103,13 @@ public final class PackagesCategories {
     //region Set each package category
 
     public static List<AppTable> setCategoriesForAppTable(Context ctx,
-                                                          List<ResolveInfo> activities)
-    {
+                                                          List<ResolveInfo> activities) {
         return setCategoriesForAppTable(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
     public static List<AppTable> setCategoriesForAppTable(List<ResolveInfo> activities,
                                                           HashMap<String, String> categories,
-                                                          HashMap<String, String[]> keywords)
-    {
+                                                          HashMap<String, String[]> keywords) {
         List<AppTable> apps = new ArrayList<>();
         long categoryId;
         for (ResolveInfo ri : activities) {

@@ -19,7 +19,6 @@
 
 package com.launcher.silverfish.launcher;
 
-import android.content.ClipDescription;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -28,7 +27,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.DragEvent;
 import android.view.KeyEvent;
-import android.view.View;
 
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
@@ -85,12 +83,12 @@ public class LauncherActivity extends FragmentActivity
     //region First time setup
 
     private boolean createDefaultTabs() {
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) getApplication());
         if (sql.hasTabs())
             return false;
 
         // Load default names for the tab
-        String[] defaultTabNames = new String[] {
+        String[] defaultTabNames = new String[]{
                 getString(R.string.tab_other),
                 getString(R.string.tab_phone),
                 getString(R.string.tab_games),
@@ -113,7 +111,7 @@ public class LauncherActivity extends FragmentActivity
     private void autoSortApplications() {
 
         // Set up both SQL helper and package manager
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)getApplication());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) getApplication());
         PackageManager mPacMan = getApplicationContext().getPackageManager();
 
         // Set MAIN and LAUNCHER filters, so we only get activities with that defined on their manifest
@@ -154,15 +152,14 @@ public class LauncherActivity extends FragmentActivity
     }
 
     HomeScreenFragment getHomeScreenFragment() {
-        return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
+        return (HomeScreenFragment) mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
     public boolean addShortcut(AppTable appTable) {
         if (getFragShortcutAddListenerRefreshListener() != null) {
             getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appTable);
             return true;
-        }
-        else
+        } else
             return false;
     }
 
@@ -199,12 +196,12 @@ public class LauncherActivity extends FragmentActivity
 
         // Get display size
         int width = Utils.getScreenDimensions(this).x;
-        int threshold = (int)(Constants.DRAG_THRESHOLD_PERCENT_X * width);
+        int threshold = (int) (Constants.DRAG_THRESHOLD_PERCENT_X * width);
 
         // Change page
         if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold) {
             mViewPager.setCurrentItem(1);
-        } else if(mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold) {
+        } else if (mViewPager.getCurrentItem() == 1 && dragEvent.getX() <= threshold) {
             mViewPager.setCurrentItem(0);
         }
     }
@@ -223,7 +220,7 @@ public class LauncherActivity extends FragmentActivity
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         // Override the functionality of back and home key
-        if ((keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME)&& event.isTracking()
+        if ((keyCode == KeyEvent.KEYCODE_BACK || keyCode == KeyEvent.KEYCODE_HOME) && event.isTracking()
                 && !event.isCanceled()) {
             mViewPager.setCurrentItem(1);
             return true;

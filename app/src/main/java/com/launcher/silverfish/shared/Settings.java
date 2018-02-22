@@ -99,7 +99,7 @@ public class Settings {
         gd.setStroke(BUTTON_BORDER, getFontFgColor());
 
         // GradientDrawable doesn't have Inset, use LayerDrawable
-        LayerDrawable ld = new LayerDrawable(new Drawable[] { gd });
+        LayerDrawable ld = new LayerDrawable(new Drawable[]{gd});
         ld.setLayerInset(0, -BUTTON_BORDER, -BUTTON_BORDER, 0, -BUTTON_BORDER);
         stateListDrawable.addState(new int[]{android.R.attr.state_selected}, ld);
 
@@ -147,7 +147,7 @@ public class Settings {
     //region Private utilities
 
     private static int darkenAlpha(int color, float percentage) {
-        int darken = Color.alpha(color) + (int)(percentage*255);
+        int darken = Color.alpha(color) + (int) (percentage * 255);
         if (darken > 255)
             darken = 255;
 

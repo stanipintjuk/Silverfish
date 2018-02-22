@@ -18,6 +18,7 @@
  */
 
 package com.launcher.silverfish.models;
+
 import android.graphics.drawable.Drawable;
 
 public class AppDetail {

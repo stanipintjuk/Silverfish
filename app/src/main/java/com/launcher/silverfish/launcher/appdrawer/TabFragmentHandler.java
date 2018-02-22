@@ -122,11 +122,11 @@ public class TabFragmentHandler {
 
     // region Attaching and detaching tabs
 
-    private void attachTabFragment(TabInfo tab, FragmentTransaction ft){
+    private void attachTabFragment(TabInfo tab, FragmentTransaction ft) {
         // Retrieve the fragment
         String fragment_tag = tab.getTag();
-        AppDrawerTabFragment fragment = (AppDrawerTabFragment)mFragmentManager
-                                                              .findFragmentByTag(fragment_tag);
+        AppDrawerTabFragment fragment = (AppDrawerTabFragment) mFragmentManager
+                .findFragmentByTag(fragment_tag);
 
         // Attach it to the UI if an instance already exists, otherwise create a new instance and add it.
         if (fragment == null) {
@@ -148,7 +148,7 @@ public class TabFragmentHandler {
         // Detach all tab fragments from UI
         for (TabInfo tab : arrTabs) {
             AppDrawerTabFragment fragment = (AppDrawerTabFragment)
-                                            mFragmentManager.findFragmentByTag(tab.getTag());
+                    mFragmentManager.findFragmentByTag(tab.getTag());
 
             if (fragment != null)
                 ft.detach(fragment);
@@ -162,13 +162,13 @@ public class TabFragmentHandler {
     /**
      * Loads all tabs from the database.
      */
-    public void loadTabs(){
+    public void loadTabs() {
         arrButton = new ArrayList<>();
         arrTabs = new ArrayList<>();
 
-        LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
+        LinearLayout tabWidget = (LinearLayout) rootView.findViewById(R.id.custom_tabwidget);
 
-        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+        LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) mActivity.getApplication());
         List<TabTable> tabTables = sql.getAllTabs();
 
         for (TabTable tabEntry : tabTables) {
@@ -184,8 +184,8 @@ public class TabFragmentHandler {
             // Set the style of the button
             btn.setBackground(settings.getTabButtonStyle());
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                                              ViewGroup.LayoutParams.MATCH_PARENT,
-                                                              1));
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    1));
             btn.setTextColor(settings.getFontFgColor());
 
             // Add the button to the tab widget.
@@ -211,7 +211,7 @@ public class TabFragmentHandler {
         selectTab(index);
     }
 
-    private void selectTab(int index){
+    private void selectTab(int index) {
         // Toggle all the tab buttons to false
         for (Button button : arrButton) {
             button.setSelected(false);
@@ -225,14 +225,14 @@ public class TabFragmentHandler {
 
     //region Get and set last tab id
 
-    public void saveLastOpenTab(){
+    public void saveLastOpenTab() {
         // save the last tab
-        if (currentOpenTab != -1){
+        if (currentOpenTab != -1) {
             setLastTabId(currentOpenTab);
         }
     }
 
-    public void loadLastOpenTab(){
+    public void loadLastOpenTab() {
         // Open last opened tab
         currentOpenTab = getLastTabId();
 
@@ -271,6 +271,7 @@ public class TabFragmentHandler {
 
     /**
      * Saves the last opened tab's id in the apps preferences
+     *
      * @param tabId The id of the tab to be saved
      */
     private void setLastTabId(int tabId) {
@@ -281,18 +282,18 @@ public class TabFragmentHandler {
 
     //region Click listener
 
-    public void setOnTabButtonClickListener(AppDrawerTabFragment.TabButtonClickListener clickListener){
+    public void setOnTabButtonClickListener(AppDrawerTabFragment.TabButtonClickListener clickListener) {
         tabButtonClickListener = clickListener;
     }
 
-    private void setClickListener(){
+    private void setClickListener() {
 
-        for (int i = 0; i < arrButton.size(); i++){
+        for (int i = 0; i < arrButton.size(); i++) {
             Button btn = arrButton.get(i);
             final TabInfo tab = arrTabs.get(i);
             final int position = i;
 
-            btn.setOnClickListener(new View.OnClickListener(){
+            btn.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
@@ -302,7 +303,7 @@ public class TabFragmentHandler {
                 }
             });
 
-            btn.setOnLongClickListener(new View.OnLongClickListener(){
+            btn.setOnLongClickListener(new View.OnLongClickListener() {
 
                 @Override
                 public boolean onLongClick(View view) {
@@ -318,10 +319,10 @@ public class TabFragmentHandler {
 
     public void swapTabs(TabInfo left, int leftIndex, TabInfo right, int rightIndex) {
         // Don't allow the first tab to be moved
-        if (leftIndex == 0 || rightIndex == 0){
+        if (leftIndex == 0 || rightIndex == 0) {
             throw new IllegalArgumentException("First tab is not allowed to be moved.");
         } else {
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) mActivity.getApplication());
 
             // Get their original names
             String leftName = sql.getTabName(left.getId());
@@ -362,19 +363,19 @@ public class TabFragmentHandler {
         }
     }
 
-    public void addTab(String tabName){
+    public void addTab(String tabName) {
         if (tabName == null || tabName.isEmpty()) {
             throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
             // add the tab to database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) mActivity.getApplication());
             TabTable tabEntry = sql.addTab(tabName);
 
             final TabInfo tab = new TabInfo(tabEntry);
             arrTabs.add(tab);
 
             // create a button for the tab
-            LinearLayout tabWidget = (LinearLayout)rootView.findViewById(R.id.custom_tabwidget);
+            LinearLayout tabWidget = (LinearLayout) rootView.findViewById(R.id.custom_tabwidget);
 
             Button btn = new Button(mActivity.getApplicationContext());
             btn.setText(tab.getLabel());
@@ -415,11 +416,11 @@ public class TabFragmentHandler {
     }
 
     public void renameTab(TabInfo tab, int tab_index, String new_name) {
-        if (new_name == null || new_name.isEmpty()){
+        if (new_name == null || new_name.isEmpty()) {
             throw new IllegalArgumentException("Tab packageName cannot be empty");
         } else {
             // update packageName in database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) mActivity.getApplication());
             sql.renameTab(tab.getId(), new_name);
 
             // rename the button
@@ -431,11 +432,11 @@ public class TabFragmentHandler {
 
     public void removeTab(TabInfo tab, int tab_index) {
         // Don't allow the first tab to be removed
-        if (tab_index == 0){
+        if (tab_index == 0) {
             throw new IllegalArgumentException("First tab is not allowed to be removed.");
         } else {
             // Remove the tab from the database
-            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App)mActivity.getApplication());
+            LauncherSQLiteHelper sql = new LauncherSQLiteHelper((App) mActivity.getApplication());
             sql.removeTab(tab.getId());
 
             // Hide the tab button
@@ -461,22 +462,22 @@ public class TabFragmentHandler {
      * Returns the index of th button which the (x, y) coordinates are inside of.
      * Returns -1 if there is none.
      */
-    public int getHoveringTab(float x, float y){
+    public int getHoveringTab(float x, float y) {
 
         // Loop through all buttons and check if (x, y) is inside one of them
         for (int i = 0; i < arrButton.size(); i++) {
 
             // ignore all tab buttons that are removed
             Button btn = arrButton.get(i);
-            if (btn.getVisibility() == View.GONE){
+            if (btn.getVisibility() == View.GONE) {
                 continue;
             }
 
             // Get the geometry
             float high_x = btn.getX();
             float high_y = btn.getY();
-            float low_x = btn.getX()+btn.getWidth();
-            float low_y = btn.getY()+btn.getHeight();
+            float low_x = btn.getX() + btn.getWidth();
+            float low_y = btn.getY() + btn.getHeight();
 
             // Check if (x, y) is inside
             if (x > high_x && x < low_x && y > high_y && y < low_y) {
@@ -488,9 +489,10 @@ public class TabFragmentHandler {
 
     /**
      * Returns the current open tab
+     *
      * @return currently open tab
      */
-    public TabInfo getCurrentTab(){
+    public TabInfo getCurrentTab() {
         return arrTabs.get(currentOpenTab);
     }
 

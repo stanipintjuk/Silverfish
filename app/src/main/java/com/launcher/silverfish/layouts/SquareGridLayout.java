@@ -10,11 +10,10 @@ import com.launcher.silverfish.R;
 
 /**
  * A layout that arranges views into a grid of same-sized squares.
- *
+ * <p>
  * This source code contained in this file is in the Public Domain.
  *
  * @author Tom Gibara
- *
  */
 
 public class SquareGridLayout extends ViewGroup {
@@ -47,7 +46,7 @@ public class SquareGridLayout extends ViewGroup {
      * Constructor used to inflate layout from XML. It extracts the size from
      * the attributes and sets it.
      */
-	/* This requires a resource to be defined like this:
+    /* This requires a resource to be defined like this:
 	 *
 	 * <resources>
 	 *   <declare-styleable name="SquareGridLayout">
@@ -205,10 +204,10 @@ public class SquareGridLayout extends ViewGroup {
                 int revx = size - x - 1;
                 int revy = size - y - 1;
                 child.layout(
-                        l + (s *  revx   ) / size + lps.leftMargin,
-                        t + (s *  revy   ) / size + lps.topMargin,
-                        l + (s * (revx+1)) / size - lps.rightMargin,
-                        t + (s * (revy+1)) / size - lps.bottomMargin
+                        l + (s * revx) / size + lps.leftMargin,
+                        t + (s * revy) / size + lps.topMargin,
+                        l + (s * (revx + 1)) / size - lps.rightMargin,
+                        t + (s * (revy + 1)) / size - lps.bottomMargin
                 );
             }
         }

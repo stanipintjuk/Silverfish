@@ -11,7 +11,7 @@ public class TabInfo {
     private final String tag;
     private String label;
 
-    public TabInfo(TabTable tab){
+    public TabInfo(TabTable tab) {
         this.id = tab.getId();
         this.label = tab.getLabel();
 
@@ -19,15 +19,15 @@ public class TabInfo {
         tag = Long.toString(id);
     }
 
-    public long getId(){
+    public long getId() {
         return id;
     }
 
-    public String getTag(){
+    public String getTag() {
         return tag;
     }
 
-    public String getLabel(){
+    public String getLabel() {
         return label;
     }
 

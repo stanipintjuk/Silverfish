@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016 Stanislav Pintjuk
  * E-mail: stanislav.pintjuk@gmail.com
@@ -73,11 +72,11 @@ public class AppDrawerTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // get the sql database helper and the view of this tab
-        sqlHelper = new LauncherSQLiteHelper((App)getActivity().getApplication());
+        sqlHelper = new LauncherSQLiteHelper((App) getActivity().getApplication());
         settings = new Settings(getContext());
 
         rootView = inflater.inflate(R.layout.activity_app_drawer_tab, container, false);
-        emptyCategoryTextView = (TextView)rootView.findViewById(R.id.textView_empty_category_notice);
+        emptyCategoryTextView = (TextView) rootView.findViewById(R.id.textView_empty_category_notice);
 
         // Get this tab's ID.
         Bundle args = getArguments();
@@ -168,14 +167,14 @@ public class AppDrawerTabFragment extends Fragment {
         Intent i = new Intent(Intent.ACTION_MAIN, null);
         i.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        switch ((int)tabId) {
+        switch ((int) tabId) {
             case 1:
                 // Tab 1 is a special tab and includes all except for the ones in other tabs
                 // Retrieve all installed apps on the device
                 List<ResolveInfo> availableActivities = mPacMan.queryIntentActivities(i, 0);
-                
+
                 // And only add those that are not in the database
-                for (int j = 0; j < availableActivities.size(); j++)    {
+                for (int j = 0; j < availableActivities.size(); j++) {
                     ResolveInfo ri = availableActivities.get(j);
 
                     if (sqlHelper.containsApp(ri.activityInfo.name))
@@ -202,7 +201,7 @@ public class AppDrawerTabFragment extends Fragment {
                     // If the app could not be added then it was probably uninstalled,
                     // so we have to remove it from the database
                     if (!success) {
-                        Log.d("DB", "Removing app "+app.getPackageName()+" from db");
+                        Log.d("DB", "Removing app " + app.getPackageName() + " from db");
                         sqlHelper.removeAppFromTab(app);
                     }
                 }
@@ -228,6 +227,7 @@ public class AppDrawerTabFragment extends Fragment {
     private void showEmptyCategoryNotice() {
         emptyCategoryTextView.setVisibility(View.VISIBLE);
     }
+
     private void hideEmptyCategoryNotice() {
         emptyCategoryTextView.setVisibility(View.GONE);
     }
@@ -241,7 +241,7 @@ public class AppDrawerTabFragment extends Fragment {
         appsView.setAdapter(arrayAdapter);
     }
 
-    private void sortAppsList(){
+    private void sortAppsList() {
         Collections.sort(appsList, new Comparator<AppDetail>() {
             @Override
             public int compare(AppDetail app1, AppDetail app2) {
@@ -256,6 +256,7 @@ public class AppDrawerTabFragment extends Fragment {
      */
     public interface TabButtonClickListener {
         void onClick(TabInfo tab, int position);
+
         boolean onLongClick(TabInfo tab, int position);
     }
 }

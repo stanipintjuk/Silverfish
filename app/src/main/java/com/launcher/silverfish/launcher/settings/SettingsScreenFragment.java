@@ -15,13 +15,15 @@ import com.launcher.silverfish.shared.Settings;
 
 import yuku.ambilwarna.AmbilWarnaDialog;
 
-public class SettingsScreenFragment extends Fragment  {
+public class SettingsScreenFragment extends Fragment {
 
     //region Interfaces
 
     public interface SettingChanged {
         void onWidgetVisibilityChanged(boolean visible);
+
         void onWidgetChangeRequested();
+
         void onColorChanged(int drawerBg, int widgetBg, int fontFg);
     }
 
@@ -51,29 +53,29 @@ public class SettingsScreenFragment extends Fragment  {
         // Toggle widget visibility button
         rootView.findViewById(R.id.toggle_widget_visibility_button)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                toggleWidgetVisibility();
-            }
-        });
+                    @Override
+                    public void onClick(View view) {
+                        toggleWidgetVisibility();
+                    }
+                });
 
         // Change widget button
         rootView.findViewById(R.id.change_widget_button)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeWidget();
-            }
-        });
+                    @Override
+                    public void onClick(View view) {
+                        changeWidget();
+                    }
+                });
 
         // Change wallpaper button
         rootView.findViewById(R.id.change_wallpaper_button)
                 .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeWallpaper();
-            }
-        });
+                    @Override
+                    public void onClick(View view) {
+                        changeWallpaper();
+                    }
+                });
 
         // Change colors, app drawer background
         rootView.findViewById(R.id.change_drawer_color)
@@ -124,7 +126,7 @@ public class SettingsScreenFragment extends Fragment  {
         if (!settings.isWidgetVisible())
             toggleWidgetVisibility();
 
-            callback.onWidgetChangeRequested();
+        callback.onWidgetChangeRequested();
     }
 
     private void changeWallpaper() {
@@ -187,7 +189,7 @@ public class SettingsScreenFragment extends Fragment  {
 
         // Ensure the parent activity implements SettingChanged
         try {
-            callback = (SettingChanged)getActivity();
+            callback = (SettingChanged) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString()
                     + " must implement SettingChanged");

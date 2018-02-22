@@ -117,7 +117,7 @@ public class LauncherSQLiteHelper {
             return mSession.getShortcutTableDao().queryBuilder()
                     .where(commonCondition,
                             ShortcutTableDao.Properties.IntentUri.eq(shortcutTable.getIntentUri()))
-                .unique() == null;
+                    .unique() == null;
         } else {
             return mSession.getShortcutTableDao().queryBuilder()
                     .where(commonCondition,
@@ -148,7 +148,8 @@ public class LauncherSQLiteHelper {
                             .where(ShortcutTableDao.Properties.Id.eq(id))
                             .uniqueOrThrow()
             );
-        } catch (DaoException ignored) { }
+        } catch (DaoException ignored) {
+        }
     }
 
     public List<ShortcutTable> getAllShortcuts() {

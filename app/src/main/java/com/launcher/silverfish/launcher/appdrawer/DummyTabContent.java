@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2016 Stanislav Pintjuk
  * E-mail: stanislav.pintjuk@gmail.com

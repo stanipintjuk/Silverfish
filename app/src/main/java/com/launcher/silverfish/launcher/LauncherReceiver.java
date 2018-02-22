@@ -28,7 +28,7 @@ public class LauncherReceiver extends BroadcastReceiver {
             //
             // TODO Save 'target.toUri(0)' instead, to preserve all the information
             final LauncherSQLiteHelper sql =
-                    new LauncherSQLiteHelper((App)context.getApplicationContext());
+                    new LauncherSQLiteHelper((App) context.getApplicationContext());
 
             String intentUri = target.toUri(Intent.URI_INTENT_SCHEME);
             ShortcutTable shortcutTable = new ShortcutTable(null,

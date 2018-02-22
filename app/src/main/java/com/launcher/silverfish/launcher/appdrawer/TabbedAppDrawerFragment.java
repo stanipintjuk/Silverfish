@@ -19,14 +19,12 @@
 
 package com.launcher.silverfish.launcher.appdrawer;
 
-import android.content.ClipDescription;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.text.Html;
 import android.text.InputType;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -108,7 +106,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                switch (i){
+                switch (i) {
                     case 0:
                         promptRenameTab(tab, tab_index);
                         break;
@@ -190,7 +188,7 @@ public class TabbedAppDrawerFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 try {
                     tabHandler.renameTab(tab, tab_index, input.getText().toString());
-                } catch (IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     /* This means that the user entered an empty name */
                     showToast(R.string.text_cannot_name_empty);
                 }
@@ -239,7 +237,7 @@ public class TabbedAppDrawerFragment extends Fragment {
 
     private void addOnClickListener() {
 
-        tabHandler.setOnTabButtonClickListener(new AppDrawerTabFragment.TabButtonClickListener(){
+        tabHandler.setOnTabButtonClickListener(new AppDrawerTabFragment.TabButtonClickListener() {
 
             @Override
             public void onClick(TabInfo tab, int position) {
@@ -293,14 +291,14 @@ public class TabbedAppDrawerFragment extends Fragment {
                     case DragEvent.ACTION_DRAG_LOCATION: {
                         // Do nothing if inside 'Move to Home Page' zone
                         if (!Utils.isBeyondRightHandThreshold(getActivity(), dragEvent)) {
-                             // Check if the drag is hovering over a tab button
-                             int i = tabHandler.getHoveringTab(dragEvent.getX(), dragEvent.getY());
-                             // If so, change to that tab
-                             if (i > -1) {
-                                 hasTabHoverOccurred = true;
-                                 tabHandler.setTab(i);
-                             }
-                         }
+                            // Check if the drag is hovering over a tab button
+                            int i = tabHandler.getHoveringTab(dragEvent.getX(), dragEvent.getY());
+                            // If so, change to that tab
+                            if (i > -1) {
+                                hasTabHoverOccurred = true;
+                                tabHandler.setTab(i);
+                            }
+                        }
                         break;
                     }
 
@@ -320,7 +318,7 @@ public class TabbedAppDrawerFragment extends Fragment {
                         }
                         // Add shortcut to home page if dragged to far right
                         else if (Utils.isBeyondRightHandThreshold(getActivity(), dragEvent)) {
-                            moveToHomeScreen((LauncherActivity)getActivity(), appTable);
+                            moveToHomeScreen((LauncherActivity) getActivity(), appTable);
                         }
                         // Transfer app to another folder
                         else if (hasTabHoverOccurred) {
@@ -364,19 +362,19 @@ public class TabbedAppDrawerFragment extends Fragment {
         uninstall_indicator.setVisibility(View.VISIBLE);
 
         // And start the animation
-        AlphaAnimation animation =  new AlphaAnimation(0.0f, 1.0f);
+        AlphaAnimation animation = new AlphaAnimation(0.0f, 1.0f);
         animation.setDuration(500);
         uninstall_indicator.startAnimation(animation);
     }
 
     private void hideUninstallIndicator() {
         FrameLayout uninstall_indicator;
-        uninstall_indicator = (FrameLayout)rootView.findViewById(R.id.uninstall_indicator);
+        uninstall_indicator = (FrameLayout) rootView.findViewById(R.id.uninstall_indicator);
         uninstall_indicator.setVisibility(View.INVISIBLE);
     }
 
     private void launchUninstallIntent(String package_name) {
-        Uri packageUri = Uri.parse("package:"+package_name);
+        Uri packageUri = Uri.parse("package:" + package_name);
         Intent uninstallIntent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
         startActivity(uninstallIntent);
     }
@@ -399,7 +397,7 @@ public class TabbedAppDrawerFragment extends Fragment {
         // Retrieve tab fragment
         android.support.v4.app.FragmentManager fm = getChildFragmentManager();
         TabInfo tab = tabHandler.getCurrentTab();
-        AppDrawerTabFragment fragment = (AppDrawerTabFragment)fm.findFragmentByTag(tab.getTag());
+        AppDrawerTabFragment fragment = (AppDrawerTabFragment) fm.findFragmentByTag(tab.getTag());
 
         // Add app and refresh the tab's layout
         fragment.addApp(appTable);
@@ -421,9 +419,9 @@ public class TabbedAppDrawerFragment extends Fragment {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                switch (i){
+                switch (i) {
                     case 0:
-                        moveToHomeScreen((LauncherActivity)getActivity(), appTable);
+                        moveToHomeScreen((LauncherActivity) getActivity(), appTable);
                         break;
                 }
             }

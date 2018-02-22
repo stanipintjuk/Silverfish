@@ -19,7 +19,7 @@ public class PackageModifiedReceiver extends BroadcastReceiver {
             boolean removed = intent.getAction().equals(PACKAGE_REMOVED);
             if (added || removed) {
                 final String pkg = intent.getDataString().split(":")[1];
-                final App app = (App)context.getApplicationContext();
+                final App app = (App) context.getApplicationContext();
                 final LauncherSQLiteHelper sql = new LauncherSQLiteHelper(app);
 
                 if (added) {
