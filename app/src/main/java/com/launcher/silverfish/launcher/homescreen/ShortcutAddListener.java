@@ -19,9 +19,11 @@
 
 package com.launcher.silverfish.launcher.homescreen;
 
+import com.launcher.silverfish.dbmodel.AppTable;
+
 /**
  * Used for communication between the launcher activity and the home screen fragment.
  */
 public interface ShortcutAddListener {
-    void OnShortcutAdd(String appName);
+    void OnShortcutAdd(AppTable appTable);
 }

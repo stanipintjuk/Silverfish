@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.pm.ResolveInfo;
 
 import com.launcher.silverfish.R;
+import com.launcher.silverfish.dbmodel.AppTable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -93,45 +95,50 @@ public final class PackagesCategories {
 
     //region Set each package category
 
-    public static HashMap<String, Long> setCategories(Context ctx,
-                                                         List<ResolveInfo> activities)
+    public static List<AppTable> setCategoriesForAppTable(Context ctx,
+                                                          List<ResolveInfo> activities)
     {
-        return setCategories(activities, getPredefinedCategories(ctx), getKeywords());
+        return setCategoriesForAppTable(activities, getPredefinedCategories(ctx), getKeywords());
     }
 
-    public static HashMap<String, Long> setCategories(List<ResolveInfo> activities,
-                                                         HashMap<String, String> categories,
-                                                         HashMap<String, String[]> keywords)
+    public static List<AppTable> setCategoriesForAppTable(List<ResolveInfo> activities,
+                                                          HashMap<String, String> categories,
+                                                          HashMap<String, String[]> keywords)
     {
-        HashMap<String, Long> pkg_categoryId = new HashMap<>();
-        String pkg;
+        List<AppTable> apps = new ArrayList<>();
         long categoryId;
+        for (ResolveInfo ri : activities) {
+            String activityName = ri.activityInfo.name;
+            String packageName = ri.activityInfo.packageName;
 
-        for (int i = 0; i < activities.size(); i++) {
-            ResolveInfo ri = activities.get(i);
-            pkg = ri.activityInfo.packageName;
+            AppTable appTable = new AppTable();
+            appTable.setActivityName(activityName);
+            appTable.setPackageName(packageName);
 
 
-            if (categories.containsKey(pkg)) {
-                categoryId = getCategoryId(categories.get(pkg));
+            if (categories.containsKey(packageName)) {
+                categoryId = getCategoryId(categories.get(packageName));
 
                 // Only add if not default
                 if (categoryId > 1) {
-                    pkg_categoryId.put(pkg, categoryId);
+                    appTable.setTabId(categoryId);
+                    apps.add(appTable);
                 }
             }
             // Intelligent fallback: Try to guess the category
             else {
-                pkg = pkg.toLowerCase();
+                String _packageName = packageName.toLowerCase();
                 for (String key : keywords.keySet()) {
-                    if (containsKeyword(pkg, keywords.get(key))) {
-                        pkg_categoryId.put(pkg, getCategoryId(key));
+                    if (containsKeyword(_packageName, keywords.get(key))) {
+                        appTable.setTabId(getCategoryId(key));
+                        apps.add(appTable);
+                        break;
                     }
                 }
             }
         }
 
-        return pkg_categoryId;
+        return apps;
     }
 
     //endregion

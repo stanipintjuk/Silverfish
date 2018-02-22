@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.launcher.silverfish.dbmodel.ShortcutTable;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 public class LauncherReceiver extends BroadcastReceiver {
@@ -15,6 +16,7 @@ public class LauncherReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(INSTALL_SHORTCUT)) {
             Intent target = intent.getParcelableExtra(Intent.EXTRA_SHORTCUT_INTENT);
+
             if (target == null)
                 return; // No target, do nothing
 
@@ -28,8 +30,12 @@ public class LauncherReceiver extends BroadcastReceiver {
             final LauncherSQLiteHelper sql =
                     new LauncherSQLiteHelper((App)context.getApplicationContext());
 
-            if (sql.canAddShortcut(target.getPackage()))
-                sql.addShortcut(target.getPackage());
+            String intentUri = target.toUri(Intent.URI_INTENT_SCHEME);
+            ShortcutTable shortcutTable = new ShortcutTable(null,
+                    target.getComponent().getPackageName(),
+                    target.getComponent().getClassName(), intentUri);
+            if (sql.canAddShortcut(shortcutTable))
+                sql.addShortcut(shortcutTable);
         }
     }
 }

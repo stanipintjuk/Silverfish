@@ -30,12 +30,12 @@ import com.launcher.silverfish.launcher.App;
 
 import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.query.QueryBuilder;
+import org.greenrobot.greendao.query.WhereCondition;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class LauncherSQLiteHelper {
+
     private DaoSession mSession;
 
     public LauncherSQLiteHelper(App app) {
@@ -76,32 +76,29 @@ public class LauncherSQLiteHelper {
                 .list();
     }
 
-    public List<AppTable> getAllApps() {
-        return mSession.getAppTableDao().loadAll();
-    }
-
-    public boolean containsApp(String packageName) {
+    /*  Looks like this is unused. Commenting out (YAGNI).
+        public List<AppTable> getAllApps() {
+            return mSession.getAppTableDao().loadAll();
+        }
+    */
+    public boolean containsApp(String activityName) {
         return mSession.getAppTableDao().queryBuilder()
-                .where(AppTableDao.Properties.PackageName.eq(packageName))
+                .where(AppTableDao.Properties.ActivityName.eq(activityName))
                 .unique() != null;
     }
 
-    public void addAppToTab(String packageName, long tabId) {
-        mSession.getAppTableDao().insert(new AppTable(null, packageName, tabId));
+    public void addAppToTab(AppTable appTable) {
+        mSession.getAppTableDao().insert(appTable);
     }
 
-    public void addAppsToTab(Map<String, Long> pkg_categoryId) {
-        List<AppTable> apps = new LinkedList<>();
-        for (Map.Entry<String, Long> entry : pkg_categoryId.entrySet()) {
-            apps.add(new AppTable(null, entry.getKey(), entry.getValue()));
-        }
+    public void addAppsToTab(List<AppTable> apps) {
         mSession.getAppTableDao().insertInTx(apps);
     }
 
-    public void removeAppFromTab(String packageName, long tabId) {
+    public void removeAppFromTab(AppTable appTable) {
         QueryBuilder qb = mSession.getAppTableDao().queryBuilder();
-        AppTable app = (AppTable)qb.where(qb.and(AppTableDao.Properties.TabId.eq(tabId),
-                AppTableDao.Properties.PackageName.eq(packageName))).unique();
+        AppTable app = (AppTable) qb.where(qb.and(AppTableDao.Properties.TabId.eq(appTable.getTabId()),
+                AppTableDao.Properties.ActivityName.eq(appTable.getActivityName()))).unique();
 
         if (app != null)
             mSession.getAppTableDao().delete(app);
@@ -111,14 +108,27 @@ public class LauncherSQLiteHelper {
         mSession.getAppTableDao().deleteInTx(apps);
     }
 
-    public boolean canAddShortcut(String packageName) {
-        return mSession.getShortcutTableDao().queryBuilder()
-                .where(ShortcutTableDao.Properties.PackageName.eq(packageName))
+    public boolean canAddShortcut(ShortcutTable shortcutTable) {
+        WhereCondition commonCondition = mSession.getShortcutTableDao().queryBuilder().and(
+                ShortcutTableDao.Properties.ActivityName.eq(shortcutTable.getActivityName()),
+                ShortcutTableDao.Properties.PackageName.eq(shortcutTable.getPackageName())
+        );
+        if (shortcutTable.getIntentUri() != null) {
+            return mSession.getShortcutTableDao().queryBuilder()
+                    .where(commonCondition,
+                            ShortcutTableDao.Properties.IntentUri.eq(shortcutTable.getIntentUri()))
                 .unique() == null;
+        } else {
+            return mSession.getShortcutTableDao().queryBuilder()
+                    .where(commonCondition,
+                            ShortcutTableDao.Properties.IntentUri.isNull())
+                    .unique() == null;
+        }
     }
 
-    public long addShortcut(String packageName) {
-        return mSession.getShortcutTableDao().insert(new ShortcutTable(null, packageName));
+    public long addShortcut(ShortcutTable shortcutTable) {
+        shortcutTable.setId(null);
+        return mSession.getShortcutTableDao().insert(shortcutTable);
     }
 
     public long getShortcutId(String packageName) {

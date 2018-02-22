@@ -26,7 +26,6 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.DragEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -34,14 +33,13 @@ import android.view.View;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.launcher.homescreen.HomeScreenFragment;
 import com.launcher.silverfish.launcher.homescreen.ShortcutAddListener;
 import com.launcher.silverfish.launcher.settings.SettingsScreenFragment;
-import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 import com.launcher.silverfish.utils.PackagesCategories;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -126,15 +124,13 @@ public class LauncherActivity extends FragmentActivity
 
         // Get all activities that have those filters
         List<ResolveInfo> availableActivities = mPacMan.queryIntentActivities(i, 0);
-
-
         // Store here the packages and their categories IDs
         // This will allow us to add all the apps at once instead opening the database over and over
-        HashMap<String, Long> pkg_categoryId =
-                PackagesCategories.setCategories(getApplicationContext(), availableActivities);
+        List<AppTable> apps =
+                PackagesCategories.setCategoriesForAppTable(getApplicationContext(), availableActivities);
 
         // Then add all the apps to their corresponding tabs at once
-        sql.addAppsToTab(pkg_categoryId);
+        sql.addAppsToTab(apps);
     }
 
     //endregion
@@ -163,9 +159,9 @@ public class LauncherActivity extends FragmentActivity
         return (HomeScreenFragment)mCollectionPagerAdapter.instantiateItem(mViewPager, 1);
     }
 
-    public boolean addShortcut(String appName) {
+    public boolean addShortcut(AppTable appTable) {
         if (getFragShortcutAddListenerRefreshListener() != null) {
-            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appName);
+            getFragShortcutAddListenerRefreshListener().OnShortcutAdd(appTable);
             return true;
         }
         else
@@ -224,8 +220,10 @@ public class LauncherActivity extends FragmentActivity
 
     private void dropItem(DragEvent dragEvent) {
         if (mViewPager.getCurrentItem() == 1) {
-            String appName = dragEvent.getClipData().getItemAt(0).getText().toString();
-            addShortcut(appName);
+            AppTable appTable = new AppTable();
+            appTable.setPackageName(dragEvent.getClipData().getItemAt(0).getText().toString());
+            appTable.setActivityName(dragEvent.getClipData().getItemAt(1).getText().toString());
+            addShortcut(appTable);
         }
     }
 

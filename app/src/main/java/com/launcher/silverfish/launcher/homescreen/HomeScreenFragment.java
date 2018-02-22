@@ -27,7 +27,7 @@ import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -49,6 +49,7 @@ import android.widget.Toast;
 import com.launcher.silverfish.R;
 import com.launcher.silverfish.common.Constants;
 import com.launcher.silverfish.common.Utils;
+import com.launcher.silverfish.dbmodel.AppTable;
 import com.launcher.silverfish.dbmodel.ShortcutTable;
 import com.launcher.silverfish.launcher.App;
 import com.launcher.silverfish.launcher.LauncherActivity;
@@ -59,6 +60,7 @@ import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,17 +120,14 @@ public class HomeScreenFragment extends Fragment  {
         ((LauncherActivity)getActivity())
                 .setFragShortcutAddListenerRefreshListener(new ShortcutAddListener() {
             @Override
-            public void OnShortcutAdd(String appName) {
+            public void OnShortcutAdd(AppTable appTable) {
                 // Insert it into the database and get the row id
                 // TODO: Check if an error has occurred while inserting into database.
-                if (sqlHelper.canAddShortcut(appName)) {
-                    long appId = sqlHelper.addShortcut(appName);
-
-                    // Create shortcut and add it
-                    ShortcutTable shortcut = new ShortcutTable();
-                    shortcut.setPackageName(appName);
-                    shortcut.setId(appId);
-                    if (addAppToView(shortcut)) {
+                ShortcutTable shortcutTable = new ShortcutTable(null, appTable.getPackageName(),
+                        appTable.getActivityName(), null);
+                if (sqlHelper.canAddShortcut(shortcutTable)) {
+                    sqlHelper.addShortcut(shortcutTable);
+                    if (addAppToView(shortcutTable)) {
                         updateShortcuts();
                     }
                 }
@@ -176,15 +175,16 @@ public class HomeScreenFragment extends Fragment  {
 
     private boolean addAppToView(ShortcutTable shortcut) {
         try {
-            ApplicationInfo appInfo = mPacMan.getApplicationInfo(
-                    shortcut.getPackageName(), PackageManager.GET_META_DATA);
+            ActivityInfo activityInfo = mPacMan.getActivityInfo(
+                    new ComponentName(shortcut.getPackageName(), shortcut.getActivityName()), PackageManager.GET_META_DATA);
             AppDetail appDetail = new AppDetail();
-            appDetail.label = mPacMan.getApplicationLabel(appInfo);
-
+            appDetail.label = activityInfo.loadLabel(mPacMan);
+            appDetail.intentUri = shortcut.getIntentUri();
             // load the icon later in an async task
             appDetail.icon = null;
 
             appDetail.packageName = shortcut.getPackageName();
+            appDetail.activityName = shortcut.getActivityName();
             appDetail.id = shortcut.getId();
 
             appsList.add(appDetail);
@@ -234,7 +234,7 @@ public class HomeScreenFragment extends Fragment  {
 
             // load the app icon in an async task
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
-            Utils.loadAppIconAsync(mPacMan, app.packageName.toString(), im);
+            Utils.loadAppIconAsync(mPacMan, app, im);
 
             TextView tv = (TextView)convertView.findViewById(R.id.item_app_label);
             tv.setText(app.label);
@@ -255,7 +255,17 @@ public class HomeScreenFragment extends Fragment  {
                         case MotionEvent.ACTION_UP:
                             // We only want to launch the activity if the touch was not consumed yet!
                             if (!touchConsumed) {
-                                Intent i = mPacMan.getLaunchIntentForPackage(app.packageName.toString());
+                                Intent i = new Intent();
+                                if (app.intentUri != null) {
+                                    try {
+                                        i = Intent.parseUri(app.intentUri.toString(), Intent.URI_INTENT_SCHEME);
+                                    } catch (URISyntaxException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    i.setAction(Intent.ACTION_MAIN);
+                                    i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                                }
                                 if (i != null) {
                                     // Sanity check (application may have been uninstalled)
                                     // TODO Remove it from the database

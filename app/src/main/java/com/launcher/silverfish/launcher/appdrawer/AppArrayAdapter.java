@@ -3,12 +3,11 @@ package com.launcher.silverfish.launcher.appdrawer;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -22,6 +21,7 @@ import com.launcher.silverfish.common.Utils;
 import com.launcher.silverfish.models.AppDetail;
 import com.launcher.silverfish.shared.Settings;
 
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -60,7 +60,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         }
 
         // load the app icon in an async task
-        Utils.loadAppIconAsync(mPackageManager, app.packageName.toString(), viewHolder.appIcon);
+        Utils.loadAppIconAsync(mPackageManager, app, viewHolder.appIcon);
 
         //final TextView appLabel = (TextView) view.findViewById(R.id.item_app_label);
         viewHolder.appLabel.setText(app.label);
@@ -73,6 +73,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
                 // Add data to the clipboard
                 String[] mime_type = {ClipDescription.MIMETYPE_TEXT_PLAIN};
                 ClipData data = new ClipData(Constants.DRAG_APP_MOVE, mime_type, new ClipData.Item(app.packageName.toString()));
+                data.addItem(new ClipData.Item(app.activityName.toString()));
                 data.addItem(new ClipData.Item(Integer.toString(position)));
                 data.addItem(new ClipData.Item(mTag));
 
@@ -97,7 +98,17 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = mPackageManager.getLaunchIntentForPackage(app.packageName.toString());
+                Intent i = new Intent();
+                if (app.intentUri != null) {
+                    try {
+                        i = Intent.parseUri(app.intentUri.toString(), Intent.URI_INTENT_SCHEME);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    i.setAction(Intent.ACTION_MAIN);
+                    i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                }
                 if (i != null) {
                     // Sanity check (application may have been uninstalled)
                     // TODO Remove it from the database

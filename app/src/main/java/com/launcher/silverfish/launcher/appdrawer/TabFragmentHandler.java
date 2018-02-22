@@ -40,9 +40,7 @@ import com.launcher.silverfish.shared.Settings;
 import com.launcher.silverfish.sqlite.LauncherSQLiteHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Stanislav Pintjuk on 8/12/16.
@@ -340,16 +338,18 @@ public class TabFragmentHandler {
             right.rename(leftName);
 
             // And now swap the applications by updating their category
-            Map<String, Long> leftApps = new HashMap<>();
+            List<AppTable> leftApps = new ArrayList<>();
             for (AppTable app : sql.getAppsForTab(left.getId())) {
                 long category = rightIndex + 1; // Categories start one over
-                leftApps.put(app.getPackageName(), category);
+                app.setTabId(category);
+                leftApps.add(app);
             }
 
-            Map<String, Long> rightApps = new HashMap<>();
+            List<AppTable> rightApps = new ArrayList<>();
             for (AppTable app : sql.getAppsForTab(right.getId())) {
                 long category = leftIndex + 1; // Categories start one over
-                rightApps.put(app.getPackageName(), category);
+                app.setTabId(category);
+                rightApps.add(app);
             }
 
             // First remove the apps from their original tab, we don't want duplicates!
