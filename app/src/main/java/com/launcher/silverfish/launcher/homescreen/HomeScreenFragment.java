@@ -20,19 +20,23 @@
 package com.launcher.silverfish.launcher.homescreen;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.appwidget.AppWidgetHostView;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MotionEventCompat;
+import android.text.Html;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -234,7 +238,7 @@ public class HomeScreenFragment extends Fragment  {
 
             // load the app icon in an async task
             ImageView im = (ImageView)convertView.findViewById(R.id.item_app_icon);
-            Utils.loadAppIconAsync(mPacMan, app, im);
+            Utils.loadAppIconAsync(mPacMan, app.packageName.toString(), im);
 
             TextView tv = (TextView)convertView.findViewById(R.id.item_app_label);
             tv.setText(app.label);
@@ -341,7 +345,6 @@ public class HomeScreenFragment extends Fragment  {
                         //Don't do anything
                         break;
                     case DragEvent.ACTION_DROP:
-
                         // If outside of bound, remove the app
                         if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
                             String appId = dragEvent.getClipData().getItemAt(0).getText().toString();
@@ -374,8 +377,6 @@ public class HomeScreenFragment extends Fragment  {
             }
         });
     }
-
-    //endregion
 
     //region Widgets
 

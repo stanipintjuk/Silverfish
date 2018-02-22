@@ -78,8 +78,6 @@ public class LauncherActivity extends FragmentActivity
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mCollectionPagerAdapter);
         mViewPager.setCurrentItem(getIntent().getIntExtra(START_PAGE, 1));
-
-        setDragListener();
     }
 
     //endregion
@@ -176,36 +174,6 @@ public class LauncherActivity extends FragmentActivity
 
     //region Listeners
 
-    private void setDragListener() {
-        mViewPager.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()) {
-                    case DragEvent.ACTION_DRAG_STARTED:
-                        // Only care about the DRAG_APP_MOVE description.
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
-                            return false;
-                        break;
-                    case DragEvent.ACTION_DRAG_ENTERED:
-                        // Don't do anything
-                        break;
-                    case DragEvent.ACTION_DRAG_LOCATION:
-                        changePage(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DROP:
-                        dropItem(dragEvent);
-                        break;
-                    case DragEvent.ACTION_DRAG_ENDED:
-                        // Don't do anything
-                        break;
-
-                }
-                return true;
-            }
-        });
-    }
-
     public ShortcutAddListener getFragShortcutAddListenerRefreshListener() {
         return shortcutAddListener;
     }
@@ -228,11 +196,10 @@ public class LauncherActivity extends FragmentActivity
     }
 
     private void changePage(DragEvent dragEvent) {
-        // Change page mid drag if drag is within threshold
-        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
 
         // Get display size
         int width = Utils.getScreenDimensions(this).x;
+        int threshold = (int)(Constants.DRAG_THRESHOLD_PERCENT_X * width);
 
         // Change page
         if (mViewPager.getCurrentItem() == 0 && dragEvent.getX() >= width - threshold) {

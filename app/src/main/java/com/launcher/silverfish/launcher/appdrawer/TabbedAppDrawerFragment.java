@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
 import android.text.InputType;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -257,24 +258,27 @@ public class TabbedAppDrawerFragment extends Fragment {
         });
     }
 
-    private float dragOffsetX, dragOffsetY;
-
     private void setOnDragListener() {
 
         rootView.setOnDragListener(new View.OnDragListener() {
+
+            private float dragBeginX, dragOffsetX, dragBeginY, dragOffsetY;
+            boolean hasTabHoverOccurred;
+
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
+                String cdLabel = Utils.getClipLabel(dragEvent, "TappedAppDrawerFragment");
 
                 switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED: {
-                        // Care only about DRAG_APP_MOVE drags.
-                        ClipDescription cd = dragEvent.getClipDescription();
-                        if (!cd.getLabel().toString().equals(Constants.DRAG_APP_MOVE))
-                            return false;
+                        dragBeginX = dragEvent.getX();  // Starting position (x)
+                        dragBeginY = dragEvent.getY();  // Starting position (y)
+                        hasTabHoverOccurred = false;
 
-                        // Starting movement, drag offset is now reset to 0
-                        dragOffsetX = dragEvent.getX();
-                        dragOffsetY = dragEvent.getY();
+                        // Check ClipDescription label for expected value
+                        if (!cdLabel.equals(Constants.DRAG_APP_MOVE)) {
+                            return false;
+                        }
 
                         // Show the uninstall indicator
                         showUninstallIndicator();
@@ -287,26 +291,25 @@ public class TabbedAppDrawerFragment extends Fragment {
                     }
 
                     case DragEvent.ACTION_DRAG_LOCATION: {
-                        // If drag is on the way out of this page then stop receiving drag events
-                        int threshold = Constants.SCREEN_CORNER_THRESHOLD;
-                        // Get display size
-                        int screen_width = Utils.getScreenDimensions(getActivity()).x;
-                        if (dragEvent.getX() > screen_width - threshold) {
-                            return false;
-
-                        } else {
-
-                            // Check if the drag is hovering over a tab button
-                            int i = tabHandler.getHoveringTab(dragEvent.getX(), dragEvent.getY());
-
-                            // If so, change to that tab
-                            if (i > -1)
-                                tabHandler.setTab(i);
-                        }
+                        // Do nothing if inside 'Move to Home Page' zone
+                        if (!Utils.isBeyondRightHandThreshold(getActivity(), dragEvent)) {
+                             // Check if the drag is hovering over a tab button
+                             int i = tabHandler.getHoveringTab(dragEvent.getX(), dragEvent.getY());
+                             // If so, change to that tab
+                             if (i > -1) {
+                                 hasTabHoverOccurred = true;
+                                 tabHandler.setTab(i);
+                             }
+                         }
                         break;
                     }
 
                     case DragEvent.ACTION_DROP: {
+                        dragOffsetX = dragBeginX - dragEvent.getX();    // Total x movement (+/-)
+                        dragOffsetY = dragBeginY - dragEvent.getY();    // Total y movement (+/-)
+                        int absDragPx = (int) Math.max(Math.abs(dragOffsetX), Math.abs(dragOffsetY));
+                        int absIconPx = Utils.getIconDimPixels(getContext());
+
                         AppTable appTable = new AppTable();
                         appTable.setPackageName(dragEvent.getClipData().getItemAt(0).getText().toString());
                         appTable.setActivityName(dragEvent.getClipData().getItemAt(1).getText().toString());
@@ -314,30 +317,23 @@ public class TabbedAppDrawerFragment extends Fragment {
                         // If app is dropped on the uninstall indicator uninstall the app
                         if (Utils.onBottomCenterScreenEdge(getActivity(), dragEvent.getX(), dragEvent.getY())) {
                             launchUninstallIntent(appTable.getPackageName());
-                        } else {
-                            // If the user didn't move the application from its original
-                            // place (too much), then they might want to show a menu with more options
-                            float dragDistanceX = dragEvent.getX() - dragOffsetX;
-                            float dragDistanceY = dragEvent.getY() - dragOffsetY;
-                            Float distSq = (dragDistanceX * dragDistanceX) + (dragDistanceY * dragDistanceY);
-                            if (distSq < Constants.NO_DRAG_THRESHOLD_SQ) {
-                                showExtraOptionsMenu(appTable);
-                            } else {
-                                // Retrieve tha drop information  and remove it from the original tab
-                                int appIndex = Integer.parseInt(
-                                        dragEvent.getClipData().getItemAt(2).
-                                                getText().toString());
-
-                                String tabTag = dragEvent.getClipData().getItemAt(3)
-                                        .getText().toString();
-
-                                removeAppFromTab(appIndex, tabTag);
-
-                                // add it to the new tab
-                                String packageName = dragEvent.getClipData().getItemAt(0).getText().toString();
-                                String activityName = dragEvent.getClipData().getItemAt(1).getText().toString();
-                                dropAppInTab(new AppTable(null, packageName, activityName, null));
-                            }
+                        }
+                        // Add shortcut to home page if dragged to far right
+                        else if (Utils.isBeyondRightHandThreshold(getActivity(), dragEvent)) {
+                            moveToHomeScreen((LauncherActivity)getActivity(), appTable);
+                        }
+                        // Transfer app to another folder
+                        else if (hasTabHoverOccurred) {
+                            // TODO Drop!!!!!!!
+                            int appIndex = Integer.parseInt(
+                                    dragEvent.getClipData().getItemAt(2).getText().toString());
+                            String tabTag = dragEvent.getClipData().getItemAt(3).getText().toString();
+                            removeAppFromTab(appIndex, tabTag);
+                            dropAppInTab(appTable);
+                        }
+                        // Display submenu if 'minimal drag'
+                        else if (absDragPx < Constants.MIN_DRAG_ADJ * absIconPx) {
+                            showExtraOptionsMenu(appTable);
                         }
                         break;
                     }
@@ -427,15 +423,18 @@ public class TabbedAppDrawerFragment extends Fragment {
             public void onClick(DialogInterface dialogInterface, int i) {
                 switch (i){
                     case 0:
-                        LauncherActivity activity = (LauncherActivity)getActivity();
-                        activity.addShortcut(appTable);
-                        activity.moveToScreen(1);
+                        moveToHomeScreen((LauncherActivity)getActivity(), appTable);
                         break;
                 }
             }
         });
 
         builder.show();
+    }
+
+    private void moveToHomeScreen(LauncherActivity activity, AppTable appName) {
+        activity.addShortcut(appName);
+        activity.moveToScreen(1);
     }
 
     //endregion
