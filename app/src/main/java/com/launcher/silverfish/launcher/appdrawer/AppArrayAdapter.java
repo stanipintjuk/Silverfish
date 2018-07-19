@@ -3,7 +3,6 @@ package com.launcher.silverfish.launcher.appdrawer;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipDescription;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -113,8 +112,7 @@ public class AppArrayAdapter extends ArrayAdapter<AppDetail> {
                         e.printStackTrace();
                     }
                 } else {
-                    i.setAction(Intent.ACTION_MAIN);
-                    i.setComponent(new ComponentName(app.packageName.toString(), app.activityName.toString()));
+                    i = mPackageManager.getLaunchIntentForPackage(app.packageName.toString());
                 }
                 if (i != null) {
                     // Sanity check (application may have been uninstalled)
