@@ -17,7 +17,8 @@
         <activity
             android:name=".launcher.LauncherActivity"
             android:theme="@style/AppTheme"
-            android:label="Silverfish Launcher">
+            android:label="Silverfish Launcher"
+            android:excludeFromRecents="true">
             <!--android:theme="@android:style/Theme.Wallpaper.NoTitleBar"-->
 
             <intent-filter>
